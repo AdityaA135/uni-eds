@@ -214,5 +214,91 @@
         "valueType": "string"
       }
     ]
+  },
+  {
+    "id": "dell-hero-block",
+    "fields": [
+      {
+        "component": "text",
+        "name": "controlsText",
+        "label": "Controls Text",
+        "value": "Play,Pause",
+        "valueType": "string"
+      },
+      {
+        "component": "multifield",
+        "name": "slides",
+        "label": "Slides",
+        "fields": [
+          {
+            "component": "reference",
+            "name": "desktopImage",
+            "label": "Desktop Image",
+            "multi": false
+          },
+          {
+            "component": "reference",
+            "name": "mobileImage",
+            "label": "Mobile Image",
+            "multi": false
+          },
+          {
+            "component": "text",
+            "name": "eyebrow",
+            "label": "Eyebrow",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "title",
+            "label": "Title",
+            "valueType": "string"
+          },
+          {
+            "component": "textarea",
+            "name": "description",
+            "label": "Description",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "primaryText",
+            "label": "Primary Button Text",
+            "valueType": "string"
+          },
+          {
+            "component": "aem-content",
+            "name": "primaryLink",
+            "label": "Primary Button Link"
+          },
+          {
+            "component": "text",
+            "name": "secondaryText",
+            "label": "Secondary Button Text",
+            "valueType": "string"
+          },
+          {
+            "component": "aem-content",
+            "name": "secondaryLink",
+            "label": "Secondary Button Link"
+          },
+          {
+            "component": "select",
+            "name": "theme",
+            "label": "Theme",
+            "options": [
+              {
+                "name": "Dark",
+                "value": "dark"
+              },
+              {
+                "name": "Light",
+                "value": "light"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
