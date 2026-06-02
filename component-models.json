@@ -226,79 +226,90 @@
         "valueType": "string"
       },
       {
-        "component": "multifield",
-        "name": "slides",
-        "label": "Slides",
-        "fields": [
+        "component": "reference",
+        "name": "desktopImages",
+        "label": "Desktop Images",
+        "multi": true
+      },
+
+      {
+        "component": "reference",
+        "name": "mobileImages",
+        "label": "Mobile Images",
+        "multi": true
+      },
+
+      {
+        "component": "text",
+        "name": "eyebrows",
+        "label": "Eyebrows",
+        "multi": true,
+        "valueType": "string"
+      },
+
+      {
+        "component": "text",
+        "name": "titles",
+        "label": "Titles",
+        "multi": true,
+        "valueType": "string"
+      },
+
+      {
+        "component": "text",
+        "name": "descriptions",
+        "label": "Descriptions",
+        "multi": true,
+        "valueType": "string"
+      },
+
+      {
+        "component": "text",
+        "name": "primaryTexts",
+        "label": "Primary Button Texts",
+        "multi": true,
+        "valueType": "string"
+      },
+
+      {
+        "component": "aem-content",
+        "name": "primaryLinks",
+        "label": "Primary Button Links",
+        "multi": true
+      },
+
+      {
+        "component": "text",
+        "name": "secondaryTexts",
+        "label": "Secondary Button Texts",
+        "multi": true,
+        "valueType": "string"
+      },
+
+      {
+        "component": "aem-content",
+        "name": "secondaryLinks",
+        "label": "Secondary Button Links",
+        "multi": true
+      },
+
+      {
+        "component": "select",
+        "name": "themes",
+        "label": "Themes",
+        "multi": true,
+        "options": [
           {
-            "component": "reference",
-            "name": "desktopImage",
-            "label": "Desktop Image",
-            "multi": false
+            "name": "Dark",
+            "value": "dark"
           },
           {
-            "component": "reference",
-            "name": "mobileImage",
-            "label": "Mobile Image",
-            "multi": false
-          },
-          {
-            "component": "text",
-            "name": "eyebrow",
-            "label": "Eyebrow",
-            "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "title",
-            "label": "Title",
-            "valueType": "string"
-          },
-          {
-            "component": "textarea",
-            "name": "description",
-            "label": "Description",
-            "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "primaryText",
-            "label": "Primary Button Text",
-            "valueType": "string"
-          },
-          {
-            "component": "aem-content",
-            "name": "primaryLink",
-            "label": "Primary Button Link"
-          },
-          {
-            "component": "text",
-            "name": "secondaryText",
-            "label": "Secondary Button Text",
-            "valueType": "string"
-          },
-          {
-            "component": "aem-content",
-            "name": "secondaryLink",
-            "label": "Secondary Button Link"
-          },
-          {
-            "component": "select",
-            "name": "theme",
-            "label": "Theme",
-            "options": [
-              {
-                "name": "Dark",
-                "value": "dark"
-              },
-              {
-                "name": "Light",
-                "value": "light"
-              }
-            ]
+            "name": "Light",
+            "value": "light"
           }
         ]
       }
+
     ]
   }
 ]
