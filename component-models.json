@@ -216,18 +216,6 @@
     ]
   },
   {
-    "id": "dell-hero-block",
-    "fields": [
-      {
-        "component": "text",
-        "name": "controlsText",
-        "label": "Controls Text",
-        "value": "Play,Pause",
-        "valueType": "string"
-      }
-    ]
-  },
-  {
     "id": "dell-hero-slide",
     "fields": [
       {
