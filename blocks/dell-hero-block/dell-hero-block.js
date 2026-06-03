@@ -1,254 +1,306 @@
 export default function decorate(block) {
-  const rows = [...block.children];
+// =========================
+// CONTROLS
+// =========================
 
-  // CONTROLS
-  const controlsRow = rows[0];
+const controlsText =
+block.querySelector('[data-aue-prop="controlsText"]')
+?.textContent
+?.trim() || 'Play,Pause';
 
-  const controlsText = controlsRow.children[0]?.textContent.trim()
-    || 'Play,Pause';
+const [playLabel, pauseLabel] = controlsText.split(',');
 
-  const [playLabel, pauseLabel] = controlsText.split(',');
+const playText = playLabel?.trim() || 'Play';
 
-  const playText = playLabel?.trim() || 'Play';
+const pauseText = pauseLabel?.trim() || 'Pause';
 
-  const pauseText = pauseLabel?.trim() || 'Pause';
+// =========================
+// SLIDES
+// =========================
 
-  // SLIDES
-  const slides = rows.slice(1).map((row) => {
-    const cols = [...row.children];
+const slideNodes = [
+...block.querySelectorAll(
+'[data-aue-model="dell-hero-slide"]',
+),
+];
 
-    const pictureEls = row.querySelectorAll('picture');
+const slides = slideNodes.map((slideNode) => ({
+image:
+slideNode.querySelector(
+'[data-aue-prop="desktopImage"] img',
+)?.src || '',
 
-    const contentCol = cols[2];
 
-    const eyebrowEl = contentCol?.querySelector('p');
+mobileImage:
+  slideNode.querySelector(
+    '[data-aue-prop="mobileImage"] img',
+  )?.src || '',
 
-    const titleEl = contentCol?.querySelector('h2');
+eyebrow:
+  slideNode.querySelector(
+    '[data-aue-prop="eyebrow"]',
+  )?.textContent?.trim() || '',
 
-    const descriptionEl = contentCol?.querySelector('h3');
+title:
+  slideNode.querySelector(
+    '[data-aue-prop="title"]',
+  )?.textContent?.trim() || '',
 
-    const linkEls = contentCol?.querySelectorAll('a') || [];
+description:
+  slideNode.querySelector(
+    '[data-aue-prop="description"]',
+  )?.textContent?.trim() || '',
 
-    return {
-      image: pictureEls[0]?.querySelector('img')?.src || '',
+primaryText:
+  slideNode.querySelector(
+    '[data-aue-prop="primaryText"]',
+  )?.textContent?.trim() || '',
 
-      mobileImage:
-        pictureEls[1]?.querySelector('img')?.src || '',
+primaryLink:
+  slideNode.querySelector(
+    '[data-aue-prop="primaryLink"] a',
+  )?.href || '',
 
-      eyebrow:
-        eyebrowEl?.textContent.trim() || '',
+secondaryText:
+  slideNode.querySelector(
+    '[data-aue-prop="secondaryText"]',
+  )?.textContent?.trim() || '',
 
-      title:
-        titleEl?.textContent.trim() || '',
+secondaryLink:
+  slideNode.querySelector(
+    '[data-aue-prop="secondaryLink"] a',
+  )?.href || '',
 
-      description:
-        descriptionEl?.textContent.trim() || '',
+theme:
+  slideNode.querySelector(
+    '[data-aue-prop="theme"]',
+  )?.textContent?.trim() || 'dark',
 
-      primaryText:
-        linkEls[0]?.textContent.trim() || '',
 
-      primaryLink:
-        linkEls[0]?.href || '',
+}));
 
-      secondaryText:
-        linkEls[1]?.textContent.trim() || '',
+// CLEAR ORIGINAL UE MARKUP
 
-      secondaryLink:
-        linkEls[1]?.href || '',
-    };
-  });
+block.textContent = '';
 
-  block.textContent = '';
+// =========================
+// MAIN CAROUSEL
+// =========================
 
-  const carousel = document.createElement('section');
+const carousel = document.createElement('section');
 
-  carousel.className = 'hero-carousel-dell-hero-block';
+carousel.className = 'hero-carousel-dell-hero-block';
 
-  slides.forEach((slide, index) => {
-    const slideEl = document.createElement('div');
+slides.forEach((slide, index) => {
+const slideEl = document.createElement('div');
 
-    slideEl.className = `
-      hero-slide-dell-hero-block
-      ${index === 0 ? 'active' : ''}
+
+slideEl.className = `
+  hero-slide-dell-hero-block
+  ${index === 0 ? 'active' : ''}
+  ${
+
+
+slide.theme === 'light'
+? 'light-theme-dell-hero-block'
+: 'dark-theme-dell-hero-block'
+}
+`;
+
+
+slideEl.innerHTML = `
+  <div class="hero-content-dell-hero-block">
+
+    <p class="eyebrow-dell-hero-block">
+      ${slide.eyebrow || ''}
+    </p>
+
+    <h1 class="title-dell-hero-block">
+      ${slide.title || ''}
+    </h1>
+
+    <p class="desc-dell-hero-block">
+      ${slide.description || ''}
+    </p>
+
+    <div class="btn-wrap-dell-hero-block">
+
       ${
-  index % 2 === 0
-    ? 'dark-theme-dell-hero-block'
-    : 'light-theme-dell-hero-block'
-}
-    `;
 
-    slideEl.innerHTML = `
-      <div class="hero-content-dell-hero-block">
 
-        <p class="eyebrow-dell-hero-block">
-          ${slide.eyebrow || ''}
-        </p>
-
-        <h1 class="title-dell-hero-block">
-          ${slide.title || ''}
-        </h1>
-
-        <p class="desc-dell-hero-block">
-          ${slide.description || ''}
-        </p>
-
-        <div class="btn-wrap-dell-hero-block">
-
-          ${
-  slide.primaryText
-    ? `
-                <a
-                  href="${slide.primaryLink || '#'}"
-                  class="primary-btn-dell-hero-block"
-                >
-                  ${slide.primaryText}
-                </a>
-              `
-    : ''
+slide.primaryText
+? `               <a
+                href="${slide.primaryLink || '#'}"
+                class="primary-btn-dell-hero-block"               >
+                ${slide.primaryText}               </a>
+            `
+: ''
 }
 
-          ${
-  slide.secondaryText
-    ? `
-                <a
-                  href="${slide.secondaryLink || '#'}"
-                  class="outline-btn-dell-hero-block"
-                >
-                  ${slide.secondaryText}
-                </a>
-              `
-    : ''
+
+      ${
+
+
+slide.secondaryText
+? `               <a
+                href="${slide.secondaryLink || '#'}"
+                class="outline-btn-dell-hero-block"               >
+                ${slide.secondaryText}               </a>
+            `
+: ''
 }
 
-        </div>
-
-      </div>
-
-      <div class="hero-image-dell-hero-block">
-        <picture>
-
-          ${slide.mobileImage
-    ? `
-            <source
-              media="(max-width: 1023px)"
-              srcset="${slide.mobileImage}"
-            />
-          `
-    : ''}
-
-          <img
-            src="${slide.image}"
-            alt="${slide.title || 'Hero Banner'}"
-          />
-
-        </picture>
-      </div>
-    `;
-
-    carousel.append(slideEl);
-  });
-
-  // CONTROLS
-  const controls = document.createElement('div');
-
-  controls.className = 'carousel-controls-dell-hero-block';
-
-  controls.innerHTML = `
-    <div class="controls-group-dell-hero-block">
-
-      <button class="nav-btn-dell-hero-block prev-dell-hero-block">
-        &#8592;
-      </button>
-
-      <div class="slide-count-dell-hero-block">
-        <span class="current-slide-dell-hero-block">1</span>/${slides.length}
-      </div>
-
-      <button class="nav-btn-dell-hero-block next-dell-hero-block">
-        &#8594;
-      </button>
 
     </div>
 
-    <button class="pause-btn-dell-hero-block">
-      ${pauseText} ||
-    </button>
-  `;
+  </div>
 
-  carousel.append(controls);
+  <div class="hero-image-dell-hero-block">
+    <picture>
 
-  block.append(carousel);
+      ${slide.mobileImage
+? `
+        <source
+          media="(max-width: 1023px)"
+          srcset="${slide.mobileImage}"
+        />
+      `
+: ''}
 
-  // JS
-  const heroSlides = block.querySelectorAll(
-    '.hero-slide-dell-hero-block',
-  );
+      <img
+        src="${slide.image}"
+        alt="${slide.title || 'Hero Banner'}"
+      />
 
-  const nextBtn = block.querySelector(
-    '.next-dell-hero-block',
-  );
+    </picture>
+  </div>
+`;
 
-  const prevBtn = block.querySelector(
-    '.prev-dell-hero-block',
-  );
+carousel.append(slideEl);
 
-  const currentSlideText = block.querySelector(
-    '.current-slide-dell-hero-block',
-  );
 
-  const pauseBtn = block.querySelector(
-    '.pause-btn-dell-hero-block',
-  );
+});
 
-  let currentSlide = 0;
+// =========================
+// CONTROLS UI
+// =========================
 
-  let autoPlay = true;
+const controls = document.createElement('div');
 
-  function showSlide(index) {
-    heroSlides.forEach((slide) => {
-      slide.classList.remove('active');
-    });
+controls.className = 'carousel-controls-dell-hero-block';
 
-    heroSlides[index].classList.add('active');
+controls.innerHTML = ` <div class="controls-group-dell-hero-block">
 
-    currentSlideText.textContent = index + 1;
-  }
 
-  function nextSlide() {
-    currentSlide += 1;
+  <button class="nav-btn-dell-hero-block prev-dell-hero-block">
+    &#8592;
+  </button>
 
-    if (currentSlide >= heroSlides.length) {
-      currentSlide = 0;
-    }
+  <div class="slide-count-dell-hero-block">
+    <span class="current-slide-dell-hero-block">
+      1
+    </span>/${slides.length}
+  </div>
 
-    showSlide(currentSlide);
-  }
+  <button class="nav-btn-dell-hero-block next-dell-hero-block">
+    &#8594;
+  </button>
 
-  function prevSlide() {
-    currentSlide -= 1;
+</div>
 
-    if (currentSlide < 0) {
-      currentSlide = heroSlides.length - 1;
-    }
+<button class="pause-btn-dell-hero-block">
+  ${pauseText} ||
+</button>
 
-    showSlide(currentSlide);
-  }
 
-  nextBtn.addEventListener('click', nextSlide);
+`;
 
-  prevBtn.addEventListener('click', prevSlide);
+carousel.append(controls);
 
-  setInterval(() => {
-    if (autoPlay) {
-      nextSlide();
-    }
-  }, 5000);
+block.append(carousel);
 
-  pauseBtn.addEventListener('click', () => {
-    autoPlay = !autoPlay;
+// =========================
+// CAROUSEL LOGIC
+// =========================
 
-    pauseBtn.textContent = autoPlay
-      ? `${pauseText} ||`
-      : `${playText} ▶`;
-  });
+const heroSlides = block.querySelectorAll(
+'.hero-slide-dell-hero-block',
+);
+
+const nextBtn = block.querySelector(
+'.next-dell-hero-block',
+);
+
+const prevBtn = block.querySelector(
+'.prev-dell-hero-block',
+);
+
+const currentSlideText = block.querySelector(
+'.current-slide-dell-hero-block',
+);
+
+const pauseBtn = block.querySelector(
+'.pause-btn-dell-hero-block',
+);
+
+let currentSlide = 0;
+
+let autoPlay = true;
+
+function showSlide(index) {
+heroSlides.forEach((slide) => {
+slide.classList.remove('active');
+});
+
+
+heroSlides[index].classList.add('active');
+
+currentSlideText.textContent = index + 1;
+
+
+}
+
+function nextSlide() {
+currentSlide += 1;
+
+
+if (currentSlide >= heroSlides.length) {
+  currentSlide = 0;
+}
+
+showSlide(currentSlide);
+
+
+}
+
+function prevSlide() {
+currentSlide -= 1;
+
+
+if (currentSlide < 0) {
+  currentSlide = heroSlides.length - 1;
+}
+
+showSlide(currentSlide);
+
+
+}
+
+nextBtn.addEventListener('click', nextSlide);
+
+prevBtn.addEventListener('click', prevSlide);
+
+setInterval(() => {
+if (autoPlay) {
+nextSlide();
+}
+}, 5000);
+
+pauseBtn.addEventListener('click', () => {
+autoPlay = !autoPlay;
+pauseBtn.textContent = autoPlay
+  ? `${pauseText} ||`
+  : `${playText} ▶`;
+
+});
 }
