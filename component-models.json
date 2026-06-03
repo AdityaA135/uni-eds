@@ -224,73 +224,76 @@
         "label": "Controls Text",
         "value": "Play,Pause",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "dell-hero-slide",
+    "fields": [
+      {
+        "component": "reference",
+        "name": "desktopImage",
+        "label": "Desktop Image"
       },
       {
         "component": "reference",
-        "name": "desktopImages",
-        "label": "Desktop Images",
-        "multi": true
+        "name": "mobileImage",
+        "label": "Mobile Image"
       },
-
-      {
-        "component": "reference",
-        "name": "mobileImages",
-        "label": "Mobile Images",
-        "multi": true
-      },
-
       {
         "component": "text",
-        "name": "eyebrows",
-        "label": "Eyebrows",
-        "multi": true,
+        "name": "eyebrow",
+        "label": "Eyebrow",
         "valueType": "string"
       },
-
       {
         "component": "text",
-        "name": "titles",
-        "label": "Titles",
-        "multi": true,
+        "name": "title",
+        "label": "Title",
         "valueType": "string"
       },
-
+      {
+        "component": "textarea",
+        "name": "description",
+        "label": "Description",
+        "valueType": "string"
+      },
       {
         "component": "text",
-        "name": "descriptions",
-        "label": "Descriptions",
-        "multi": true,
+        "name": "primaryText",
+        "label": "Primary Button Text",
         "valueType": "string"
       },
-
-      {
-        "component": "text",
-        "name": "primaryTexts",
-        "label": "Primary Button Texts",
-        "multi": true,
-        "valueType": "string"
-      },
-
       {
         "component": "aem-content",
-        "name": "primaryLinks",
-        "label": "Primary Button Links",
-        "multi": true
+        "name": "primaryLink",
+        "label": "Primary Button Link"
       },
-
       {
         "component": "text",
-        "name": "secondaryTexts",
-        "label": "Secondary Button Texts",
-        "multi": true,
+        "name": "secondaryText",
+        "label": "Secondary Button Text",
         "valueType": "string"
       },
-
       {
         "component": "aem-content",
-        "name": "secondaryLinks",
-        "label": "Secondary Button Links",
-        "multi": true
+        "name": "secondaryLink",
+        "label": "Secondary Button Link"
+      },
+      {
+        "component": "select",
+        "name": "theme",
+        "label": "Theme",
+        "options": [
+          {
+            "name": "Dark",
+            "value": "dark"
+          },
+          {
+            "name": "Light",
+            "value": "light"
+          }
+        ]
       }
     ]
   }
