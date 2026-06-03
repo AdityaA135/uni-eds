@@ -291,25 +291,7 @@
         "name": "secondaryLinks",
         "label": "Secondary Button Links",
         "multi": true
-      },
-
-      {
-        "component": "select",
-        "name": "themes",
-        "label": "Themes",
-        "multi": true,
-        "options": [
-          {
-            "name": "Dark",
-            "value": "dark"
-          },
-          {
-            "name": "Light",
-            "value": "light"
-          }
-        ]
       }
-
     ]
   }
 ]
