@@ -232,13 +232,17 @@
     "fields": [
       {
         "component": "reference",
+        "valueType": "string",
         "name": "desktopImage",
-        "label": "Desktop Image"
+        "label": "Desktop Image",
+        "multi": false
       },
       {
         "component": "reference",
+        "valueType": "string",
         "name": "mobileImage",
-        "label": "Mobile Image"
+        "label": "Mobile Image",
+        "multi": false
       },
       {
         "component": "text",

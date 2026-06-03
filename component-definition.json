@@ -148,11 +148,10 @@
           "plugins": {
             "xwalk": {
               "page": {
-                "resourceType": "core/franklin/components/container/v1/container",
+                "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
-                  "name": "dell-hero-block",
-                  "filter": "dell-hero-block",
-                  "model": "dell-hero-block"
+                  "name": "Dell Hero Carousel",
+                  "filter": "dell-hero-block"
                 }
               }
             }
@@ -166,7 +165,7 @@
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block/item",
                 "template": {
-                  "name": "dell-hero-slide",
+                  "name": "Slide",
                   "model": "dell-hero-slide"
                 }
               }
