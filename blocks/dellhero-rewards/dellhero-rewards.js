@@ -1,6 +1,7 @@
 export default function decorate(block) {
   const row = block.children[0];
 
+  console.log("aditya");
   if (!row) return;
 
   const contentDiv = row.children[0];
@@ -23,6 +24,7 @@ export default function decorate(block) {
   const picture = imageDiv.querySelector('picture');
 
   // Build final structure
+   console.log("aditya");
   block.innerHTML = `
     <div>
       <div>
