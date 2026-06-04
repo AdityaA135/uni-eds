@@ -1,4 +1,3 @@
-```js
 export default function decorate(block) {
   const row = block.children[0];
 
@@ -58,4 +57,3 @@ export default function decorate(block) {
     </div>
   `;
 }
-```
