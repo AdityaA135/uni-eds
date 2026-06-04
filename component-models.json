@@ -216,6 +216,59 @@
     ]
   },
   {
+        "id": "dellhero-rewards",
+        "fields": [
+          {
+            "component": "text",
+            "name": "eyebrow",
+            "label": "Eyebrow Text",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "title",
+            "label": "Title",
+            "valueType": "string"
+          },
+          {
+            "component": "multiline",
+            "name": "description",
+            "label": "Description",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "primaryCtaText",
+            "label": "Primary CTA Text",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "primaryCtaLink",
+            "label": "Primary CTA Link",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "secondaryCtaText",
+            "label": "Secondary CTA Text",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "secondaryCtaLink",
+            "label": "Secondary CTA Link",
+            "valueType": "string"
+          },
+          {
+            "component": "reference",
+            "name": "image",
+            "label": "Image",
+            "valueType": "string"
+          }
+        ]
+  },
+  {
     "id": "dell-hero-slide",
     "fields": [
       {

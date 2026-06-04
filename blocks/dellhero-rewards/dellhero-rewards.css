@@ -1,0 +1,147 @@
+.dellhero {
+  background: #062f63;
+  padding: 70px 80px;
+}
+
+/* Main layout */
+.dellhero > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+/* Left content */
+.dellhero > div > div:first-child {
+  width: 42%;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Right image */
+.dellhero > div > div:last-child {
+  width: 58%;
+}
+
+/* Dell Rewards text */
+.dellhero p:first-child {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+
+  margin-top: 20;
+  margin-bottom: 8px;
+}
+
+/* Main heading */
+.dellhero h2 {
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 300;
+  color: white;
+
+  margin-top: 0;
+  margin-bottom: 18px;
+
+  max-width: 320px;
+}
+.dellhero.block div div p:nth-child(2){
+    font-size: 40px;
+}
+.dellhero.block div div p:nth-child(2){
+    max-width: 300px;
+}
+.dellhero.block div div p:nth-child(3){
+    max-width: 400px;
+}
+/* Description */
+.dellhero p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #dce7f5;
+
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+/* CTA wrapper spacing */
+.dellhero p:last-child {
+  margin-top: 18px;
+}
+
+/* CTA buttons */
+.dellhero a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 14px 28px;
+  border-radius: 4px;
+
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+
+  transition: all 0.3s ease;
+
+  margin-right: 18px;
+}
+
+/* Primary CTA */
+.dellhero a:first-of-type {
+  background: #0672cd;
+  border-color: #0672cd;
+  color: white;
+}
+
+/* Third/Tertiary CTA */
+.dellhero a:last-of-type {
+  background: transparent;
+  color: white;
+  padding-left: 0;
+}
+
+.dellhero a:last-of-type::after {
+  content: " →";
+  margin-left: 6px;
+}
+
+/* Image */
+.dellhero picture,
+.dellhero img {
+  width: 100%;
+  display: block;
+}
+
+.dellhero img {
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dellhero {
+    padding: 40px 20px;
+  }
+
+  .dellhero > div {
+    flex-direction: column;
+  }
+
+  .dellhero > div > div:first-child,
+  .dellhero > div > div:last-child {
+    width: 100%;
+  }
+
+  .dellhero h2 {
+    font-size: 34px;
+    max-width: 100%;
+  }
+
+  .dellhero img {
+    margin-top: 20px;
+  }
+}
