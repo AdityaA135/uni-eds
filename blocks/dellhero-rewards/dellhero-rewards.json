@@ -75,7 +75,7 @@
 
   "filters": [
     {
-      "id": "dellhero-rewards-filter",
+      "id": "dellhero-rewards",
       "components": [
         "dellhero-rewards"
       ]
