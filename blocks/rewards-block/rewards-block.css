@@ -1,0 +1,167 @@
+.demo-center-rewards-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 80px;
+
+  padding: 60px 80px;
+
+  background: #0b3768;
+  color: #fff;
+
+  min-height: 420px;
+  box-sizing: border-box;
+}
+
+.demo-center-rewards-block * {
+  box-sizing: border-box;
+}
+
+.demo-center-rewards-block__content {
+  flex: 1;
+  max-width: 520px;
+}
+
+.demo-center-rewards-block__eyebrow {
+  font-size: 16px;
+  font-weight: 400;
+
+  margin: 0 0 18px;
+}
+
+.demo-center-rewards-block__title {
+  font-size: 52px;
+  line-height: 1.1;
+  font-weight: 300;
+
+  margin: 0 0 24px;
+}
+
+.demo-center-rewards-block__description {
+  font-size: 22px;
+  line-height: 1.5;
+
+  margin: 0 0 36px;
+}
+
+.demo-center-rewards-block__actions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.demo-center-rewards-block__button,
+.demo-center-rewards-block__link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.demo-center-rewards-block__button {
+  background: #1683e2;
+  color: #fff;
+
+  padding: 16px 34px;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  transition: background 0.3s ease;
+}
+
+.demo-center-rewards-block__button:hover {
+  background: #2b94ef;
+}
+
+.demo-center-rewards-block__link {
+  color: #fff;
+
+  font-size: 20px;
+  font-weight: 500;
+
+  gap: 10px;
+}
+
+.demo-center-rewards-block__arrow {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.demo-center-rewards-block__image {
+  flex: 1;
+
+  display: flex;
+  justify-content: center;
+}
+
+.demo-center-rewards-block__image img {
+  width: 100%;
+  max-width: 620px;
+
+  display: block;
+  object-fit: cover;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+  .demo-center-rewards-block {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+
+    gap: 24px;
+
+    padding: 24px 20px 32px;
+  }
+
+  .demo-center-rewards-block__content {
+    max-width: 100%;
+  }
+
+  .demo-center-rewards-block__image {
+    width: 100%;
+  }
+
+  .demo-center-rewards-block__image img {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .demo-center-rewards-block__eyebrow {
+    font-size: 15px;
+
+    margin-bottom: 12px;
+  }
+
+  .demo-center-rewards-block__title {
+    font-size: 28px;
+    line-height: 1.15;
+
+    margin-bottom: 16px;
+  }
+
+  .demo-center-rewards-block__description {
+    font-size: 16px;
+    line-height: 1.5;
+
+    margin-bottom: 24px;
+  }
+
+  .demo-center-rewards-block__actions {
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .demo-center-rewards-block__button {
+    padding: 14px 22px;
+    font-size: 16px;
+  }
+
+  .demo-center-rewards-block__link {
+    font-size: 16px;
+  }
+
+  .demo-center-rewards-block__arrow {
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "definitions": [
+    {
+      "title": "Rewards Block",
+      "id": "rewards-block"
+    }
+  ],
+  "models": [
+    {
+      "id": "rewards-block",
+      "fields": [
+        {
+          "component": "text",
+          "name": "pretitle",
+          "label": "Pretitle"
+        },
+        {
+          "component": "text",
+          "name": "title",
+          "label": "Title"
+        },
+        {
+          "component": "text-area",
+          "name": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "component": "text",
+          "name": "primaryButtonText",
+          "label": "Primary Button Text"
+        },
+        {
+          "component": "text",
+          "name": "primaryButtonLink",
+          "label": "Primary Button Link"
+        },
+        {
+          "component": "text",
+          "name": "secondaryButtonText",
+          "label": "Secondary Button Text"
+        },
+        {
+          "component": "text",
+          "name": "secondaryButtonLink",
+          "label": "Secondary Button Link"
+        },
+        {
+          "component": "reference",
+          "name": "image",
+          "label": "Image",
+          "valueType": "string"
+        }
+      ]
+    }
+  ]
+}
