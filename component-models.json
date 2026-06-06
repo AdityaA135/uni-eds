@@ -273,8 +273,8 @@
     "fields": [
       {
         "component": "text",
-        "name": "pretitle",
-        "label": "Pretitle",
+        "name": "eyebrow",
+        "label": "Eyebrow Text",
         "valueType": "string"
       },
       {
@@ -284,32 +284,34 @@
         "valueType": "string"
       },
       {
-        "component": "textarea",
-        "name": "subtitle",
-        "label": "Subtitle",
+        "component": "multiline",
+        "name": "description",
+        "label": "Description",
         "valueType": "string"
       },
       {
         "component": "text",
-        "name": "primaryButtonText",
-        "label": "Primary Button Text",
+        "name": "primaryCtaText",
+        "label": "Primary CTA Text",
         "valueType": "string"
-      },
-      {
-        "component": "aem-content",
-        "name": "primaryButtonLink",
-        "label": "Primary Button Link"
       },
       {
         "component": "text",
-        "name": "secondaryButtonText",
-        "label": "Secondary Button Text",
+        "name": "primaryCtaLink",
+        "label": "Primary CTA Link",
         "valueType": "string"
       },
       {
-        "component": "aem-content",
-        "name": "secondaryButtonLink",
-        "label": "Secondary Button Link"
+        "component": "text",
+        "name": "secondaryCtaText",
+        "label": "Secondary CTA Text",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "secondaryCtaLink",
+        "label": "Secondary CTA Link",
+        "valueType": "string"
       },
       {
         "component": "reference",
