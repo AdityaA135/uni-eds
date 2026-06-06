@@ -5,38 +5,34 @@
       "section"
     ]
   },
-
   {
     "id": "section",
     "components": [
       "text",
       "image",
       "button",
+      "rewards-block",
       "title",
       "hero",
       "cards",
       "columns",
       "fragment",
       "dell-hero-block",
-      "dellhero-rewards",
-      "rewards-block"
+      "dellhero-rewards"
     ]
   },
-
   {
     "id": "cards",
     "components": [
       "card"
     ]
   },
-
   {
     "id": "columns",
     "components": [
       "column"
     ]
   },
-
   {
     "id": "column",
     "components": [
@@ -46,14 +42,12 @@
       "title"
     ]
   },
-
   {
     "id": "dell-hero-block",
     "components": [
       "dell-hero-slide"
     ]
   },
-
   {
     "id": "dellhero-rewards-filter",
     "components": [
