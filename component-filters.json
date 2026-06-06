@@ -5,6 +5,7 @@
       "section"
     ]
   },
+
   {
     "id": "section",
     "components": [
@@ -21,18 +22,21 @@
       "rewards-block"
     ]
   },
+
   {
     "id": "cards",
     "components": [
       "card"
     ]
   },
+
   {
     "id": "columns",
     "components": [
       "column"
     ]
   },
+
   {
     "id": "column",
     "components": [
@@ -42,12 +46,14 @@
       "title"
     ]
   },
+
   {
     "id": "dell-hero-block",
     "components": [
       "dell-hero-slide"
     ]
   },
+
   {
     "id": "dellhero-rewards-filter",
     "components": [
