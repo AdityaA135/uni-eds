@@ -213,8 +213,6 @@
         },
 
         {
-          "title": "Rewards Block",
-          "id": "rewards-block",
           "plugins": {
             "xwalk": {
               "page": {
