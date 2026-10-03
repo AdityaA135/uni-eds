@@ -370,11 +370,7 @@
             "label": "X Position (%)",
             "description": "Horizontal position from the left edge of the motor image. Enter 0 to 100.",
             "valueType": "string",
-            "required": true,
-            "validation": {
-              "regExp": "^(100|[0-9]{1,2})$",
-              "customErrorMsg": "Enter a value between 0 and 100."
-            }
+            "required": true
           },
           {
             "component": "text",
@@ -382,11 +378,7 @@
             "label": "Y Position (%)",
             "description": "Vertical position from the top edge of the motor image. Enter 0 to 100.",
             "valueType": "string",
-            "required": true,
-            "validation": {
-              "regExp": "^(100|[0-9]{1,2})$",
-              "customErrorMsg": "Enter a value between 0 and 100."
-            }
+            "required": true
           }
         ]
       }
