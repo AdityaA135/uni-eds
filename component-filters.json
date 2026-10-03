@@ -8,6 +8,7 @@
   {
     "id": "section",
     "components": [
+      "nav-tech",
       "text",
       "image",
       "button",
@@ -15,8 +16,7 @@
       "hero",
       "cards",
       "columns",
-      "fragment",
-      "nav-tech"
+      "fragment"
     ]
   },
   {
