@@ -8,7 +8,7 @@
   {
     "id": "section",
     "components": [
-      "nav-tech",
+      "nev-tech",
       "text",
       "image",
       "button",
