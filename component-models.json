@@ -366,7 +366,7 @@
           },
           {
             "component": "text",
-            "name": "x",
+            "name": "xaxis",
             "label": "X Position (%)",
             "description": "Horizontal position from the left edge of the motor image. Enter 0 to 100.",
             "valueType": "string",
@@ -374,7 +374,7 @@
           },
           {
             "component": "text",
-            "name": "y",
+            "name": "yaxis",
             "label": "Y Position (%)",
             "description": "Vertical position from the top edge of the motor image. Enter 0 to 100.",
             "valueType": "string",
