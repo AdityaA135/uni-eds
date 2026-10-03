@@ -98,30 +98,18 @@
               "required": true
             },
             {
-              "component": "number",
+              "component": "text",
               "name": "x",
               "label": "X Position (%)",
               "description": "Horizontal position from the left edge of the motor image.",
-              "valueType": "number",
-              "required": true,
-              "validation": {
-                "numberMin": 0,
-                "numberMax": 100,
-                "customErrorMsg": "Enter a value between 0 and 100."
-              }
+              "valueType": "string"
             },
             {
-              "component": "number",
+              "component": "text",
               "name": "y",
               "label": "Y Position (%)",
               "description": "Vertical position from the top edge of the motor image.",
-              "valueType": "number",
-              "required": true,
-              "validation": {
-                "numberMin": 0,
-                "numberMax": 100,
-                "customErrorMsg": "Enter a value between 0 and 100."
-              }
+              "valueType": "string"
             }
           ]
         }
