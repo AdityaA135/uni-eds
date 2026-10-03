@@ -15,10 +15,7 @@
       "hero",
       "cards",
       "columns",
-      "fragment",
-      "dell-hero-block",
-      "dellhero-rewards",
-      "rewards-block"
+      "fragment"
     ]
   },
   {
@@ -49,9 +46,15 @@
     ]
   },
   {
-    "id": "dellhero-rewards-filter",
+    "id": "nev-tech",
     "components": [
-      "dellhero-rewards"
+      "nev-tech-card"
+    ]
+  },
+  {
+    "id": "nev-tech-card",
+    "components": [
+      "nev-tech-module"
     ]
   }
 ]

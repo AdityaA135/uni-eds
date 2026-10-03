@@ -180,141 +180,13 @@
     ]
   },
   {
-    "id": "fragment",
-    "fields": [
-      {
-        "component": "aem-content",
-        "name": "reference",
-        "label": "Reference"
-      }
-    ]
-  },
-  {
-    "id": "hero",
-    "fields": [
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "image",
-        "label": "Image",
-        "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "imageAlt",
-        "label": "Alt",
-        "value": ""
-      },
-      {
-        "component": "richtext",
-        "name": "text",
-        "value": "",
-        "label": "Text",
-        "valueType": "string"
-      }
-    ]
-  },
-  {
-        "id": "dellhero-rewards",
-        "fields": [
-          {
-            "component": "text",
-            "name": "eyebrow",
-            "label": "Eyebrow Text",
-            "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "title",
-            "label": "Title",
-            "valueType": "string"
-          },
-          {
-            "component": "multiline",
-            "name": "description",
-            "label": "Description",
-            "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "primaryCtaText",
-            "label": "Primary CTA Text",
-            "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "primaryCtaLink",
-            "label": "Primary CTA Link",
-            "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "secondaryCtaText",
-            "label": "Secondary CTA Text",
-            "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "secondaryCtaLink",
-            "label": "Secondary CTA Link",
-            "valueType": "string"
-          },
-          {
-            "component": "reference",
-            "name": "image",
-            "label": "Image",
-            "valueType": "string"
-          }
-        ]
-  },
-  {
-    "id": "rewards-block",
+    "id": "dell-hero-block",
     "fields": [
       {
         "component": "text",
-        "name": "pretitle",
-        "label": "Pretitle",
-        "valueType": "string"
-      },
-      {
-        "component": "text",
-        "name": "title",
-        "label": "Title",
-        "valueType": "string"
-      },
-      {
-        "component": "textarea",
-        "name": "subtitle",
-        "label": "Subtitle",
-        "valueType": "string"
-      },
-      {
-        "component": "text",
-        "name": "primaryButtonText",
-        "label": "Primary Button Text",
-        "valueType": "string"
-      },
-      {
-        "component": "aem-content",
-        "name": "primaryButtonLink",
-        "label": "Primary Button Link"
-      },
-      {
-        "component": "text",
-        "name": "secondaryButtonText",
-        "label": "Secondary Button Text",
-        "valueType": "string"
-      },
-      {
-        "component": "aem-content",
-        "name": "secondaryButtonLink",
-        "label": "Secondary Button Link"
-      },
-      {
-        "component": "reference",
-        "name": "image",
-        "label": "Image",
+        "name": "controlsText",
+        "label": "Controls Text",
+        "value": "Play,Pause",
         "valueType": "string"
       }
     ]
@@ -390,6 +262,132 @@
             "value": "light"
           }
         ]
+      }
+    ]
+  },
+  {
+    "id": "fragment",
+    "fields": [
+      {
+        "component": "aem-content",
+        "name": "reference",
+        "label": "Reference"
+      }
+    ]
+  },
+  {
+    "id": "hero",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "nev-tech",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "nev-tech-card",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string",
+        "required": true
+      },
+      {
+        "component": "textarea",
+        "name": "description",
+        "label": "Description",
+        "valueType": "string",
+        "required": true
+      },
+      {
+        "component": "reference",
+        "name": "thumbnail",
+        "label": "Thumbnail",
+        "valueType": "string",
+        "required": true
+      },
+      {
+        "component": "reference",
+        "name": "motorImage",
+        "label": "Motor Image",
+        "valueType": "string",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "nev-tech-module",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string",
+        "required": true
+      },
+      {
+        "component": "textarea",
+        "name": "description",
+        "label": "Description",
+        "valueType": "string",
+        "required": true
+      },
+      {
+        "component": "number",
+        "name": "x",
+        "label": "X Position (%)",
+        "description": "Horizontal position from the left edge of the motor image.",
+        "valueType": "number",
+        "required": true,
+        "validation": {
+          "numberMin": 0,
+          "numberMax": 100,
+          "customErrorMsg": "Enter a value between 0 and 100."
+        }
+      },
+      {
+        "component": "number",
+        "name": "y",
+        "label": "Y Position (%)",
+        "description": "Vertical position from the top edge of the motor image.",
+        "valueType": "number",
+        "required": true,
+        "validation": {
+          "numberMin": 0,
+          "numberMax": 100,
+          "customErrorMsg": "Enter a value between 0 and 100."
+        }
       }
     ]
   }

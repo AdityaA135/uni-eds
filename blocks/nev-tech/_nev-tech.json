@@ -1,0 +1,157 @@
+{
+  "definitions": [
+    {
+      "title": "NEV Tech",
+      "id": "nev-tech",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "nev-tech",
+              "model": "nev-tech",
+              "filter": "nev-tech"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "NEV Tech Card",
+      "id": "nev-tech-card",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "nev-tech-card",
+              "model": "nev-tech-card",
+              "filter": "nev-tech-card"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "NEV Tech Module",
+      "id": "nev-tech-module",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "nev-tech-module",
+              "model": "nev-tech-module"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "nev-tech",
+      "fields": [
+        {
+          "component": "text",
+          "name": "title",
+          "label": "Title",
+          "valueType": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "nev-tech-card",
+      "fields": [
+        {
+          "component": "text",
+          "name": "title",
+          "label": "Title",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "component": "textarea",
+          "name": "description",
+          "label": "Description",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "component": "reference",
+          "name": "thumbnail",
+          "label": "Thumbnail",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "component": "reference",
+          "name": "motorImage",
+          "label": "Motor Image",
+          "valueType": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "nev-tech-module",
+      "fields": [
+        {
+          "component": "text",
+          "name": "title",
+          "label": "Title",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "component": "textarea",
+          "name": "description",
+          "label": "Description",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "component": "number",
+          "name": "x",
+          "label": "X Position (%)",
+          "description": "Horizontal position from the left edge of the motor image.",
+          "valueType": "number",
+          "required": true,
+          "validation": {
+            "numberMin": 0,
+            "numberMax": 100,
+            "customErrorMsg": "Enter a value between 0 and 100."
+          }
+        },
+        {
+          "component": "number",
+          "name": "y",
+          "label": "Y Position (%)",
+          "description": "Vertical position from the top edge of the motor image.",
+          "valueType": "number",
+          "required": true,
+          "validation": {
+            "numberMin": 0,
+            "numberMax": 100,
+            "customErrorMsg": "Enter a value between 0 and 100."
+          }
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "nev-tech",
+      "components": [
+        "nev-tech-card"
+      ]
+    },
+    {
+      "id": "nev-tech-card",
+      "components": [
+        "nev-tech-module"
+      ]
+    }
+  ]
+}
