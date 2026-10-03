@@ -51,16 +51,13 @@ function getReference(element) {
 
 /**
  * Get the actual field elements from an authored item.
- *
- * The generated EDS markup can contain wrapper divs, so we
- * intentionally work with the direct row/cell structure.
  */
 function getFieldElements(element) {
   return getChildren(element);
 }
 
 /**
- * Read a NEV Tech Module.
+ * Read one module from the Modules multifield.
  *
  * Module model:
  *
@@ -81,12 +78,25 @@ function readModule(moduleElement) {
 }
 
 /**
- * Determine whether an element is a NEV Tech Module.
+ * Determine whether an element looks like a Modules multifield
+ * container.
+ *
+ * The authored structure is:
+ *
+ * Card
+ * ├── Title
+ * ├── Description
+ * ├── Thumbnail
+ * ├── Motor Image
+ * └── Modules
  */
-function isModule(element) {
+function isModulesContainer(element) {
+  if (!element) return false;
+
   return (
-    element?.classList?.contains('nev-tech-module')
-    || element?.dataset?.blockName === 'nev-tech-module'
+    element.dataset?.aueProp === 'modules'
+    || element.classList?.contains('modules')
+    || element.classList?.contains('nev-tech-card-modules')
   );
 }
 
@@ -99,30 +109,57 @@ function isModule(element) {
  * Description
  * Thumbnail
  * Motor Image
- *
- * followed by child Module blocks.
+ * Modules (multi-field)
  */
 function readCard(cardElement) {
   const children = getChildren(cardElement);
 
   /*
-   * The first four children represent the authored fields.
-   * Module blocks are separate child blocks.
+   * The first four direct children represent:
+   *
+   * 0 = Title
+   * 1 = Description
+   * 2 = Thumbnail
+   * 3 = Motor Image
    */
-  const fields = children.filter(
-    (child) => !isModule(child),
-  );
+  const fields = children.slice(0, 4);
 
-  const moduleElements = children
-    .filter(isModule)
-    .slice(0, MAX_MODULES);
+  /*
+   * The fifth child is the Modules multifield container.
+   */
+  let modulesContainer = children[4];
+
+  /*
+   * Prefer an explicitly identified modules container if
+   * Universal Editor provides data-aue-prop/class information.
+   */
+  const identifiedModulesContainer = children.find(isModulesContainer);
+
+  if (identifiedModulesContainer) {
+    modulesContainer = identifiedModulesContainer;
+  }
+
+  /*
+   * Each direct child of the Modules container represents
+   * one complete module entry.
+   */
+  const moduleElements = modulesContainer
+    ? getChildren(modulesContainer).slice(0, MAX_MODULES)
+    : [];
 
   return {
     title: getText(fields[0]),
     description: getText(fields[1]),
     thumbnail: getReference(fields[2]),
     image: getReference(fields[3]),
-    modules: moduleElements.map(readModule),
+    modules: moduleElements
+      .map(readModule)
+      .filter((module) => (
+        module.title
+        || module.description
+        || module.x !== null
+        || module.y !== null
+      )),
   };
 }
 
@@ -158,7 +195,7 @@ function readBlockData(block) {
   );
 
   /*
-   * Cards are direct child item blocks.
+   * Cards are direct child blocks.
    */
   const cardElements = children
     .filter(isCard)
@@ -367,7 +404,6 @@ export default function decorate(block) {
     card.modules
       .slice(0, MAX_MODULES)
       .forEach((module) => {
-
         /*
          * Invalid module data should not break
          * the rest of the component.
@@ -388,10 +424,6 @@ export default function decorate(block) {
 
         /*
          * Author-controlled position.
-         *
-         * Example:
-         * left: 73%;
-         * top: 42%;
          */
         wrapper.style.left =
           `${module.x}%`;
@@ -477,7 +509,6 @@ export default function decorate(block) {
         button.addEventListener(
           'click',
           (event) => {
-
             event.stopPropagation();
 
             /*
@@ -516,7 +547,6 @@ export default function decorate(block) {
         closeButton.addEventListener(
           'click',
           (event) => {
-
             event.stopPropagation();
 
             closePopover();
@@ -591,7 +621,6 @@ export default function decorate(block) {
     );
 
     window.setTimeout(() => {
-
       activeIndex = index;
 
       renderCard();
@@ -601,7 +630,6 @@ export default function decorate(block) {
           'is-changing',
         );
       });
-
     }, SLIDE_CHANGE_DURATION);
   }
 
@@ -611,7 +639,6 @@ export default function decorate(block) {
   ui.ui.addEventListener(
     'click',
     (event) => {
-
       if (
         !event.target.closest(
           '.nev-tech__hotspot-wrapper',
@@ -628,11 +655,9 @@ export default function decorate(block) {
   ui.ui.addEventListener(
     'keydown',
     (event) => {
-
       if (event.key === 'Escape') {
         closePopover();
       }
-
     },
   );
 

@@ -1,0 +1,491 @@
+/* =========================================================
+   NEV TECH
+   ========================================================= */
+
+.nev-tech {
+  --nev-tech-black: #111;
+  --nev-tech-white: #fff;
+  --nev-tech-grey: #666;
+  --nev-tech-light-grey: #e8e8e8;
+  --nev-tech-border: #d9d9d9;
+  --nev-tech-hotspot-size: 34px;
+
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   UI WRAPPER
+   ========================================================= */
+
+.nev-tech__ui {
+  display: grid;
+  grid-template-columns: minmax(280px, 34%) minmax(0, 66%);
+  width: 100%;
+  min-height: 650px;
+}
+
+
+/* =========================================================
+   LEFT CONTENT
+   ========================================================= */
+
+.nev-tech__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px 40px 60px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.nev-tech__headline {
+  margin: 0;
+  font-size: clamp(32px, 3.2vw, 56px);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--nev-tech-black);
+}
+
+.nev-tech__details {
+  margin-top: auto;
+  padding-top: 80px;
+}
+
+.nev-tech__counter {
+  margin-bottom: 18px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--nev-tech-grey);
+}
+
+.nev-tech__title {
+  margin: 0 0 18px;
+  font-size: clamp(24px, 2vw, 36px);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--nev-tech-black);
+}
+
+.nev-tech__description {
+  max-width: 430px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--nev-tech-grey);
+}
+
+
+/* =========================================================
+   THUMBNAILS
+   ========================================================= */
+
+.nev-tech__thumbnails {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 38px;
+}
+
+.nev-tech__thumbnail {
+  display: block;
+  width: 74px;
+  height: 54px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.nev-tech__thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nev-tech__thumbnail:not(.is-active) {
+  opacity: 0.5;
+}
+
+.nev-tech__thumbnail:hover,
+.nev-tech__thumbnail:focus-visible,
+.nev-tech__thumbnail.is-active {
+  opacity: 1;
+}
+
+.nev-tech__thumbnail.is-active {
+  border-color: var(--nev-tech-black);
+}
+
+.nev-tech__thumbnail:focus-visible {
+  outline: 2px solid var(--nev-tech-black);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   RIGHT VISUAL
+   ========================================================= */
+
+.nev-tech__visual {
+  position: relative;
+  min-width: 0;
+}
+
+.nev-tech__stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 650px;
+  overflow: visible;
+}
+
+.nev-tech__image-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.nev-tech__main-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+
+/* =========================================================
+   HOTSPOTS
+   ========================================================= */
+
+.nev-tech__hotspots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.nev-tech__hotspot-wrapper {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+
+/* =========================================================
+   HOTSPOT BUTTON
+   ========================================================= */
+
+.nev-tech__hotspot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--nev-tech-hotspot-size);
+  height: var(--nev-tech-hotspot-size);
+
+  padding: 0;
+  border: 1px solid var(--nev-tech-white);
+  border-radius: 50%;
+
+  background: var(--nev-tech-black);
+  color: var(--nev-tech-white);
+
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 3px 12px rgb(0 0 0 / 20%);
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.nev-tech__hotspot span {
+  display: block;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.nev-tech__hotspot:hover {
+  transform: scale(1.08);
+}
+
+.nev-tech__hotspot:focus-visible {
+  outline: 2px solid var(--nev-tech-black);
+  outline-offset: 4px;
+}
+
+.nev-tech__hotspot.is-open {
+  background: var(--nev-tech-white);
+  color: var(--nev-tech-black);
+}
+
+
+/* =========================================================
+   POPOVER
+   ========================================================= */
+
+.nev-tech__popover {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 14px);
+
+  width: min(300px, 70vw);
+
+  padding: 22px 24px;
+
+  background: var(--nev-tech-white);
+  border: 1px solid var(--nev-tech-border);
+
+  box-shadow:
+    0 10px 35px rgb(0 0 0 / 16%);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform:
+    translate(-50%, 8px);
+
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    visibility 180ms ease;
+}
+
+.nev-tech__popover.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transform:
+    translate(-50%, 0);
+}
+
+
+/* =========================================================
+   POPOVER CLOSE
+   ========================================================= */
+
+.nev-tech__popover-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  padding: 0;
+  border: 0;
+  background: transparent;
+
+  color: var(--nev-tech-black);
+
+  font-size: 22px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.nev-tech__popover-close:hover {
+  opacity: 0.6;
+}
+
+.nev-tech__popover-close:focus-visible {
+  outline: 2px solid var(--nev-tech-black);
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   POPOVER CONTENT
+   ========================================================= */
+
+.nev-tech__popover-title {
+  margin: 0 30px 10px 0;
+
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 600;
+
+  color: var(--nev-tech-black);
+}
+
+.nev-tech__popover-description {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  color: var(--nev-tech-grey);
+}
+
+
+/* =========================================================
+   IMAGE TRANSITION
+   ========================================================= */
+
+.nev-tech__image-wrap.is-changing {
+  overflow: hidden;
+}
+
+.nev-tech__image-wrap.is-changing
+.nev-tech__main-image {
+  animation: nev-tech-image-change 260ms ease both;
+}
+
+@keyframes nev-tech-image-change {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1023px) {
+  .nev-tech__ui {
+    grid-template-columns: 1fr;
+  }
+
+  .nev-tech__content {
+    min-height: auto;
+    padding: 40px 0;
+  }
+
+  .nev-tech__details {
+    padding-top: 50px;
+  }
+
+  .nev-tech__visual {
+    order: -1;
+  }
+
+  .nev-tech__stage {
+    min-height: 500px;
+  }
+
+  .nev-tech__image-wrap {
+    min-height: 500px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .nev-tech__content {
+    padding: 30px 0;
+  }
+
+  .nev-tech__headline {
+    font-size: 36px;
+  }
+
+  .nev-tech__details {
+    padding-top: 45px;
+  }
+
+  .nev-tech__title {
+    font-size: 26px;
+  }
+
+  .nev-tech__description {
+    font-size: 15px;
+  }
+
+  .nev-tech__thumbnails {
+    margin-top: 28px;
+    gap: 8px;
+  }
+
+  .nev-tech__thumbnail {
+    width: 62px;
+    height: 46px;
+  }
+
+  .nev-tech__stage,
+  .nev-tech__image-wrap {
+    min-height: 360px;
+  }
+
+  .nev-tech__hotspot {
+    width: 30px;
+    height: 30px;
+    font-size: 19px;
+  }
+
+  .nev-tech__popover {
+    width: min(270px, 80vw);
+    padding: 20px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .nev-tech__headline {
+    font-size: 30px;
+  }
+
+  .nev-tech__stage,
+  .nev-tech__image-wrap {
+    min-height: 300px;
+  }
+
+  .nev-tech__popover {
+    width: min(250px, 78vw);
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nev-tech__main-image,
+  .nev-tech__popover,
+  .nev-tech__hotspot,
+  .nev-tech__thumbnail {
+    transition: none;
+  }
+
+  .nev-tech__image-wrap.is-changing
+  .nev-tech__main-image {
+    animation: none;
+  }
+}
