@@ -372,8 +372,7 @@
             "valueType": "number",
             "required": true,
             "validation": {
-              "numberMin": 0,
-              "numberMax": 100,
+              "regExp": "^(100|[0-9]{1,2})$",
               "customErrorMsg": "Enter a value between 0 and 100."
             }
           },
@@ -385,8 +384,7 @@
             "valueType": "number",
             "required": true,
             "validation": {
-              "numberMin": 0,
-              "numberMax": 100,
+              "regExp": "^(100|[0-9]{1,2})$",
               "customErrorMsg": "Enter a value between 0 and 100."
             }
           }
