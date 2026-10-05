@@ -1,7 +1,6 @@
 const MAX_CARDS = 3;
 const MAX_MODULES = 4;
 const SLIDE_CHANGE_DURATION = 260;
-
 /**
  * Return direct children of an element.
  */

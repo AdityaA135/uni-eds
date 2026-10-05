@@ -93,8 +93,8 @@
 
 .nev-tech__thumbnail {
   display: block;
-  width: 74px;
-  height: 54px;
+  /* width: 740px; */
+  /* height: 540px; */
   padding: 0;
   border: 1px solid transparent;
   background: transparent;
@@ -348,25 +348,32 @@
    IMAGE TRANSITION
    ========================================================= */
 
-.nev-tech__image-wrap.is-changing {
+.nev-tech__image-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+}
+
+.nev-tech__main-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+
+  opacity: 1;
+  transform: translateY(0);
+
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
 }
 
 .nev-tech__image-wrap.is-changing
 .nev-tech__main-image {
-  animation: nev-tech-image-change 260ms ease both;
-}
-
-@keyframes nev-tech-image-change {
-  0% {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  opacity: 0;
+  transform: translateY(18px);
 }
 
 .nev-tech__popover {
@@ -566,26 +573,64 @@
    NEV TECH - THUMBNAILS
    ========================================= */
 
-.nev-tech .nev-tech-thumbnail,
-.nev-tech .nev-tech-thumb,
-.nev-tech .nev-tech__thumbnail,
-.nev-tech .nev-tech__thumb {
-  width: 72px;
-  height: 48px;
-  border-radius: 0;
-  overflow: hidden;
-  flex: 0 0 auto;
+.nev-tech .nev-tech__thumbnails {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.nev-tech .nev-tech-thumbnail img,
-.nev-tech .nev-tech-thumb img,
-.nev-tech .nev-tech__thumbnail img,
-.nev-tech .nev-tech__thumb img {
+.nev-tech .nev-tech__thumbnail {
+  width: 76px;
+  height: 64px;
+
+  padding: 0;
+
+  border: 2px solid transparent;
+  border-radius: 8px;
+
+  background: transparent;
+
+  overflow: hidden;
+  flex: 0 0 auto;
+
+  cursor: pointer;
+
+  opacity: 0.5;
+
+  transition:
+    opacity 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.nev-tech .nev-tech__thumbnail img {
+  display: block;
+
   width: 100%;
   height: 100%;
-  display: block;
+
   object-fit: cover;
-  border-radius: 0;
+
+  border-radius: 6px;
+}
+
+.nev-tech .nev-tech__thumbnail:hover,
+.nev-tech .nev-tech__thumbnail:focus-visible {
+  opacity: 1;
+}
+
+.nev-tech .nev-tech__thumbnail.is-active {
+  opacity: 1;
+
+  border-color: var(--nev-tech-black);
+
+  box-shadow:
+    0 0 0 2px var(--nev-tech-white);
+}
+
+.nev-tech .nev-tech__thumbnail:focus-visible {
+  outline: 2px solid var(--nev-tech-black);
+  outline-offset: 3px;
 }
 
 .nev-tech__ui {
