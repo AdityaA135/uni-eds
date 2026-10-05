@@ -587,3 +587,7 @@
   object-fit: cover;
   border-radius: 0;
 }
+
+.nev-tech > :not(.nev-tech__ui) {
+  display: none;
+}

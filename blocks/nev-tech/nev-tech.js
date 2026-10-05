@@ -299,7 +299,7 @@ function createUI(block) {
     </div>
   `;
 
-  block.replaceChildren(ui);
+  block.appendChild(ui);
 
   return {
     ui,
