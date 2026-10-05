@@ -637,3 +637,7 @@
   position: relative;
   z-index: 10;
 }
+
+.nev-tech > :not(.nev-tech__ui) {
+  display: none;
+}
