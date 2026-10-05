@@ -345,7 +345,7 @@
         "required": true
       },
       {
-        "component": "textarea",
+        "component": "richtext",
         "name": "modules",
         "label": "Modules",
         "valueType": "string",
