@@ -299,7 +299,7 @@ function createUI(block) {
     </div>
   `;
 
-  block.appendChild(ui);
+  block.replaceChildren(ui);
 
   return {
     ui,
@@ -342,6 +342,7 @@ function createUI(block) {
  * Main block decoration.
  */
 export default function decorate(block) {
+
   const data = readBlockData(block);
 
   /*
