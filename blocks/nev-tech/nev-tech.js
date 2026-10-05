@@ -1,6 +1,7 @@
 const MAX_CARDS = 3;
 const MAX_MODULES = 4;
 const SLIDE_CHANGE_DURATION = 260;
+
 /**
  * Return direct children of an element.
  */
@@ -33,8 +34,11 @@ function getNumberFromText(value) {
 /**
  * Read an authored image/reference field.
  *
- * Universal Editor reference fields can result in an image
- * element or a link depending on the generated semantic HTML.
+ * Normal EDS output can contain:
+ * - img
+ * - a containing img
+ * - a reference wrapper
+ * - plain text
  */
 function getReference(element) {
   if (!element) {
@@ -42,7 +46,7 @@ function getReference(element) {
   }
 
   /*
-   * The field itself can sometimes be an image.
+   * The field itself is an image.
    */
   if (
     element.tagName?.toLowerCase() === 'img'
@@ -52,7 +56,7 @@ function getReference(element) {
   }
 
   /*
-   * Normal reference field containing an image.
+   * Look for an image inside the field.
    */
   const image = element.querySelector?.('img');
 
@@ -61,7 +65,7 @@ function getReference(element) {
   }
 
   /*
-   * Reference field containing a link.
+   * Look for a link containing the reference.
    */
   const link = element.querySelector?.('a');
 
@@ -69,15 +73,82 @@ function getReference(element) {
     return link.href;
   }
 
+  /*
+   * Fallback to the field's text.
+   */
   return getText(element);
+}
+
+/**
+ * Find the modules element inside a card.
+ *
+ * On Universal Editor we may have:
+ *
+ * [data-aue-prop="modules"]
+ *
+ * On the published EDS page we normally have
+ * the normal HTML list without the UE attribute.
+ */
+function findModulesElement(cardElement) {
+  if (!cardElement) {
+    return null;
+  }
+
+  /*
+   * First support the UE representation.
+   */
+  const ueModules = cardElement.querySelector(
+    '[data-aue-prop="modules"]',
+  );
+
+  if (ueModules) {
+    return ueModules;
+  }
+
+  /*
+   * Published EDS representation:
+   *
+   * Card
+   * ├── title
+   * ├── description
+   * ├── thumbnail
+   * ├── motor image
+   * └── modules <ul>
+   *
+   * The modules field is therefore the fifth field.
+   */
+  const fields = getChildren(cardElement);
+
+  const modulesField = fields[4];
+
+  if (!modulesField) {
+    return null;
+  }
+
+  /*
+   * The field itself may be the UL/OL.
+   */
+  const fieldTag = modulesField.tagName?.toLowerCase();
+
+  if (
+    fieldTag === 'ul'
+    || fieldTag === 'ol'
+  ) {
+    return modulesField;
+  }
+
+  /*
+   * Or the list may be wrapped inside the field.
+   */
+  return modulesField.querySelector?.('ul, ol') || null;
 }
 
 /**
  * Read modules from the rich-text Modules field.
  *
- * Expected authored HTML:
+ * Expected structure:
  *
- * <ul data-richtext-prop="modules">
+ * <ul>
  *   <li>
  *     Module-1
  *     <ul>
@@ -89,29 +160,40 @@ function getReference(element) {
  *   </li>
  * </ul>
  *
- * The first/natural text of the outer LI is the module label.
- *
- * The nested UL contains:
+ * Nested fields:
  *   0 = title
  *   1 = description
  *   2 = X
  *   3 = Y
  */
 function readModules(cardElement) {
-  const modulesElement = cardElement.querySelector(
-    '[data-aue-prop="modules"]',
+  const modulesElement = findModulesElement(
+    cardElement,
   );
 
   if (!modulesElement) {
     return [];
   }
 
-  const moduleElements = getChildren(modulesElement)
-    .filter(
-      (element) =>
-        element.tagName?.toLowerCase() === 'ul'
-        || element.tagName?.toLowerCase() === 'ol',
-    )
+  /*
+   * The module list itself can be the element
+   * or can contain the list.
+   */
+  const listTag = modulesElement.tagName?.toLowerCase();
+
+  const lists =
+    listTag === 'ul' || listTag === 'ol'
+      ? [modulesElement]
+      : getChildren(modulesElement).filter(
+        (element) => {
+          const tag =
+            element.tagName?.toLowerCase();
+
+          return tag === 'ul' || tag === 'ol';
+        },
+      );
+
+  const moduleElements = lists
     .flatMap((list) =>
       getChildren(list).filter(
         (element) =>
@@ -122,13 +204,18 @@ function readModules(cardElement) {
 
   return moduleElements
     .map((moduleElement) => {
+      /*
+       * Each module contains a nested UL/OL
+       * containing the four actual fields.
+       */
       const nestedList = Array.from(
         moduleElement.children || [],
-      ).find(
-        (element) =>
-          element.tagName?.toLowerCase() === 'ul'
-          || element.tagName?.toLowerCase() === 'ol',
-      );
+      ).find((element) => {
+        const tag =
+          element.tagName?.toLowerCase();
+
+        return tag === 'ul' || tag === 'ol';
+      });
 
       if (!nestedList) {
         return null;
@@ -136,8 +223,6 @@ function readModules(cardElement) {
 
       const fields = getChildren(nestedList);
 
-      // A module is valid only when all 4
-      // module fields are present.
       if (fields.length < 4) {
         return null;
       }
@@ -164,37 +249,18 @@ function readModules(cardElement) {
 }
 
 /**
- * Determine whether an element is a NEV Tech Card.
- */
-function isCard(element) {
-  return (
-    element?.classList?.contains('nev-tech-card')
-    || element?.dataset?.blockName === 'nev-tech-card'
-    || element?.dataset?.aueComponent === 'nev-tech-card'
-  );
-}
-
-/**
- * Read a NEV Tech Card.
+ * Read a NEV Tech Card from normal EDS markup.
  *
  * Card structure:
  *
- * Title
- * Description
- * Thumbnail
- * Motor Image
- * Modules rich-text
+ * 0 = Title
+ * 1 = Description
+ * 2 = Thumbnail
+ * 3 = Motor Image
+ * 4 = Modules
  */
 function readCard(cardElement) {
-  const children = getChildren(cardElement);
-
-  /*
-   * Find the actual authored fields.
-   *
-   * The Universal Editor can wrap fields in divs, so
-   * we use the known first four card fields.
-   */
-  const fields = children.slice(0, 4);
+  const fields = getChildren(cardElement);
 
   return {
     title: getText(fields[0]),
@@ -206,32 +272,39 @@ function readCard(cardElement) {
 }
 
 /**
- * Read the complete NEV Tech authored data.
+ * Read the complete NEV Tech block.
  *
- * Structure:
+ * Normal published EDS structure:
  *
  * NEV Tech
  * ├── Title
  * ├── Card
  * ├── Card
  * └── Card
+ *
+ * We intentionally use the normal EDS DOM structure
+ * instead of depending on Universal Editor attributes.
  */
 function readBlockData(block) {
   const children = getChildren(block);
 
-  /*
-   * First authored field is the main NEV Tech title.
-   */
-  const titleElement = children.find(
-    (child) => !isCard(child),
-  );
+  if (!children.length) {
+    return {
+      title: '',
+      cards: [],
+    };
+  }
 
   /*
-   * Cards are direct child blocks.
+   * First child is the block title.
+   */
+  const titleElement = children[0];
+
+  /*
+   * Remaining children are cards.
    */
   const cardElements = children
-    .filter(isCard)
-    .slice(0, MAX_CARDS);
+    .slice(1, 1 + MAX_CARDS);
 
   return {
     title: getText(titleElement),
@@ -240,19 +313,36 @@ function readBlockData(block) {
       .filter(
         (card) =>
           card.title
-          || card.image,
+          || card.image
+          || card.thumbnail,
       ),
   };
 }
 
 /**
+ * Detect whether the block is currently running
+ * inside Universal Editor markup.
+ *
+ * Published .aem.page markup does not contain
+ * data-aue-* attributes.
+ */
+function isUniversalEditor(block) {
+  return Boolean(
+    block.querySelector?.('[data-aue-type]')
+    || block.closest?.('[data-aue-type]'),
+  );
+}
+
+/**
  * Create the interactive visual UI.
  */
-function createUI(block) {
+function createUI() {
   const ui = document.createElement('div');
   ui.className = 'nev-tech__ui';
 
-  // Content
+  /*
+   * Content
+   */
   const content = document.createElement('div');
   content.className = 'nev-tech__content';
 
@@ -273,6 +363,7 @@ function createUI(block) {
 
   const thumbnails = document.createElement('div');
   thumbnails.className = 'nev-tech__thumbnails';
+
   thumbnails.setAttribute(
     'aria-label',
     'Technology options',
@@ -290,7 +381,9 @@ function createUI(block) {
     details,
   );
 
-  // Visual
+  /*
+   * Visual
+   */
   const visual = document.createElement('div');
   visual.className = 'nev-tech__visual';
 
@@ -316,14 +409,13 @@ function createUI(block) {
 
   visual.append(stage);
 
-  // Complete UI
+  /*
+   * Complete UI.
+   */
   ui.append(
     content,
     visual,
   );
-
-  // Keep authored UE markup in the DOM.
-  block.appendChild(ui);
 
   return {
     ui,
@@ -342,17 +434,41 @@ function createUI(block) {
  * Main block decoration.
  */
 export default function decorate(block) {
-
+  /*
+   * IMPORTANT:
+   *
+   * Read the normal EDS DOM BEFORE modifying the block.
+   */
   const data = readBlockData(block);
 
-  /*
-   * Nothing to render if no cards have been authored.
-   */
   if (!data.cards.length) {
     return;
   }
 
-  const ui = createUI(block);
+  /*
+   * Determine whether this is the UE editing DOM
+   * or the published EDS DOM.
+   */
+  const inUniversalEditor = isUniversalEditor(block);
+
+  const ui = createUI();
+
+  /*
+   * In Universal Editor:
+   *
+   * Keep the authored fields in the DOM so UE
+   * can continue editing them.
+   *
+   * On the published .aem.page:
+   *
+   * The authored EDS data has already been read,
+   * so replace it with the actual component UI.
+   */
+  if (inUniversalEditor) {
+    block.appendChild(ui.ui);
+  } else {
+    block.replaceChildren(ui.ui);
+  }
 
   let activeIndex = 0;
   let openHotspot = null;
@@ -404,10 +520,10 @@ export default function decorate(block) {
         return;
       }
 
-      const button = document.createElement('button');
+      const button =
+        document.createElement('button');
 
       button.type = 'button';
-
       button.className =
         'nev-tech__thumbnail';
 
@@ -425,10 +541,10 @@ export default function decorate(block) {
         button.classList.add('is-active');
       }
 
-      const image = document.createElement('img');
+      const image =
+        document.createElement('img');
 
       image.src = card.thumbnail;
-
       image.alt = '';
 
       button.appendChild(image);
@@ -446,9 +562,6 @@ export default function decorate(block) {
 
   /**
    * Render hotspots for the active card.
-   *
-   * X and Y come directly from the rich-text module data
-   * and are interpreted as percentages.
    */
   function renderHotspots() {
     ui.hotspots.innerHTML = '';
@@ -463,19 +576,16 @@ export default function decorate(block) {
       .slice(0, MAX_MODULES)
       .forEach((module) => {
         /*
-         * Invalid module data should not break
-         * the rest of the component.
+         * Invalid coordinates should not break
+         * the component.
          */
         if (
-       module.x === null
+          module.x === null
           || module.y === null
         ) {
           return;
         }
 
-        /*
-         * Keep coordinates inside the image bounds.
-         */
         const x = Math.min(
           100,
           Math.max(0, module.x),
@@ -492,9 +602,6 @@ export default function decorate(block) {
         wrapper.className =
           'nev-tech__hotspot-wrapper';
 
-        /*
-         * Author-controlled position.
-         */
         wrapper.style.left = `${x}%`;
         wrapper.style.top = `${y}%`;
 
@@ -508,7 +615,7 @@ export default function decorate(block) {
 
         button.setAttribute(
           'aria-label',
-          module.title,
+          module.title || 'Open module',
         );
 
         button.setAttribute(
@@ -516,9 +623,17 @@ export default function decorate(block) {
           'false',
         );
 
-        button.innerHTML = `
-          <span aria-hidden="true">+</span>
-        `;
+        const icon =
+          document.createElement('span');
+
+        icon.setAttribute(
+          'aria-hidden',
+          'true',
+        );
+
+        icon.textContent = '+';
+
+        button.appendChild(icon);
 
         const popover =
           document.createElement('div');
@@ -541,7 +656,7 @@ export default function decorate(block) {
 
         closeButton.setAttribute(
           'aria-label',
-          `Close ${module.title}`,
+          `Close ${module.title || 'module'}`,
         );
 
         closeButton.textContent = '−';
@@ -570,7 +685,7 @@ export default function decorate(block) {
           popoverDescription,
         );
 
-        /**
+        /*
          * Open / close hotspot.
          */
         button.addEventListener(
@@ -578,9 +693,6 @@ export default function decorate(block) {
           (event) => {
             event.stopPropagation();
 
-            /*
-             * Only one hotspot can be open.
-             */
             if (
               openHotspot
               && openHotspot !== wrapper
@@ -603,20 +715,15 @@ export default function decorate(block) {
               String(isOpen),
             );
 
-            const buttonIcon =
-              button.querySelector('span');
-
-            if (buttonIcon) {
-              buttonIcon.textContent =
-                isOpen ? '−' : '+';
-            }
+            icon.textContent =
+              isOpen ? '−' : '+';
 
             openHotspot =
               isOpen ? wrapper : null;
           },
         );
 
-        /**
+        /*
          * Close popover.
          */
         closeButton.addEventListener(
@@ -625,7 +732,6 @@ export default function decorate(block) {
             event.stopPropagation();
 
             closePopover();
-
             button.focus();
           },
         );
@@ -666,7 +772,6 @@ export default function decorate(block) {
       card.image;
 
     renderThumbnails();
-
     renderHotspots();
   }
 
@@ -681,16 +786,8 @@ export default function decorate(block) {
       return;
     }
 
-    /*
-     * Close any currently open module
-     * before changing the image.
-     */
     closePopover();
 
-    /*
-     * CSS will use this class to perform
-     * the fade / upward transition.
-     */
     ui.imageWrap.classList.add(
       'is-changing',
     );
