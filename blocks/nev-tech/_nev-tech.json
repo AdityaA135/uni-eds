@@ -31,21 +31,6 @@
           }
         }
       }
-    },
-    {
-      "title": "NEV Tech Module",
-      "id": "nev-tech-module",
-      "plugins": {
-        "xwalk": {
-          "page": {
-            "resourceType": "core/franklin/components/block/v1/block",
-            "template": {
-              "name": "nev-tech-module",
-              "model": "nev-tech-module"
-            }
-          }
-        }
-      }
     }
   ],
   "models": [
@@ -91,49 +76,13 @@
           "label": "Motor Image",
           "valueType": "string",
           "required": true
-        }
-      ]
-    },
-    {
-      "id": "nev-tech-module",
-      "fields": [
-        {
-          "component": "text",
-          "name": "title",
-          "label": "Title",
-          "valueType": "string",
-          "required": true
         },
         {
           "component": "textarea",
-          "name": "description",
-          "label": "Description",
+          "name": "modules",
+          "label": "Modules",
           "valueType": "string",
-          "required": true
-        },
-        {
-          "component": "number",
-          "name": "x",
-          "label": "X Position (%)",
-          "description": "Horizontal position from the left edge of the motor image.",
-          "valueType": "number",
-          "required": true,
-          "validation": {
-            "numberMin": 0,
-            "numberMax": 100
-          }
-        },
-        {
-          "component": "number",
-          "name": "y",
-          "label": "Y Position (%)",
-          "description": "Vertical position from the top edge of the motor image.",
-          "valueType": "number",
-          "required": true,
-          "validation": {
-            "numberMin": 0,
-            "numberMax": 100
-          }
+          "description": "Enter up to 4 modules using this format:\n\nmodule-1\n title: Module title\n description: Module description\n x: 73\n y: 42\n\nmodule-2\n title: Module title\n description: Module description\n x: 35\n y: 61\n\nmodule-3\n title: Module title\n description: Module description\n x: 52\n y: 78\n\nmodule-4\n title: Module title\n description: Module description\n x: 20\n y: 30"
         }
       ]
     }
@@ -143,12 +92,6 @@
       "id": "nev-tech",
       "components": [
         "nev-tech-card"
-      ]
-    },
-    {
-      "id": "nev-tech-card",
-      "components": [
-        "nev-tech-module"
       ]
     }
   ]
