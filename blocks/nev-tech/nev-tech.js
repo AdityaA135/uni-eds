@@ -132,21 +132,24 @@ function readModules(cardElement) {
       );
 
       if (!nestedList) {
-        return {
-          title: '',
-          description: '',
-          x: null,
-          y: null,
-        };
+        return null;
       }
 
       const fields = getChildren(nestedList);
 
+      // A module is valid only when all 4
+      // module fields are present.
+      if (fields.length < 4) {
+        return null;
+      }
+
       const title = getText(fields[0]);
       const description = getText(fields[1]);
+
       const x = getNumberFromText(
         getText(fields[2]),
       );
+
       const y = getNumberFromText(
         getText(fields[3]),
       );
@@ -158,13 +161,7 @@ function readModules(cardElement) {
         y,
       };
     })
-    .filter(
-      (module) =>
-        module.title
-        || module.description
-        || module.x !== null
-        || module.y !== null,
-    );
+    .filter(Boolean);
 }
 
 /**
@@ -254,87 +251,91 @@ function readBlockData(block) {
  */
 function createUI(block) {
   const ui = document.createElement('div');
-
   ui.className = 'nev-tech__ui';
 
-  ui.innerHTML = `
-    <div class="nev-tech__content">
+  // Content
+  const content = document.createElement('div');
+  content.className = 'nev-tech__content';
 
-      <h2 class="nev-tech__headline"></h2>
+  const headline = document.createElement('h2');
+  headline.className = 'nev-tech__headline';
 
-      <div class="nev-tech__details">
+  const details = document.createElement('div');
+  details.className = 'nev-tech__details';
 
-        <div class="nev-tech__counter"></div>
+  const counter = document.createElement('div');
+  counter.className = 'nev-tech__counter';
 
-        <h3 class="nev-tech__title"></h3>
+  const title = document.createElement('h3');
+  title.className = 'nev-tech__title';
 
-        <p class="nev-tech__description"></p>
+  const description = document.createElement('p');
+  description.className = 'nev-tech__description';
 
-        <div
-          class="nev-tech__thumbnails"
-          aria-label="Technology options"
-        ></div>
+  const thumbnails = document.createElement('div');
+  thumbnails.className = 'nev-tech__thumbnails';
+  thumbnails.setAttribute(
+    'aria-label',
+    'Technology options',
+  );
 
-      </div>
+  details.append(
+    counter,
+    title,
+    description,
+    thumbnails,
+  );
 
-    </div>
+  content.append(
+    headline,
+    details,
+  );
 
-    <div class="nev-tech__visual">
+  // Visual
+  const visual = document.createElement('div');
+  visual.className = 'nev-tech__visual';
 
-      <div class="nev-tech__stage">
+  const stage = document.createElement('div');
+  stage.className = 'nev-tech__stage';
 
-        <div class="nev-tech__image-wrap">
+  const imageWrap = document.createElement('div');
+  imageWrap.className = 'nev-tech__image-wrap';
 
-          <img
-            class="nev-tech__main-image"
-            alt=""
-          />
+  const mainImage = document.createElement('img');
+  mainImage.className = 'nev-tech__main-image';
+  mainImage.alt = '';
 
-        </div>
+  const hotspots = document.createElement('div');
+  hotspots.className = 'nev-tech__hotspots';
 
-        <div class="nev-tech__hotspots"></div>
+  imageWrap.append(mainImage);
 
-      </div>
+  stage.append(
+    imageWrap,
+    hotspots,
+  );
 
-    </div>
-  `;
+  visual.append(stage);
 
+  // Complete UI
+  ui.append(
+    content,
+    visual,
+  );
+
+  // Keep authored UE markup in the DOM.
   block.appendChild(ui);
 
   return {
     ui,
-
-    headline: ui.querySelector(
-      '.nev-tech__headline',
-    ),
-
-    counter: ui.querySelector(
-      '.nev-tech__counter',
-    ),
-
-    title: ui.querySelector(
-      '.nev-tech__title',
-    ),
-
-    description: ui.querySelector(
-      '.nev-tech__description',
-    ),
-
-    thumbnails: ui.querySelector(
-      '.nev-tech__thumbnails',
-    ),
-
-    imageWrap: ui.querySelector(
-      '.nev-tech__image-wrap',
-    ),
-
-    mainImage: ui.querySelector(
-      '.nev-tech__main-image',
-    ),
-
-    hotspots: ui.querySelector(
-      '.nev-tech__hotspots',
-    ),
+    headline,
+    counter,
+    title,
+    description,
+    thumbnails,
+    imageWrap,
+    mainImage,
+    hotspots,
   };
 }
 
@@ -467,8 +468,7 @@ export default function decorate(block) {
          * the rest of the component.
          */
         if (
-          !module.title
-          || module.x === null
+       module.x === null
           || module.y === null
         ) {
           return;
