@@ -17,12 +17,18 @@ function getText(element) {
 }
 
 /**
- * Return numeric value.
+ * Convert text to a number.
  */
-function getNumber(element) {
-  const value = Number.parseFloat(getText(element));
+function getNumberFromText(value) {
+  if (value === undefined || value === null) {
+    return null;
+  }
 
-  return Number.isFinite(value) ? value : null;
+  const number = Number.parseFloat(
+    String(value).trim(),
+  );
+
+  return Number.isFinite(number) ? number : null;
 }
 
 /**
@@ -32,15 +38,33 @@ function getNumber(element) {
  * element or a link depending on the generated semantic HTML.
  */
 function getReference(element) {
-  if (!element) return '';
+  if (!element) {
+    return '';
+  }
 
-  const image = element.querySelector('img');
+  /*
+   * The field itself can sometimes be an image.
+   */
+  if (
+    element.tagName?.toLowerCase() === 'img'
+    && element.src
+  ) {
+    return element.src;
+  }
+
+  /*
+   * Normal reference field containing an image.
+   */
+  const image = element.querySelector?.('img');
 
   if (image?.src) {
     return image.src;
   }
 
-  const link = element.querySelector('a');
+  /*
+   * Reference field containing a link.
+   */
+  const link = element.querySelector?.('a');
 
   if (link?.href) {
     return link.href;
@@ -50,117 +74,97 @@ function getReference(element) {
 }
 
 /**
- * Get the actual field elements from an authored item.
+ * Read modules from the rich-text Modules field.
+ *
+ * Expected authored HTML:
+ *
+ * <ul data-richtext-prop="modules">
+ *   <li>
+ *     Module-1
+ *     <ul>
+ *       <li>Title</li>
+ *       <li>Description</li>
+ *       <li>20</li>
+ *       <li>30</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ *
+ * The first/natural text of the outer LI is the module label.
+ *
+ * The nested UL contains:
+ *   0 = title
+ *   1 = description
+ *   2 = X
+ *   3 = Y
  */
-function getFieldElements(element) {
-  return getChildren(element);
-}
-
-/**
- * Read one module from the Modules multifield.
- *
- * Module model:
- *
- * Title
- * Description
- * X Position
- * Y Position
- */
-function readModule(moduleElement) {
-  const fields = getFieldElements(moduleElement);
-
-  return {
-    title: getText(fields[0]),
-    description: getText(fields[1]),
-    x: getNumber(fields[2]),
-    y: getNumber(fields[3]),
-  };
-}
-
-/**
- * Determine whether an element looks like a Modules multifield
- * container.
- *
- * The authored structure is:
- *
- * Card
- * ├── Title
- * ├── Description
- * ├── Thumbnail
- * ├── Motor Image
- * └── Modules
- */
-function isModulesContainer(element) {
-  if (!element) return false;
-
-  return (
-    element.dataset?.aueProp === 'modules'
-    || element.classList?.contains('modules')
-    || element.classList?.contains('nev-tech-card-modules')
+function readModules(cardElement) {
+  const modulesElement = cardElement.querySelector(
+    '[data-aue-prop="modules"]',
   );
-}
 
-/**
- * Read a NEV Tech Card.
- *
- * Card model:
- *
- * Title
- * Description
- * Thumbnail
- * Motor Image
- * Modules (multi-field)
- */
-function readCard(cardElement) {
-  const children = getChildren(cardElement);
-
-  /*
-   * The first four direct children represent:
-   *
-   * 0 = Title
-   * 1 = Description
-   * 2 = Thumbnail
-   * 3 = Motor Image
-   */
-  const fields = children.slice(0, 4);
-
-  /*
-   * The fifth child is the Modules multifield container.
-   */
-  let modulesContainer = children[4];
-
-  /*
-   * Prefer an explicitly identified modules container if
-   * Universal Editor provides data-aue-prop/class information.
-   */
-  const identifiedModulesContainer = children.find(isModulesContainer);
-
-  if (identifiedModulesContainer) {
-    modulesContainer = identifiedModulesContainer;
+  if (!modulesElement) {
+    return [];
   }
 
-  /*
-   * Each direct child of the Modules container represents
-   * one complete module entry.
-   */
-  const moduleElements = modulesContainer
-    ? getChildren(modulesContainer).slice(0, MAX_MODULES)
-    : [];
+  const moduleElements = getChildren(modulesElement)
+    .filter(
+      (element) =>
+        element.tagName?.toLowerCase() === 'ul'
+        || element.tagName?.toLowerCase() === 'ol',
+    )
+    .flatMap((list) =>
+      getChildren(list).filter(
+        (element) =>
+          element.tagName?.toLowerCase() === 'li',
+      ),
+    )
+    .slice(0, MAX_MODULES);
 
-  return {
-    title: getText(fields[0]),
-    description: getText(fields[1]),
-    thumbnail: getReference(fields[2]),
-    image: getReference(fields[3]),
-    modules: moduleElements
-      .map(readModule)
-      .filter((module) => (
+  return moduleElements
+    .map((moduleElement) => {
+      const nestedList = Array.from(
+        moduleElement.children || [],
+      ).find(
+        (element) =>
+          element.tagName?.toLowerCase() === 'ul'
+          || element.tagName?.toLowerCase() === 'ol',
+      );
+
+      if (!nestedList) {
+        return {
+          title: '',
+          description: '',
+          x: null,
+          y: null,
+        };
+      }
+
+      const fields = getChildren(nestedList);
+
+      const title = getText(fields[0]);
+      const description = getText(fields[1]);
+      const x = getNumberFromText(
+        getText(fields[2]),
+      );
+      const y = getNumberFromText(
+        getText(fields[3]),
+      );
+
+      return {
+        title,
+        description,
+        x,
+        y,
+      };
+    })
+    .filter(
+      (module) =>
         module.title
         || module.description
         || module.x !== null
-        || module.y !== null
-      )),
-  };
+        || module.y !== null,
+    );
 }
 
 /**
@@ -170,7 +174,39 @@ function isCard(element) {
   return (
     element?.classList?.contains('nev-tech-card')
     || element?.dataset?.blockName === 'nev-tech-card'
+    || element?.dataset?.aueComponent === 'nev-tech-card'
   );
+}
+
+/**
+ * Read a NEV Tech Card.
+ *
+ * Card structure:
+ *
+ * Title
+ * Description
+ * Thumbnail
+ * Motor Image
+ * Modules rich-text
+ */
+function readCard(cardElement) {
+  const children = getChildren(cardElement);
+
+  /*
+   * Find the actual authored fields.
+   *
+   * The Universal Editor can wrap fields in divs, so
+   * we use the known first four card fields.
+   */
+  const fields = children.slice(0, 4);
+
+  return {
+    title: getText(fields[0]),
+    description: getText(fields[1]),
+    thumbnail: getReference(fields[2]),
+    image: getReference(fields[3]),
+    modules: readModules(cardElement),
+  };
 }
 
 /**
@@ -206,7 +242,9 @@ function readBlockData(block) {
     cards: cardElements
       .map(readCard)
       .filter(
-        (card) => card.title || card.image,
+        (card) =>
+          card.title
+          || card.image,
       ),
   };
 }
@@ -265,27 +303,35 @@ function createUI(block) {
 
   return {
     ui,
+
     headline: ui.querySelector(
       '.nev-tech__headline',
     ),
+
     counter: ui.querySelector(
       '.nev-tech__counter',
     ),
+
     title: ui.querySelector(
       '.nev-tech__title',
     ),
+
     description: ui.querySelector(
       '.nev-tech__description',
     ),
+
     thumbnails: ui.querySelector(
       '.nev-tech__thumbnails',
     ),
+
     imageWrap: ui.querySelector(
       '.nev-tech__image-wrap',
     ),
+
     mainImage: ui.querySelector(
       '.nev-tech__main-image',
     ),
+
     hotspots: ui.querySelector(
       '.nev-tech__hotspots',
     ),
@@ -332,6 +378,14 @@ export default function decorate(block) {
       'aria-expanded',
       'false',
     );
+
+    const buttonIcon = button?.querySelector(
+      'span',
+    );
+
+    if (buttonIcon) {
+      buttonIcon.textContent = '+';
+    }
 
     popover?.classList.remove('is-open');
 
@@ -391,6 +445,9 @@ export default function decorate(block) {
 
   /**
    * Render hotspots for the active card.
+   *
+   * X and Y come directly from the rich-text module data
+   * and are interpreted as percentages.
    */
   function renderHotspots() {
     ui.hotspots.innerHTML = '';
@@ -416,6 +473,19 @@ export default function decorate(block) {
           return;
         }
 
+        /*
+         * Keep coordinates inside the image bounds.
+         */
+        const x = Math.min(
+          100,
+          Math.max(0, module.x),
+        );
+
+        const y = Math.min(
+          100,
+          Math.max(0, module.y),
+        );
+
         const wrapper =
           document.createElement('div');
 
@@ -425,11 +495,8 @@ export default function decorate(block) {
         /*
          * Author-controlled position.
          */
-        wrapper.style.left =
-          `${module.x}%`;
-
-        wrapper.style.top =
-          `${module.y}%`;
+        wrapper.style.left = `${x}%`;
+        wrapper.style.top = `${y}%`;
 
         const button =
           document.createElement('button');
@@ -535,6 +602,14 @@ export default function decorate(block) {
               'aria-expanded',
               String(isOpen),
             );
+
+            const buttonIcon =
+              button.querySelector('span');
+
+            if (buttonIcon) {
+              buttonIcon.textContent =
+                isOpen ? '−' : '+';
+            }
 
             openHotspot =
               isOpen ? wrapper : null;
