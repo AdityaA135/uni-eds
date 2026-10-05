@@ -5,6 +5,6 @@
     "/content/uni-eds/metadata:/metadata.json"
   ],
   "includes": [
-    "/"
+    "/content/uni-eds/"
   ]
 }
