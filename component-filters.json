@@ -15,8 +15,7 @@
       "hero",
       "cards",
       "columns",
-      "fragment",
-      "nev-tech"
+      "fragment"
     ]
   },
   {
@@ -44,6 +43,12 @@
     "id": "dell-hero-block",
     "components": [
       "dell-hero-slide"
+    ]
+  },
+  {
+    "id": "nev-tech-motor",
+    "components": [
+      "nev-tech-motor-card"
     ]
   },
   {
