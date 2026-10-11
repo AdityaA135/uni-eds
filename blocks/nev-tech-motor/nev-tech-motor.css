@@ -641,3 +641,37 @@
 .nev-tech > :not(.nev-tech__ui) {
   display: none;
 }
+
+
+/* Both blocks need the same design tokens */
+.nev-tech,
+.nev-tech-motor {
+  --nev-tech-black: #111;
+  --nev-tech-white: #fff;
+  --nev-tech-grey: #666;
+  --nev-tech-light-grey: #e8e8e8;
+  --nev-tech-border: #d9d9d9;
+  --nev-tech-hotspot-size: 34px;
+
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Update the existing thumbnail-specific selectors */
+:is(.nev-tech, .nev-tech-motor) .nev-tech__thumbnails {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+:is(.nev-tech, .nev-tech-motor) .nev-tech__thumbnail {
+  width: 76px;
+  height: 64px;
+}
+
+/* Keep authored Universal Editor fields hidden only
+   when they are outside the rendered UI. */
+:is(.nev-tech, .nev-tech-motor) > :not(.nev-tech__ui) {
+  display: none;
+}

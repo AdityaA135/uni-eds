@@ -1,807 +1,565 @@
 
-/**
- * NEV TECH MOTOR — DIAGNOSTIC VERSION
- *
- * Purpose:
- * 1. Inspect the authored card and Modules field.
- * 2. Fetch the AEM Assets API.
- * 3. Log all returned metadata and imageMap data.
- * 4. Parse hotspot IDs and polygon coordinates.
- * 5. Calculate hotspot center X/Y percentages.
- * 6. Match API hotspot IDs against authored module IDs.
- *
- * This version is diagnostic only.
- * It does not render the final carousel or popovers.
- */
-
 const MAX_CARDS = 3;
 const MAX_MODULES = 4;
+const SLIDE_CHANGE_DURATION = 260;
 
 const ASSETS_API_BASE =
   'https://author-p8803-e1283844.adobeaemcloud.com/api/assets/';
 
-const LOG_PREFIX = '[NEV-DIAG]';
+/* ---------- Author data helpers ---------- */
 
-function log(label, value) {
-  console.log(`${LOG_PREFIX} ${label}`, value);
-}
-
-function warn(label, value) {
-  console.warn(`${LOG_PREFIX} ${label}`, value);
-}
-
-function error(label, value) {
-  console.error(`${LOG_PREFIX} ${label}`, value);
-}
-
-function getChildren(element) {
+function childrenOf(element) {
   return Array.from(element?.children || []);
 }
 
-function getText(element) {
-  return element?.textContent?.trim() || '';
+function textOf(element) {
+  return (
+    element?.innerText?.trim()
+    || element?.textContent?.trim()
+    || ''
+  );
 }
 
-/* --------------------------------------------------
-   1. Read image references
--------------------------------------------------- */
+function referenceOf(element) {
+  if (!element) return '';
 
-function getReference(element) {
-  log('REFERENCE: element', element);
-
-  if (!element) {
-    warn('REFERENCE: element is missing', element);
-    return '';
-  }
-
-  log('REFERENCE: outerHTML', element.outerHTML);
-
-  if (
-    element.tagName?.toLowerCase() === 'img'
-    && element.src
-  ) {
-    log('REFERENCE: direct img.src', element.src);
+  if (element.tagName?.toLowerCase() === 'img' && element.src) {
     return element.src;
   }
 
   const image = element.querySelector?.('img');
-
-  if (image?.src) {
-    log('REFERENCE: nested img.src', image.src);
-    return image.src;
-  }
+  if (image?.src) return image.src;
 
   const link = element.querySelector?.('a');
+  if (link?.href) return link.href;
 
-  if (link?.href) {
-    log('REFERENCE: nested link.href', link.href);
-    return link.href;
-  }
-
-  const text = getText(element);
-
-  log('REFERENCE: text fallback', text);
-
-  return text;
-}
-
-/* --------------------------------------------------
-   2. Inspect and parse the Modules field
--------------------------------------------------- */
-
-function findModulesElement(cardElement) {
-  log('MODULES: searching card', cardElement);
-
-  // Universal Editor field representation.
-  const ueField = cardElement.querySelector(
-    '[data-aue-prop="modules"]',
-  );
-
-  if (ueField) {
-    log('MODULES: found data-aue-prop field', ueField);
-    return ueField;
-  }
-
-  const fields = getChildren(cardElement);
-
-  log('MODULES: direct card children', fields);
-  log(
-    'MODULES: direct child count',
-    fields.length,
-  );
-
-  // Expected card fields:
-  // 0 title, 1 description, 2 thumbnail,
-  // 3 motor image, 4 modules.
-  const candidate = fields[4];
-
-  if (!candidate) {
-    warn('MODULES: fifth card field not found', {
-      childCount: fields.length,
-      cardHTML: cardElement.outerHTML,
-    });
-
-    return null;
-  }
-
-  log('MODULES: fifth field candidate', candidate);
-  log('MODULES: candidate HTML', candidate.outerHTML);
-
-  return candidate;
+  return textOf(element);
 }
 
 function readModules(element) {
-  log('MODULES: starting parser', element);
+  if (!element) return [];
 
-  if (!element) {
-    warn('MODULES: no element supplied', null);
-    return [];
-  }
+  const raw = textOf(element);
 
-  log('MODULES: original innerHTML', element.innerHTML);
-  log('MODULES: original textContent', element.textContent);
-  log('MODULES: original innerText', element.innerText);
-
-  /*
-   * Inspect the HTML representation before parsing.
-   * Clone it so the actual authored content is untouched.
-   */
-  const copy = element.cloneNode(true);
-
-  // Preserve explicit HTML line breaks.
-  copy.querySelectorAll('br').forEach((br) => {
-    br.replaceWith('\n');
-  });
-
-  // Preserve block boundaries.
-  copy.querySelectorAll('p, div, li').forEach((node) => {
-    node.append('\n');
-  });
-
-  const raw = (
-    copy.innerText
-    || copy.textContent
-    || ''
-  )
-    .replace(/\r/g, '')
-    .trim();
-
-  log('MODULES: normalized text', raw);
-
-  const lines = raw
-    .split('\n')
+  return raw
+    .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter(Boolean);
-
-  log('MODULES: parsed lines', lines);
-
-  const modules = lines
-    .map((line, index) => {
-      log(`MODULES: parsing line ${index + 1}`, line);
-
-      const firstPipe = line.indexOf('|');
-      const secondPipe = line.indexOf(
-        '|',
-        firstPipe + 1,
-      );
-
-      if (firstPipe < 1 || secondPipe < 0) {
-        warn('MODULES: invalid line format', {
-          line,
-          expected: 'ID|Title|Description',
-        });
-
-        return null;
-      }
-
-      const module = {
-        id: line.slice(0, firstPipe).trim(),
-        title: line
-          .slice(firstPipe + 1, secondPipe)
-          .trim(),
-        description: line
-          .slice(secondPipe + 1)
-          .trim(),
-      };
-
-      log('MODULES: parsed module', module);
-
-      return module;
-    })
     .filter(Boolean)
+    .map((line) => {
+      const [id, title, ...descriptionParts] = line.split('|');
+
+      return {
+        id: (id || '').trim(),
+        title: (title || '').trim(),
+        description: descriptionParts.join('|').trim(),
+      };
+    })
+    .filter((module) => module.id && module.title)
     .slice(0, MAX_MODULES);
-
-  log('MODULES: final authored modules', modules);
-
-  return modules;
 }
 
-/* --------------------------------------------------
-   3. Read card fields
--------------------------------------------------- */
+function readCard(element) {
+  const fields = childrenOf(element);
 
-function readCard(cardElement, index) {
-  console.group(`${LOG_PREFIX} CARD ${index + 1}`);
-
-  log('CARD: full HTML', cardElement.outerHTML);
-
-  const fields = getChildren(cardElement);
-
-  log('CARD: direct child count', fields.length);
-
-  fields.forEach((field, fieldIndex) => {
-    log(`CARD: field ${fieldIndex}`, {
-      html: field.outerHTML,
-      text: getText(field),
-    });
-  });
-
-  const modulesElement = findModulesElement(cardElement);
-
-  const card = {
-    title: getText(fields[0]),
-    description: getText(fields[1]),
-    thumbnail: getReference(fields[2]),
-    image: getReference(fields[3]),
-    modules: readModules(modulesElement),
+  return {
+    title: textOf(fields[0]),
+    description: textOf(fields[1]),
+    thumbnail: referenceOf(fields[2]),
+    image: referenceOf(fields[3]),
+    modules: readModules(fields[4]),
   };
-
-  log('CARD: extracted data', card);
-
-  console.groupEnd();
-
-  return card;
 }
 
 function readBlockData(block) {
-  console.group(`${LOG_PREFIX} BLOCK INSPECTION`);
-
-  log('BLOCK: element', block);
-  log('BLOCK: outerHTML', block.outerHTML);
-
-  const children = getChildren(block);
-
-  log('BLOCK: direct child count', children.length);
-
-  children.forEach((child, index) => {
-    log(`BLOCK: child ${index}`, {
-      tag: child.tagName,
-      text: getText(child),
-      html: child.outerHTML,
-    });
-  });
-
-  const title = getText(children[0]);
-
-  const cards = children
-    .slice(1, 1 + MAX_CARDS)
-    .map((element, index) => readCard(element, index))
-    .filter((card) => (
-      card.title || card.image || card.thumbnail
-    ));
-
-  const data = {
-    title,
-    cards,
-  };
-
-  log('BLOCK: final extracted data', data);
-
-  console.groupEnd();
-
-  return data;
-}
-
-/* --------------------------------------------------
-   4. Construct the Assets API URL
--------------------------------------------------- */
-
-function getAssetApiUrl(imageReference) {
-  log('API URL: input image reference', imageReference);
-
-  if (!imageReference) {
-    throw new Error('Motor image reference is empty.');
-  }
-
-  const url = new URL(
-    imageReference,
-    window.location.href,
-  );
-
-  log('API URL: resolved URL', url.href);
-  log('API URL: origin', url.origin);
-  log('API URL: pathname', url.pathname);
-
-  const pathname = decodeURIComponent(url.pathname);
-  const prefix = '/content/dam/';
-
-  if (!pathname.startsWith(prefix)) {
-    throw new Error(
-      `Image path does not start with ${prefix}: ${pathname}`,
-    );
-  }
-
-  const relativePath = pathname.slice(prefix.length);
-
-  const apiUrl = ASSETS_API_BASE
-    + relativePath
-      .split('/')
-      .map(encodeURIComponent)
-      .join('/')
-    + '.json';
-
-  log('API URL: relative asset path', relativePath);
-  log('API URL: final endpoint', apiUrl);
-
-  return apiUrl;
-}
-
-/* --------------------------------------------------
-   5. Inspect API response and metadata
--------------------------------------------------- */
-
-async function fetchAssetMetadata(imageReference) {
-  console.group(`${LOG_PREFIX} API REQUEST`);
-
-  let apiUrl;
-
-  try {
-    apiUrl = getAssetApiUrl(imageReference);
-  } catch (exception) {
-    error('API URL: construction failed', exception);
-    console.groupEnd();
-    throw exception;
-  }
-
-  log('API: fetch endpoint', apiUrl);
-  log('API: credentials mode', 'include');
-
-  let response;
-
-  try {
-    response = await fetch(apiUrl, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-  } catch (exception) {
-    error('API: fetch threw an exception', {
-      name: exception.name,
-      message: exception.message,
-      endpoint: apiUrl,
-      hint: 'Check browser Network tab, authentication and CORS.',
-    });
-
-    console.groupEnd();
-    throw exception;
-  }
-
-  log('API: HTTP status', response.status);
-  log('API: HTTP status text', response.statusText);
-  log('API: response OK', response.ok);
-  log('API: response URL', response.url);
-  log(
-    'API: content type',
-    response.headers.get('content-type'),
-  );
-
-  if (!response.ok) {
-    const responseText = await response.text();
-
-    error('API: error response body', responseText);
-
-    console.groupEnd();
-
-    throw new Error(
-      `Assets API returned HTTP ${response.status}`,
-    );
-  }
-
-  let asset;
-
-  try {
-    asset = await response.json();
-  } catch (exception) {
-    error('API: JSON parsing failed', exception);
-    console.groupEnd();
-    throw exception;
-  }
-
-  log('API: complete JSON response', asset);
-  log('API: top-level keys', Object.keys(asset || {}));
-  log('API: asset properties', asset?.properties);
-  log('API: metadata object', asset?.properties?.metadata);
-
-  const metadata = asset?.properties?.metadata || {};
-
-  log('API: imageMap raw value', metadata.imageMap);
-  log('API: imageMap type', typeof metadata.imageMap);
-  log('API: imageMap length', metadata.imageMap?.length || 0);
-
-  log('API: TIFF width property', metadata['tiff:ImageWidth']);
-  log('API: TIFF height property', metadata['tiff:ImageLength']);
-
-  log('API: asset name', asset?.properties?.['cq:name']);
-  log('API: parent path', asset?.properties?.['cq:parentPath']);
-
-  console.groupEnd();
+  const children = childrenOf(block);
 
   return {
-    asset,
-    apiUrl,
-    metadata,
-    imageMap: metadata.imageMap || '',
+    title: textOf(children[0]),
+    cards: children
+      .slice(1, 1 + MAX_CARDS)
+      .map(readCard)
+      .filter((card) => card.title || card.image || card.thumbnail),
   };
 }
 
-/* --------------------------------------------------
-   6. Get actual image dimensions
--------------------------------------------------- */
+/* ---------- Dynamic Media API helpers ---------- */
+/*
+ * Your current UE image URLs use:
+ * /adobe/dynamicmedia/deliver/dm-aid--.../powertrain-1.png
+ *
+ * The Assets API needs a DAM path, not the delivery URL.
+ * This POC assumes these assets live in /content/dam/uni-eds/.
+ */
+function getAssetApiUrl(imageReference) {
+  const url = new URL(imageReference, window.location.origin);
+  const pathname = decodeURIComponent(url.pathname);
 
-function getImageDimensions(imageReference) {
-  log('DIMENSIONS: loading image', imageReference);
+  let assetPath = '';
 
+  if (pathname.startsWith('/content/dam/')) {
+    assetPath = pathname.slice('/content/dam/'.length);
+  } else if (pathname.includes('/adobe/dynamicmedia/deliver/')) {
+    const filename = pathname.split('/').pop();
+
+    if (!filename) {
+      throw new Error(`Cannot extract asset filename from ${pathname}`);
+    }
+
+    // Adjust this folder if the assets are stored elsewhere in DAM.
+    assetPath = `uni-eds/${filename}`;
+  } else {
+    throw new Error(`Unsupported image URL: ${pathname}`);
+  }
+
+  const encodedPath = assetPath
+    .split('/')
+    .map((part) => encodeURIComponent(part))
+    .join('/');
+
+  return `${ASSETS_API_BASE}${encodedPath}.json`;
+}
+
+function getImageDimensions(imageUrl) {
   return new Promise((resolve, reject) => {
     const image = new Image();
 
     image.onload = () => {
-      const dimensions = {
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-        displayedWidth: image.width,
-        displayedHeight: image.height,
-        src: image.currentSrc || image.src,
-      };
-
-      log('DIMENSIONS: image loaded', dimensions);
-
-      if (!dimensions.width || !dimensions.height) {
-        reject(new Error('Image natural dimensions are zero.'));
+      if (!image.naturalWidth || !image.naturalHeight) {
+        reject(new Error('Image dimensions are unavailable.'));
         return;
       }
 
-      resolve(dimensions);
-    };
-
-    image.onerror = (event) => {
-      error('DIMENSIONS: image failed to load', {
-        src: image.src,
-        event,
+      resolve({
+        width: image.naturalWidth,
+        height: image.naturalHeight,
       });
-
-      reject(new Error(
-        `Unable to load image for dimensions: ${image.src}`,
-      ));
     };
 
-    image.src = imageReference;
+    image.onerror = () => {
+      reject(new Error(`Unable to load image: ${imageUrl}`));
+    };
+
+    image.src = imageUrl;
   });
 }
 
-/* --------------------------------------------------
-   7. Parse imageMap polygons
--------------------------------------------------- */
-
+/*
+ * Expected metadata example:
+ * [poly(44,44,54,44,54,34,44,34,44,44)"quickview:sku="|""|"engine3"]
+ *
+ * The hotspot ID is the final quoted value before the closing bracket.
+ */
 function parseImageMap(imageMap, imageWidth, imageHeight) {
-  console.group(`${LOG_PREFIX} IMAGE MAP PARSER`);
-
-  log('PARSER: raw imageMap', imageMap);
-  log('PARSER: width', imageWidth);
-  log('PARSER: height', imageHeight);
-
-  if (!imageMap) {
-    warn('PARSER: imageMap is empty', imageMap);
-    console.groupEnd();
-    return [];
-  }
-
-  if (!imageWidth || !imageHeight) {
-    warn('PARSER: invalid image dimensions', {
+  if (!imageMap || !imageWidth || !imageHeight) {
+    console.warn('[NEV-MOTOR] Missing imageMap or image dimensions', {
+      imageMap,
       imageWidth,
       imageHeight,
     });
-
-    console.groupEnd();
     return [];
   }
 
-  /*
-   * Split into individual polygon entries first.
-   * This avoids depending on one greedy regex for the label.
-   */
-  const entries = imageMap
-    .split(']')
-    .map((entry) => entry.trim())
-    .filter(Boolean);
+  const hotspots = [];
+  const entries = imageMap.match(/\[poly\([^)]*\)[^\]]*\]/g) || [];
 
-  log('PARSER: individual entries', entries);
+  entries.forEach((entry) => {
+    const coordinateMatch = entry.match(/poly\(([^)]*)\)/);
+    const labelMatches = [...entry.matchAll(/"([^"]*)"/g)];
 
-  const hotspots = entries
-    .map((entry, index) => {
-      console.group(`${LOG_PREFIX} POLYGON ${index + 1}`);
+    if (!coordinateMatch || !labelMatches.length) {
+      console.warn('[NEV-MOTOR] Could not parse hotspot entry:', entry);
+      return;
+    }
 
-      log('POLYGON: raw entry', entry);
+    // The final quoted string is the Dynamic Media hotspot label.
+    const id = labelMatches[labelMatches.length - 1][1].trim();
 
-      const polygonMatch = entry.match(
-        /poly\(([^)]*)\)/i,
-      );
+    const points = [
+      ...coordinateMatch[1].matchAll(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/g),
+    ].map((point) => ({
+      x: Number(point[1]),
+      y: Number(point[2]),
+    }));
 
-      if (!polygonMatch) {
-        warn('POLYGON: poly(...) not found', entry);
-        console.groupEnd();
-        return null;
-      }
+    if (!id || !points.length) {
+      console.warn('[NEV-MOTOR] Invalid hotspot entry:', entry);
+      return;
+    }
 
-      const coordinateText = polygonMatch[1];
+    /*
+     * Use the average of polygon points as the hotspot position.
+     * These coordinates are normalized against the source image dimensions.
+     */
+    const centerX =
+      points.reduce((sum, point) => sum + point.x, 0) / points.length;
+    const centerY =
+      points.reduce((sum, point) => sum + point.y, 0) / points.length;
 
-      log('POLYGON: coordinate text', coordinateText);
+    hotspots.push({
+      id,
+      x: (centerX / imageWidth) * 100,
+      y: (centerY / imageHeight) * 100,
+    });
+  });
 
-      const points = [
-        ...coordinateText.matchAll(
-          /(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)/g,
-        ),
-      ].map((match) => ({
-        x: Number(match[1]),
-        y: Number(match[2]),
-      }));
-
-      log('POLYGON: parsed points', points);
-      log('POLYGON: point count', points.length);
-
-      /*
-       * The known AEM format ends with:
-       * |""|"engine3"
-       *
-       * Match the last quoted value as the hotspot label.
-       */
-      const labelMatch = entry.match(
-        /\|"([^"]*)"\s*$/,
-      );
-
-      log('POLYGON: label regex match', labelMatch);
-
-      if (!labelMatch) {
-        warn('POLYGON: final label not found', entry);
-        console.groupEnd();
-        return null;
-      }
-
-      const id = labelMatch[1];
-
-      log('POLYGON: extracted ID', id);
-
-      if (!points.length) {
-        warn('POLYGON: no coordinate pairs found', entry);
-        console.groupEnd();
-        return null;
-      }
-
-      const sumX = points.reduce(
-        (sum, point) => sum + point.x,
-        0,
-      );
-
-      const sumY = points.reduce(
-        (sum, point) => sum + point.y,
-        0,
-      );
-
-      const centerX = sumX / points.length;
-      const centerY = sumY / points.length;
-
-      const x = (centerX / imageWidth) * 100;
-      const y = (centerY / imageHeight) * 100;
-
-      const hotspot = {
-        id,
-        points,
-        centerX,
-        centerY,
-        imageWidth,
-        imageHeight,
-        x,
-        y,
-      };
-
-      log('POLYGON: sum X', sumX);
-      log('POLYGON: sum Y', sumY);
-      log('POLYGON: center X in pixels', centerX);
-      log('POLYGON: center Y in pixels', centerY);
-      log('POLYGON: X percentage', x);
-      log('POLYGON: Y percentage', y);
-      log('POLYGON: final hotspot object', hotspot);
-
-      console.groupEnd();
-
-      return hotspot;
-    })
-    .filter(Boolean);
-
-  log('PARSER: final hotspot array', hotspots);
-  log('PARSER: hotspot count', hotspots.length);
-
-  console.table(
-    hotspots.map((hotspot) => ({
-      id: hotspot.id,
-      centerX: hotspot.centerX,
-      centerY: hotspot.centerY,
-      xPercent: hotspot.x,
-      yPercent: hotspot.y,
-    })),
-  );
-
-  console.groupEnd();
-
+  console.table(hotspots);
   return hotspots;
 }
 
-/* --------------------------------------------------
-   8. Match authored modules to API hotspots
--------------------------------------------------- */
+async function fetchHotspots(imageReference) {
+  if (!imageReference) return [];
 
-function matchModulesToHotspots(modules, hotspots) {
-  console.group(`${LOG_PREFIX} ID MATCHING`);
+  const apiUrl = getAssetApiUrl(imageReference);
 
-  log('MATCH: authored modules', modules);
-  log('MATCH: API hotspots', hotspots);
+  console.info('[NEV-MOTOR] Fetching asset metadata:', apiUrl);
 
-  const results = modules.map((module) => {
-    const match = hotspots.find(
-      (hotspot) => hotspot.id === module.id,
-    );
-
-    const result = {
-      moduleId: module.id,
-      title: module.title,
-      description: module.description,
-      matched: Boolean(match),
-      hotspotId: match?.id || null,
-      x: match?.x ?? null,
-      y: match?.y ?? null,
-    };
-
-    if (match) {
-      log(`MATCH: SUCCESS for "${module.id}"`, result);
-    } else {
-      warn(`MATCH: FAILED for "${module.id}"`, {
-        moduleId: module.id,
-        availableHotspotIds: hotspots.map((item) => item.id),
-      });
-    }
-
-    return result;
+  const response = await fetch(apiUrl, {
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+    },
   });
 
-  log('MATCH: final results', results);
-
-  console.table(results);
-
-  console.groupEnd();
-
-  return results;
-}
-
-/* --------------------------------------------------
-   9. Run diagnostics for every card
--------------------------------------------------- */
-
-async function diagnoseCard(card, index) {
-  console.group(`${LOG_PREFIX} FULL DIAGNOSTIC CARD ${index + 1}`);
-
-  log('CARD: title', card.title);
-  log('CARD: motor image', card.image);
-  log('CARD: authored modules', card.modules);
-
-  if (!card.image) {
-    error('CARD: motor image reference is empty', card);
-    console.groupEnd();
-    return;
+  if (!response.ok) {
+    throw new Error(`Assets API returned HTTP ${response.status}: ${apiUrl}`);
   }
 
+  const asset = await response.json();
+  const properties = asset?.properties || {};
+  const metadata = properties.metadata || {};
+  const imageMap = metadata.imageMap || '';
+
+  console.info('[NEV-MOTOR] Asset API response:', asset);
+  console.info('[NEV-MOTOR] imageMap:', imageMap);
+
+  /*
+   * Prefer original asset dimensions from metadata if present.
+   * The delivered image URL may be transformed to a different size.
+   */
+  let width = Number(
+    metadata['tiff:ImageWidth']
+      || metadata['dam:extracted']
+      || 0,
+  );
+
+  let height = Number(metadata['tiff:ImageLength'] || 0);
+
+  if (!width || !height) {
+    const dimensions = await getImageDimensions(imageReference);
+    width = dimensions.width;
+    height = dimensions.height;
+
+    console.warn(
+      '[NEV-MOTOR] Using delivered image dimensions as fallback:',
+      { width, height },
+    );
+  }
+
+  const hotspots = parseImageMap(imageMap, width, height);
+
+  console.info('[NEV-MOTOR] Parsed hotspots:', hotspots);
+  return hotspots;
+}
+
+async function loadCardHotspots(card) {
   try {
-    const [apiData, dimensions] = await Promise.all([
-      fetchAssetMetadata(card.image),
-      getImageDimensions(card.image),
-    ]);
+    console.info('[NEV-MOTOR] Loading hotspots for:', card.title);
+    console.info('[NEV-MOTOR] Image URL:', card.image);
+    console.info('[NEV-MOTOR] Authored modules:', card.modules);
 
-    log('CARD: API endpoint used', apiData.apiUrl);
-    log('CARD: API metadata received', apiData.metadata);
-    log('CARD: imageMap received', apiData.imageMap);
-    log('CARD: actual image dimensions', dimensions);
+    const hotspots = await fetchHotspots(card.image);
 
-    const metadataWidth = Number(
-      apiData.metadata['tiff:ImageWidth'],
+    card.modules = card.modules
+      .map((module) => {
+        const hotspot = hotspots.find(
+          (item) => item.id === module.id,
+        );
+
+        if (!hotspot) {
+          console.warn(
+            `[NEV-MOTOR] No hotspot label matches "${module.id}".`,
+            'Available labels:',
+            hotspots.map((item) => item.id),
+          );
+          return null;
+        }
+
+        return {
+          ...module,
+          x: hotspot.x,
+          y: hotspot.y,
+        };
+      })
+      .filter(Boolean)
+      .slice(0, MAX_MODULES);
+
+    console.info('[NEV-MOTOR] Matched modules:', card.modules);
+  } catch (error) {
+    console.error(
+      `[NEV-MOTOR] Could not load hotspots for "${card.title}":`,
+      error,
     );
 
-    const metadataHeight = Number(
-      apiData.metadata['tiff:ImageLength'],
-    );
-
-    const width = metadataWidth || dimensions.width;
-    const height = metadataHeight || dimensions.height;
-
-    log('CARD: final width used for calculation', width);
-    log('CARD: final height used for calculation', height);
-
-    if (!metadataWidth || !metadataHeight) {
-      warn(
-        'CARD: TIFF dimensions missing; using natural image dimensions',
-        {
-          metadataWidth: apiData.metadata['tiff:ImageWidth'],
-          metadataHeight: apiData.metadata['tiff:ImageLength'],
-          fallbackWidth: dimensions.width,
-          fallbackHeight: dimensions.height,
-        },
-      );
-    }
-
-    const hotspots = parseImageMap(
-      apiData.imageMap,
-      width,
-      height,
-    );
-
-    const matches = matchModulesToHotspots(
-      card.modules,
-      hotspots,
-    );
-
-    log('CARD: diagnostic summary', {
-      title: card.title,
-      image: card.image,
-      apiUrl: apiData.apiUrl,
-      authoredModuleCount: card.modules.length,
-      apiHotspotCount: hotspots.length,
-      matchedCount: matches.filter((item) => item.matched).length,
-      hotspots,
-      matches,
-    });
-  } catch (exception) {
-    error('CARD: diagnostic failed', {
-      title: card.title,
-      image: card.image,
-      message: exception.message,
-      stack: exception.stack,
-    });
+    // Keep the rest of the card UI working if metadata loading fails.
+    card.modules = [];
   }
-
-  console.groupEnd();
 }
 
-/* --------------------------------------------------
-   10. Block entry point
--------------------------------------------------- */
+
+/* ---------- UI creation ---------- */
+
+function createElement(tag, className, text) {
+  const element = document.createElement(tag);
+
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+
+  return element;
+}
+
+function createUI() {
+  const ui = createElement('div', 'nev-tech__ui');
+
+  const content = createElement('div', 'nev-tech__content');
+  const headline = createElement('h2', 'nev-tech__headline');
+  const details = createElement('div', 'nev-tech__details');
+  const counter = createElement('div', 'nev-tech__counter');
+  const title = createElement('h3', 'nev-tech__title');
+  const description = createElement('p', 'nev-tech__description');
+  const thumbnails = createElement('div', 'nev-tech__thumbnails');
+
+  thumbnails.setAttribute('aria-label', 'Technology options');
+  details.append(counter, title, description, thumbnails);
+  content.append(headline, details);
+
+  const visual = createElement('div', 'nev-tech__visual');
+  const stage = createElement('div', 'nev-tech__stage');
+  const imageWrap = createElement('div', 'nev-tech__image-wrap');
+  const mainImage = createElement('img', 'nev-tech__main-image');
+  const hotspots = createElement('div', 'nev-tech__hotspots');
+
+  mainImage.alt = '';
+  imageWrap.append(mainImage);
+  stage.append(imageWrap, hotspots);
+  visual.append(stage);
+  ui.append(content, visual);
+
+  return {
+    ui,
+    headline,
+    counter,
+    title,
+    description,
+    thumbnails,
+    imageWrap,
+    mainImage,
+    hotspots,
+  };
+}
+
+/* ---------- Block decoration ---------- */
 
 export default function decorate(block) {
-  console.clear();
-
-  console.group(`${LOG_PREFIX} START`);
-  log('PAGE URL', window.location.href);
-  log('PAGE ORIGIN', window.location.origin);
-  log('START TIME', new Date().toISOString());
-
   const data = readBlockData(block);
 
-  log('TOTAL CARDS', data.cards.length);
+  if (!data.cards.length) return;
 
-  console.groupEnd();
+  const ui = createUI();
 
-  if (!data.cards.length) {
-    error(
-      'No cards detected. Inspect BLOCK HTML and child structure above.',
-      block.outerHTML,
-    );
-    return;
+  // Preserve editable source fields in Universal Editor.
+  const inUniversalEditor = Boolean(
+    block.querySelector('[data-aue-type]')
+      || block.closest('[data-aue-type]'),
+  );
+
+  if (inUniversalEditor) {
+    block.appendChild(ui.ui);
+  } else {
+    block.replaceChildren(ui.ui);
   }
 
-  Promise.all(
-    data.cards.map((card, index) => diagnoseCard(card, index)),
-  ).then(() => {
-    console.group(`${LOG_PREFIX} ALL DIAGNOSTICS COMPLETE`);
-    log('Total cards inspected', data.cards.length);
-    log('Finish time', new Date().toISOString());
-    console.groupEnd();
+  let activeIndex = 0;
+  let openHotspot = null;
+
+  function closePopover() {
+    if (!openHotspot) return;
+
+    const button = openHotspot.querySelector('.nev-tech__hotspot');
+    const popover = openHotspot.querySelector('.nev-tech__popover');
+    const icon = button?.querySelector('span');
+
+    button?.classList.remove('is-open');
+    button?.setAttribute('aria-expanded', 'false');
+
+    if (icon) icon.textContent = '+';
+
+    popover?.classList.remove('is-open');
+    openHotspot = null;
+  }
+
+  function renderThumbnails() {
+    ui.thumbnails.replaceChildren();
+
+    data.cards.forEach((card, index) => {
+      if (!card.thumbnail) return;
+
+      const button = createElement('button', 'nev-tech__thumbnail');
+      button.type = 'button';
+      button.setAttribute(
+        'aria-label',
+        `Show ${card.title || `slide ${index + 1}`}`,
+      );
+      button.setAttribute('aria-pressed', String(index === activeIndex));
+
+      if (index === activeIndex) button.classList.add('is-active');
+
+      const image = createElement('img');
+      image.src = card.thumbnail;
+      image.alt = '';
+
+      button.append(image);
+      button.addEventListener('click', () => selectSlide(index));
+      ui.thumbnails.append(button);
+    });
+  }
+
+  function renderHotspots() {
+    ui.hotspots.replaceChildren();
+
+    const card = data.cards[activeIndex];
+    if (!card) return;
+
+    card.modules.forEach((module) => {
+      if (!Number.isFinite(module.x) || !Number.isFinite(module.y)) {
+        return;
+      }
+
+      const wrapper = createElement(
+        'div',
+        'nev-tech__hotspot-wrapper',
+      );
+
+      wrapper.style.left = `${Math.min(100, Math.max(0, module.x))}%`;
+      wrapper.style.top = `${Math.min(100, Math.max(0, module.y))}%`;
+
+      const button = createElement('button', 'nev-tech__hotspot');
+      button.type = 'button';
+      button.setAttribute('aria-label', module.title);
+      button.setAttribute('aria-expanded', 'false');
+
+      const icon = createElement('span', '', '+');
+      icon.setAttribute('aria-hidden', 'true');
+      button.append(icon);
+
+      const popover = createElement('div', 'nev-tech__popover');
+      popover.setAttribute('role', 'dialog');
+
+      const closeButton = createElement(
+        'button',
+        'nev-tech__popover-close',
+        '−',
+      );
+      closeButton.type = 'button';
+      closeButton.setAttribute(
+        'aria-label',
+        `Close ${module.title}`,
+      );
+
+      const popoverTitle = createElement(
+        'h4',
+        'nev-tech__popover-title',
+        module.title,
+      );
+
+      const popoverDescription = createElement(
+        'p',
+        'nev-tech__popover-description',
+        module.description,
+      );
+
+      popover.append(
+        closeButton,
+        popoverTitle,
+        popoverDescription,
+      );
+
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        if (openHotspot && openHotspot !== wrapper) {
+          closePopover();
+        }
+
+        const isOpen = popover.classList.toggle('is-open');
+
+        button.classList.toggle('is-open', isOpen);
+        button.setAttribute('aria-expanded', String(isOpen));
+        icon.textContent = isOpen ? '−' : '+';
+        openHotspot = isOpen ? wrapper : null;
+      });
+
+      closeButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        closePopover();
+        button.focus();
+      });
+
+      wrapper.append(button, popover);
+      ui.hotspots.append(wrapper);
+    });
+  }
+
+  function renderCard() {
+    const card = data.cards[activeIndex];
+    if (!card) return;
+
+    ui.counter.textContent = `${activeIndex + 1}/${data.cards.length}`;
+    ui.title.textContent = card.title;
+    ui.description.textContent = card.description;
+    ui.mainImage.alt = card.title || 'Powertrain technology';
+    ui.mainImage.src = card.image;
+
+    renderThumbnails();
+    renderHotspots();
+  }
+
+  function selectSlide(index) {
+    if (index === activeIndex || !data.cards[index]) return;
+
+    closePopover();
+    ui.imageWrap.classList.add('is-changing');
+
+    window.setTimeout(() => {
+      activeIndex = index;
+      renderCard();
+
+      window.requestAnimationFrame(() => {
+        ui.imageWrap.classList.remove('is-changing');
+      });
+    }, SLIDE_CHANGE_DURATION);
+  }
+
+  ui.ui.addEventListener('click', (event) => {
+    if (!event.target.closest('.nev-tech__hotspot-wrapper')) {
+      closePopover();
+    }
   });
+
+  ui.ui.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closePopover();
+  });
+
+  ui.headline.textContent = data.title;
+
+  // Render immediately, then replace authored modules with API-positioned ones.
+  renderCard();
+
+  loadAllCardHotspots().catch((error) => {
+    console.error('NEV Tech Motor hotspot loading failed:', error);
+  });
+
+  async function loadAllCardHotspots() {
+    await Promise.all(data.cards.map(loadCardHotspots));
+    renderCard();
+  }
 }
