@@ -15,9 +15,7 @@
       "hero",
       "cards",
       "columns",
-      "fragment",
-      "nev-tech",
-      "nev-tech-motor"
+      "fragment"
     ]
   },
   {
@@ -50,7 +48,7 @@
   {
     "id": "nev-tech-motor",
     "components": [
-      "nev-tech-motor-card"
+      "nev-tech-motor-item"
     ]
   },
   {

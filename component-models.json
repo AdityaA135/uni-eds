@@ -305,52 +305,58 @@
     "id": "nev-tech-motor",
     "fields": [
       {
-        "component": "text",
-        "name": "title",
-        "label": "Title",
+        "component": "richtext",
         "valueType": "string",
-        "required": true
+        "name": "heading",
+        "label": "Heading",
+        "value": ""
       }
     ]
   },
   {
-    "id": "nev-tech-motor-card",
+    "id": "nev-tech-motor-item",
     "fields": [
       {
-        "component": "text",
-        "name": "title",
-        "label": "Title",
+        "component": "richtext",
         "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "textarea",
-        "name": "description",
-        "label": "Description",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "reference",
-        "name": "thumbnail",
+        "name": "media_thumbnail",
         "label": "Thumbnail",
-        "valueType": "string",
-        "required": true
+        "multi": false
       },
       {
-        "component": "reference",
-        "name": "motorImage",
-        "label": "Motor Image",
+        "component": "text",
         "valueType": "string",
-        "required": true
+        "name": "media_thumbnailAlt",
+        "label": "Thumbnail alt",
+        "value": ""
       },
       {
-        "component": "textarea",
-        "name": "modules",
-        "label": "Modules",
+        "component": "richtext",
         "valueType": "string",
-        "required": true,
-        "description": "Enter up to 4 modules, one per line, using this format: ID|Title|Description\n\nengine3|Engine|Details about the engine\nengine2|Motor|Details about the motor\nHot|Cooling system|Details about the cooling system\n\nThe ID must exactly match a hotspot label configured in Dynamic Media. Do not enter X or Y coordinates."
+        "name": "media_image",
+        "label": "Showcase image (chassis / engine)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_imageAlt",
+        "label": "Showcase image alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Title and description",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "hotspots",
+        "label": "Hotspots: one list item each, as 'x%, y% | TITLE | description' (position over the showcase image)",
+        "value": ""
       }
     ]
   },
@@ -398,7 +404,7 @@
         "required": true
       },
       {
-        "component": "textarea",
+        "component": "richtext",
         "name": "modules",
         "label": "Modules",
         "valueType": "string",

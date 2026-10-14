@@ -1,565 +1,306 @@
-
-const MAX_CARDS = 3;
-const MAX_MODULES = 4;
-const SLIDE_CHANGE_DURATION = 260;
-
-const ASSETS_API_BASE =
-  'https://author-p8803-e1283844.adobeaemcloud.com/api/assets/';
-
-/* ---------- Author data helpers ---------- */
-
-function childrenOf(element) {
-  return Array.from(element?.children || []);
-}
-
-function textOf(element) {
-  return (
-    element?.innerText?.trim()
-    || element?.textContent?.trim()
-    || ''
-  );
-}
-
-function referenceOf(element) {
-  if (!element) return '';
-
-  if (element.tagName?.toLowerCase() === 'img' && element.src) {
-    return element.src;
-  }
-
-  const image = element.querySelector?.('img');
-  if (image?.src) return image.src;
-
-  const link = element.querySelector?.('a');
-  if (link?.href) return link.href;
-
-  return textOf(element);
-}
-
-function readModules(element) {
-  if (!element) return [];
-
-  const raw = textOf(element);
-
-  return raw
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [id, title, ...descriptionParts] = line.split('|');
-
-      return {
-        id: (id || '').trim(),
-        title: (title || '').trim(),
-        description: descriptionParts.join('|').trim(),
-      };
-    })
-    .filter((module) => module.id && module.title)
-    .slice(0, MAX_MODULES);
-}
-
-function readCard(element) {
-  const fields = childrenOf(element);
-
-  return {
-    title: textOf(fields[0]),
-    description: textOf(fields[1]),
-    thumbnail: referenceOf(fields[2]),
-    image: referenceOf(fields[3]),
-    modules: readModules(fields[4]),
-  };
-}
-
-function readBlockData(block) {
-  const children = childrenOf(block);
-
-  return {
-    title: textOf(children[0]),
-    cards: children
-      .slice(1, 1 + MAX_CARDS)
-      .map(readCard)
-      .filter((card) => card.title || card.image || card.thumbnail),
-  };
-}
-
-/* ---------- Dynamic Media API helpers ---------- */
 /*
- * Your current UE image URLs use:
- * /adobe/dynamicmedia/deliver/dm-aid--.../powertrain-1.png
- *
- * The Assets API needs a DAM path, not the delivery URL.
- * This POC assumes these assets live in /content/dam/uni-eds/.
+ * jsw-tech-showcase: white card, copy + thumbnail tray on the left, showcase image with
+ * hotspots on the right.
+ * Rows: a heading row, then one row per powertrain with
+ *   media    — thumbnail picture, then showcase picture
+ *   text     — title (h3) + description
+ *   hotspots — list items "x%, y% | TITLE | description" (position over the showcase image)
+ * Thumbnails are tabs: selecting one swaps the showcase image, counter and copy.
+ * A hotspot opens a frosted tooltip; clicking outside or Escape closes it.
+ * Entrance ("white curtain"): the previous section holds still while this white card slides
+ * up over it; once the card fills the screen its content fades in.
+ * The selected showcase image is marked data-zoom-source: a following parallax collage flies
+ * it from here into its centre card on scroll.
  */
-function getAssetApiUrl(imageReference) {
-  const url = new URL(imageReference, window.location.origin);
-  const pathname = decodeURIComponent(url.pathname);
 
-  let assetPath = '';
+const HOTSPOT = /^\s*(\d+(?:\.\d+)?)\s*%?\s*,\s*(\d+(?:\.\d+)?)\s*%?\s*\|\s*([^|]+?)\s*\|\s*([\s\S]+)$/;
+let instance = 0;
 
-  if (pathname.startsWith('/content/dam/')) {
-    assetPath = pathname.slice('/content/dam/'.length);
-  } else if (pathname.includes('/adobe/dynamicmedia/deliver/')) {
-    const filename = pathname.split('/').pop();
-
-    if (!filename) {
-      throw new Error(`Cannot extract asset filename from ${pathname}`);
-    }
-
-    // Adjust this folder if the assets are stored elsewhere in DAM.
-    assetPath = `uni-eds/${filename}`;
-  } else {
-    throw new Error(`Unsupported image URL: ${pathname}`);
-  }
-
-  const encodedPath = assetPath
-    .split('/')
-    .map((part) => encodeURIComponent(part))
-    .join('/');
-
-  return `${ASSETS_API_BASE}${encodedPath}.json`;
+function el(tag, className, attrs = {}) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+  return node;
 }
 
-function getImageDimensions(imageUrl) {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-
-    image.onload = () => {
-      if (!image.naturalWidth || !image.naturalHeight) {
-        reject(new Error('Image dimensions are unavailable.'));
-        return;
-      }
-
-      resolve({
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-      });
-    };
-
-    image.onerror = () => {
-      reject(new Error(`Unable to load image: ${imageUrl}`));
-    };
-
-    image.src = imageUrl;
-  });
-}
-
-/*
- * Expected metadata example:
- * [poly(44,44,54,44,54,34,44,34,44,44)"quickview:sku="|""|"engine3"]
- *
- * The hotspot ID is the final quoted value before the closing bracket.
- */
-function parseImageMap(imageMap, imageWidth, imageHeight) {
-  if (!imageMap || !imageWidth || !imageHeight) {
-    console.warn('[NEV-MOTOR] Missing imageMap or image dimensions', {
-      imageMap,
-      imageWidth,
-      imageHeight,
-    });
-    return [];
-  }
-
-  const hotspots = [];
-  const entries = imageMap.match(/\[poly\([^)]*\)[^\]]*\]/g) || [];
-
-  entries.forEach((entry) => {
-    const coordinateMatch = entry.match(/poly\(([^)]*)\)/);
-    const labelMatches = [...entry.matchAll(/"([^"]*)"/g)];
-
-    if (!coordinateMatch || !labelMatches.length) {
-      console.warn('[NEV-MOTOR] Could not parse hotspot entry:', entry);
-      return;
-    }
-
-    // The final quoted string is the Dynamic Media hotspot label.
-    const id = labelMatches[labelMatches.length - 1][1].trim();
-
-    const points = [
-      ...coordinateMatch[1].matchAll(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/g),
-    ].map((point) => ({
-      x: Number(point[1]),
-      y: Number(point[2]),
+function parseHotspots(cell) {
+  if (!cell) return [];
+  return [...cell.querySelectorAll('li')].map((li) => li.textContent.match(HOTSPOT)).filter(Boolean)
+    .map(([, x, y, title, text]) => ({
+      x: Math.min(100, +x), y: Math.min(100, +y), title: title.trim(), text: text.trim(),
     }));
+}
 
-    if (!id || !points.length) {
-      console.warn('[NEV-MOTOR] Invalid hotspot entry:', entry);
-      return;
+/**
+ * "white curtain" entrance: while this section slides up, the previous section's content is
+ * moved down by the distance scrolled, so it stays put and the white card covers it (only the
+ * content moves: section boxes, which the navigation theme and the wheel stops read, do not);
+ * the card's content is veiled until the card has filled the screen, then fades in
+ */
+function curtain(section, block) {
+  let prev = section.previousElementSibling;
+  while (prev && !prev.classList.contains('section')) prev = prev.previousElementSibling;
+  const held = prev?.firstElementChild;
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    if (held) {
+      const r = prev.getBoundingClientRect();
+      const shift = Math.min(r.height, Math.max(0, -r.top));
+      held.style.transform = shift ? `translate3d(0, ${shift.toFixed(1)}px, 0)` : '';
     }
-
-    /*
-     * Use the average of polygon points as the hotspot position.
-     * These coordinates are normalized against the source image dimensions.
-     */
-    const centerX =
-      points.reduce((sum, point) => sum + point.x, 0) / points.length;
-    const centerY =
-      points.reduce((sum, point) => sum + point.y, 0) / points.length;
-
-    hotspots.push({
-      id,
-      x: (centerX / imageWidth) * 100,
-      y: (centerY / imageHeight) * 100,
-    });
-  });
-
-  console.table(hotspots);
-  return hotspots;
-}
-
-async function fetchHotspots(imageReference) {
-  if (!imageReference) return [];
-
-  const apiUrl = getAssetApiUrl(imageReference);
-
-  console.info('[NEV-MOTOR] Fetching asset metadata:', apiUrl);
-
-  const response = await fetch(apiUrl, {
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Assets API returned HTTP ${response.status}: ${apiUrl}`);
-  }
-
-  const asset = await response.json();
-  const properties = asset?.properties || {};
-  const metadata = properties.metadata || {};
-  const imageMap = metadata.imageMap || '';
-
-  console.info('[NEV-MOTOR] Asset API response:', asset);
-  console.info('[NEV-MOTOR] imageMap:', imageMap);
-
-  /*
-   * Prefer original asset dimensions from metadata if present.
-   * The delivered image URL may be transformed to a different size.
-   */
-  let width = Number(
-    metadata['tiff:ImageWidth']
-      || metadata['dam:extracted']
-      || 0,
-  );
-
-  let height = Number(metadata['tiff:ImageLength'] || 0);
-
-  if (!width || !height) {
-    const dimensions = await getImageDimensions(imageReference);
-    width = dimensions.width;
-    height = dimensions.height;
-
-    console.warn(
-      '[NEV-MOTOR] Using delivered image dimensions as fallback:',
-      { width, height },
-    );
-  }
-
-  const hotspots = parseImageMap(imageMap, width, height);
-
-  console.info('[NEV-MOTOR] Parsed hotspots:', hotspots);
-  return hotspots;
-}
-
-async function loadCardHotspots(card) {
-  try {
-    console.info('[NEV-MOTOR] Loading hotspots for:', card.title);
-    console.info('[NEV-MOTOR] Image URL:', card.image);
-    console.info('[NEV-MOTOR] Authored modules:', card.modules);
-
-    const hotspots = await fetchHotspots(card.image);
-
-    card.modules = card.modules
-      .map((module) => {
-        const hotspot = hotspots.find(
-          (item) => item.id === module.id,
-        );
-
-        if (!hotspot) {
-          console.warn(
-            `[NEV-MOTOR] No hotspot label matches "${module.id}".`,
-            'Available labels:',
-            hotspots.map((item) => item.id),
-          );
-          return null;
-        }
-
-        return {
-          ...module,
-          x: hotspot.x,
-          y: hotspot.y,
-        };
-      })
-      .filter(Boolean)
-      .slice(0, MAX_MODULES);
-
-    console.info('[NEV-MOTOR] Matched modules:', card.modules);
-  } catch (error) {
-    console.error(
-      `[NEV-MOTOR] Could not load hotspots for "${card.title}":`,
-      error,
-    );
-
-    // Keep the rest of the card UI working if metadata loading fails.
-    card.modules = [];
-  }
-}
-
-
-/* ---------- UI creation ---------- */
-
-function createElement(tag, className, text) {
-  const element = document.createElement(tag);
-
-  if (className) element.className = className;
-  if (text !== undefined) element.textContent = text;
-
-  return element;
-}
-
-function createUI() {
-  const ui = createElement('div', 'nev-tech__ui');
-
-  const content = createElement('div', 'nev-tech__content');
-  const headline = createElement('h2', 'nev-tech__headline');
-  const details = createElement('div', 'nev-tech__details');
-  const counter = createElement('div', 'nev-tech__counter');
-  const title = createElement('h3', 'nev-tech__title');
-  const description = createElement('p', 'nev-tech__description');
-  const thumbnails = createElement('div', 'nev-tech__thumbnails');
-
-  thumbnails.setAttribute('aria-label', 'Technology options');
-  details.append(counter, title, description, thumbnails);
-  content.append(headline, details);
-
-  const visual = createElement('div', 'nev-tech__visual');
-  const stage = createElement('div', 'nev-tech__stage');
-  const imageWrap = createElement('div', 'nev-tech__image-wrap');
-  const mainImage = createElement('img', 'nev-tech__main-image');
-  const hotspots = createElement('div', 'nev-tech__hotspots');
-
-  mainImage.alt = '';
-  imageWrap.append(mainImage);
-  stage.append(imageWrap, hotspots);
-  visual.append(stage);
-  ui.append(content, visual);
-
-  return {
-    ui,
-    headline,
-    counter,
-    title,
-    description,
-    thumbnails,
-    imageWrap,
-    mainImage,
-    hotspots,
+    // not laid out yet (section still loading): decide once it is
+    if (!section.offsetHeight) return;
+    const { top } = section.getBoundingClientRect();
+    // revealed once the card is in place; veiled again when it slides back down
+    if (top <= 2) block.classList.add('jsw-tech-revealed');
+    else if (top > window.innerHeight * 0.5) block.classList.remove('jsw-tech-revealed');
   };
+  const schedule = () => {
+    if (!frame) frame = requestAnimationFrame(update);
+  };
+  block.classList.add('jsw-tech-curtain');
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  new ResizeObserver(schedule).observe(section);
+  update();
 }
 
-/* ---------- Block decoration ---------- */
-
-export default function decorate(block) {
-  const data = readBlockData(block);
-
-  if (!data.cards.length) return;
-
-  const ui = createUI();
-
-  // Preserve editable source fields in Universal Editor.
-  const inUniversalEditor = Boolean(
-    block.querySelector('[data-aue-type]')
-      || block.closest('[data-aue-type]'),
-  );
-
-  if (inUniversalEditor) {
-    block.appendChild(ui.ui);
-  } else {
-    block.replaceChildren(ui.ui);
-  }
-
-  let activeIndex = 0;
-  let openHotspot = null;
-
-  function closePopover() {
-    if (!openHotspot) return;
-
-    const button = openHotspot.querySelector('.nev-tech__hotspot');
-    const popover = openHotspot.querySelector('.nev-tech__popover');
-    const icon = button?.querySelector('span');
-
-    button?.classList.remove('is-open');
-    button?.setAttribute('aria-expanded', 'false');
-
-    if (icon) icon.textContent = '+';
-
-    popover?.classList.remove('is-open');
-    openHotspot = null;
-  }
-
-  function renderThumbnails() {
-    ui.thumbnails.replaceChildren();
-
-    data.cards.forEach((card, index) => {
-      if (!card.thumbnail) return;
-
-      const button = createElement('button', 'nev-tech__thumbnail');
-      button.type = 'button';
-      button.setAttribute(
-        'aria-label',
-        `Show ${card.title || `slide ${index + 1}`}`,
-      );
-      button.setAttribute('aria-pressed', String(index === activeIndex));
-
-      if (index === activeIndex) button.classList.add('is-active');
-
-      const image = createElement('img');
-      image.src = card.thumbnail;
-      image.alt = '';
-
-      button.append(image);
-      button.addEventListener('click', () => selectSlide(index));
-      ui.thumbnails.append(button);
-    });
-  }
-
-  function renderHotspots() {
-    ui.hotspots.replaceChildren();
-
-    const card = data.cards[activeIndex];
-    if (!card) return;
-
-    card.modules.forEach((module) => {
-      if (!Number.isFinite(module.x) || !Number.isFinite(module.y)) {
-        return;
-      }
-
-      const wrapper = createElement(
-        'div',
-        'nev-tech__hotspot-wrapper',
-      );
-
-      wrapper.style.left = `${Math.min(100, Math.max(0, module.x))}%`;
-      wrapper.style.top = `${Math.min(100, Math.max(0, module.y))}%`;
-
-      const button = createElement('button', 'nev-tech__hotspot');
-      button.type = 'button';
-      button.setAttribute('aria-label', module.title);
-      button.setAttribute('aria-expanded', 'false');
-
-      const icon = createElement('span', '', '+');
-      icon.setAttribute('aria-hidden', 'true');
-      button.append(icon);
-
-      const popover = createElement('div', 'nev-tech__popover');
-      popover.setAttribute('role', 'dialog');
-
-      const closeButton = createElement(
-        'button',
-        'nev-tech__popover-close',
-        '−',
-      );
-      closeButton.type = 'button';
-      closeButton.setAttribute(
-        'aria-label',
-        `Close ${module.title}`,
-      );
-
-      const popoverTitle = createElement(
-        'h4',
-        'nev-tech__popover-title',
-        module.title,
-      );
-
-      const popoverDescription = createElement(
-        'p',
-        'nev-tech__popover-description',
-        module.description,
-      );
-
-      popover.append(
-        closeButton,
-        popoverTitle,
-        popoverDescription,
-      );
-
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-
-        if (openHotspot && openHotspot !== wrapper) {
-          closePopover();
-        }
-
-        const isOpen = popover.classList.toggle('is-open');
-
-        button.classList.toggle('is-open', isOpen);
-        button.setAttribute('aria-expanded', String(isOpen));
-        icon.textContent = isOpen ? '−' : '+';
-        openHotspot = isOpen ? wrapper : null;
-      });
-
-      closeButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        closePopover();
-        button.focus();
-      });
-
-      wrapper.append(button, popover);
-      ui.hotspots.append(wrapper);
-    });
-  }
-
-  function renderCard() {
-    const card = data.cards[activeIndex];
-    if (!card) return;
-
-    ui.counter.textContent = `${activeIndex + 1}/${data.cards.length}`;
-    ui.title.textContent = card.title;
-    ui.description.textContent = card.description;
-    ui.mainImage.alt = card.title || 'Powertrain technology';
-    ui.mainImage.src = card.image;
-
-    renderThumbnails();
-    renderHotspots();
-  }
-
-  function selectSlide(index) {
-    if (index === activeIndex || !data.cards[index]) return;
-
-    closePopover();
-    ui.imageWrap.classList.add('is-changing');
-
-    window.setTimeout(() => {
-      activeIndex = index;
-      renderCard();
-
-      window.requestAnimationFrame(() => {
-        ui.imageWrap.classList.remove('is-changing');
-      });
-    }, SLIDE_CHANGE_DURATION);
-  }
-
-  ui.ui.addEventListener('click', (event) => {
-    if (!event.target.closest('.nev-tech__hotspot-wrapper')) {
-      closePopover();
+/** the figure takes the image's own ratio so hotspot percentages stay on the artwork */
+function trackRatio(figure, img) {
+  const apply = () => {
+    if (img.naturalWidth && img.naturalHeight) {
+      figure.style.setProperty('--jsw-ratio', (img.naturalWidth / img.naturalHeight).toFixed(4));
     }
-  });
+  };
+  if (img.complete) apply();
+  img.addEventListener('load', apply);
+}
 
-  ui.ui.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closePopover();
-  });
+/**
+ * browsers without CSS container units (cqw / cqh): the stage's own width and height as
+ * --jsw-cq-w / --jsw-cq-h, which the CSS uses in their place (@supports not container-type)
+ */
+function containerUnits(container) {
+  if (window.CSS?.supports?.('container-type', 'size')) return;
+  const measure = () => {
+    container.style.setProperty('--jsw-cq-w', `${container.clientWidth}px`);
+    container.style.setProperty('--jsw-cq-h', `${container.clientHeight}px`);
+  };
+  if (window.ResizeObserver) new ResizeObserver(measure).observe(container);
+  else window.addEventListener('resize', measure);
+}
 
-  ui.headline.textContent = data.title;
-
-  // Render immediately, then replace authored modules with API-positioned ones.
-  renderCard();
-
-  loadAllCardHotspots().catch((error) => {
-    console.error('NEV Tech Motor hotspot loading failed:', error);
-  });
-
-  async function loadAllCardHotspots() {
-    await Promise.all(data.cards.map(loadCardHotspots));
-    renderCard();
+/**
+ * loads and decorates the block
+ * @param {Element} block The block element
+ */
+export default function decorate(block) {
+  instance += 1;
+  const id = `jsw-tech-${instance}`;
+  const section = block.closest('.section');
+  if (section) {
+    section.dataset.jswTheme = 'light';
+    if (!section.id && !document.getElementById('nev-tech')) section.id = 'nev-tech';
   }
+
+  const rows = [...block.children];
+  const itemRows = rows.filter((r) => r.querySelector('picture'));
+  const headRow = rows.find((r) => !itemRows.includes(r));
+
+  const copy = el('div', 'jsw-tech-copy');
+  if (headRow) {
+    headRow.className = 'jsw-tech-heading';
+    headRow.querySelector('h1, h2, h3')?.classList.add('jsw-tech-title');
+    copy.append(headRow);
+  }
+  const detail = el('div', 'jsw-tech-detail');
+  const counter = el('p', 'jsw-tech-counter');
+  const texts = el('div', 'jsw-tech-texts', { 'aria-live': 'polite' });
+  const thumbs = el('div', 'jsw-tech-thumbs', { role: 'tablist', 'aria-label': 'Powertrains' });
+  detail.append(counter, texts, thumbs);
+  copy.append(detail);
+
+  const stage = el('div', 'jsw-tech-stage');
+  containerUnits(stage);
+  const tooltip = el('div', 'jsw-tech-tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
+  tooltip.hidden = true;
+  const tipTitle = el('p', 'jsw-tech-tooltip-title', { id: `${id}-tooltip-title` });
+  const tipText = el('p', 'jsw-tech-tooltip-text');
+  const tipClose = el('button', 'jsw-tech-tooltip-close', { type: 'button', 'aria-label': 'Close details' });
+  tooltip.setAttribute('aria-labelledby', tipTitle.id);
+  tooltip.append(tipTitle, tipText, tipClose);
+
+  let openSpot = null;
+  /**
+   * the tooltip opens to the left of its hotspot and down, the hotspot in its top corner (as
+   * in the design); where that would cut it off at the card's or the screen's edge it opens
+   * to the right / up instead. Where neither side fits (narrow screens) it opens just below
+   * (or above) the hotspot, centred on it and nudged in, the hotspot keeping its own box.
+   */
+  const placeTooltip = () => {
+    const area = stage.getBoundingClientRect();
+    const gap = 8;
+    const left = Math.max(area.left, 0) + gap;
+    const right = Math.min(area.right, document.documentElement.clientWidth) - gap;
+    const bottom = Math.min(area.bottom, window.innerHeight) - gap;
+    const set = (side, align) => {
+      tooltip.dataset.side = side;
+      tooltip.dataset.align = align;
+      return tooltip.getBoundingClientRect();
+    };
+    tooltip.style.removeProperty('--jsw-sx');
+    let box = set('left', 'top');
+    if (box.left < left) box = set('right', 'top');
+    const apart = box.left < left || box.right > right;
+    if (apart) box = set('center', 'below');
+    if (box.bottom > bottom) box = set(tooltip.dataset.side, apart ? 'above' : 'bottom');
+    if (box.right > right) tooltip.style.setProperty('--jsw-sx', `${right - box.right}px`);
+    else if (box.left < left) tooltip.style.setProperty('--jsw-sx', `${left - box.left}px`);
+    openSpot?.classList.toggle('jsw-hotspot-apart', apart);
+  };
+
+  const closeTooltip = (refocus = false) => {
+    if (!openSpot) return;
+    const spot = openSpot;
+    openSpot = null;
+    spot.setAttribute('aria-expanded', 'false');
+    spot.classList.remove('jsw-hotspot-apart');
+    tooltip.hidden = true;
+    if (refocus) spot.focus();
+  };
+  const openTooltip = (spot, data) => {
+    closeTooltip();
+    openSpot = spot;
+    spot.setAttribute('aria-expanded', 'true');
+    tipTitle.textContent = data.title;
+    tipText.textContent = data.text;
+    spot.closest('.jsw-tech-figure').append(tooltip);
+    tooltip.style.setProperty('--jsw-x', `${data.x}%`);
+    tooltip.style.setProperty('--jsw-y', `${data.y}%`);
+    tooltip.hidden = false;
+    placeTooltip();
+  };
+
+  const items = itemRows.map((row, i) => {
+    const cells = [...row.children];
+    const mediaCell = cells.find((c) => c.querySelector('picture'));
+    const pictures = [...mediaCell.querySelectorAll('picture')];
+    const thumbPicture = pictures[0];
+    const imagePicture = pictures[1] || pictures[0].cloneNode(true);
+    const hotCell = cells.find((c) => c !== mediaCell && c.querySelector('li'));
+    const textCell = cells.find((c) => c !== mediaCell && c !== hotCell);
+    const title = textCell?.querySelector('h2, h3, h4')?.textContent.trim() || `Powertrain ${i + 1}`;
+
+    // the item row becomes its panel (keeps the editor's item instrumentation)
+    row.className = 'jsw-tech-panel';
+    row.id = `${id}-panel-${i}`;
+    row.setAttribute('role', 'tabpanel');
+    row.setAttribute('aria-labelledby', `${id}-tab-${i}`);
+    const figure = el('div', 'jsw-tech-figure');
+    figure.append(imagePicture);
+    const img = imagePicture.querySelector('img');
+    if (img) trackRatio(figure, img);
+    parseHotspots(hotCell).forEach((spot) => {
+      const btn = el('button', 'jsw-hotspot', {
+        type: 'button',
+        'aria-label': `Show details: ${spot.title}`,
+        'aria-expanded': 'false',
+        'aria-controls': tooltip.id,
+      });
+      btn.style.setProperty('--jsw-x', `${spot.x}%`);
+      btn.style.setProperty('--jsw-y', `${spot.y}%`);
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (openSpot === btn) closeTooltip();
+        else openTooltip(btn, spot);
+      });
+      figure.append(btn);
+    });
+    if (hotCell) hotCell.classList.add('jsw-tech-hotspot-source');
+    mediaCell.remove();
+    row.prepend(figure);
+    stage.append(row);
+
+    if (textCell) {
+      textCell.classList.add('jsw-tech-text');
+      textCell.querySelector('h2, h3, h4')?.classList.add('jsw-tech-item-title');
+      texts.append(textCell);
+    }
+
+    const tab = el('button', 'jsw-tech-thumb', {
+      type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
+    });
+    thumbPicture.querySelector('img')?.setAttribute('alt', '');
+    tab.append(thumbPicture);
+    thumbs.append(tab);
+    return { row, textCell, tab };
+  });
+
+  let current = 0;
+  /**
+   * the images move like a vertical carousel (jsw-tech-showcase.css): picking a thumbnail to
+   * the right pushes the current image up and out while the new one rises from the bottom;
+   * one to the left pushes it down while the new one comes in from the top
+   */
+  const slideImages = (from, to) => {
+    if (from === to) return;
+    const dir = to > from ? 1 : -1;
+    const incoming = items[to].row;
+    incoming.style.transition = 'none';
+    incoming.style.transform = `translateY(${dir * 100}%)`;
+    incoming.getBoundingClientRect();
+    ['transition', 'transform'].forEach((p) => incoming.style.removeProperty(p));
+    items[from].row.style.transform = `translateY(${-dir * 100}%)`;
+  };
+
+  const select = (index, focus = false) => {
+    const from = current;
+    current = (index + items.length) % items.length;
+    closeTooltip();
+    if (items[from] && items[current]) slideImages(from, current);
+    items.forEach(({ row, textCell, tab }, i) => {
+      const active = i === current;
+      row.classList.toggle('is-active', active);
+      // the selected image flies on into the next section's card (parallax-collage)
+      row.querySelector('.jsw-tech-figure')?.toggleAttribute('data-zoom-source', active);
+      row.inert = !active;
+      if (textCell) textCell.hidden = !active;
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      tab.tabIndex = active ? 0 : -1;
+    });
+    counter.textContent = `${current + 1}/${items.length}`;
+    if (focus) items[current].tab.focus();
+  };
+
+  items.forEach(({ tab }, i) => {
+    tab.addEventListener('click', () => select(i));
+    tab.addEventListener('keydown', (e) => {
+      const step = {
+        ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1,
+      }[e.key];
+      if (step) {
+        e.preventDefault();
+        select(current + step, true);
+      }
+    });
+  });
+
+  tipClose.addEventListener('click', () => closeTooltip(true));
+  window.addEventListener('resize', () => {
+    if (openSpot) placeTooltip();
+  });
+  document.addEventListener('click', (e) => {
+    if (openSpot && !tooltip.contains(e.target)) closeTooltip();
+  });
+  block.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && openSpot) closeTooltip(true);
+  });
+
+  block.replaceChildren(copy, stage);
+  if (block.closest('[data-aue-resource]')) block.classList.add('jsw-tech-editing');
+  else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    curtain(section, block);
+  }
+  if (items.length) select(0);
 }

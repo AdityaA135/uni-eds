@@ -188,14 +188,14 @@
           }
         },
         {
-          "title": "NEV Tech Motor",
+          "title": "Jsw Tech Showcase",
           "id": "nev-tech-motor",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
-                  "name": "nev-tech-motor",
+                  "name": "Jsw Tech Showcase",
                   "model": "nev-tech-motor",
                   "filter": "nev-tech-motor"
                 }
@@ -204,16 +204,15 @@
           }
         },
         {
-          "title": "NEV Tech Motor Card",
-          "id": "nev-tech-motor-card",
+          "title": "Jsw Motor",
+          "id": "nev-tech-motor-item",
           "plugins": {
             "xwalk": {
               "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
+                "resourceType": "core/franklin/components/block/v1/block/item",
                 "template": {
-                  "name": "nev-tech-motor-card",
-                  "model": "nev-tech-motor-card",
-                  "filter": "nev-tech-motor-card"
+                  "name": "Jsw Motor",
+                  "model": "nev-tech-motor-item"
                 }
               }
             }
