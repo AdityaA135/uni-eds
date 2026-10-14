@@ -142,6 +142,65 @@
     ]
   },
   {
+    "id": "jsw-tech-showcase",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-tech-showcase-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "media_thumbnail",
+        "label": "Thumbnail",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_thumbnailAlt",
+        "label": "Thumbnail alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "media_image",
+        "label": "Showcase image (chassis / engine)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_imageAlt",
+        "label": "Showcase image alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Title and description",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "hotspots",
+        "label": "Hotspots: one list item each, as 'x%, y% | TITLE | description' (position over the showcase image)",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "card",
     "fields": [
       {

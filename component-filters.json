@@ -15,9 +15,13 @@
       "hero",
       "cards",
       "columns",
-      "fragment",
-      "nev-tech-motor",
-      "nev-tech"
+      "fragment"
+    ]
+  },
+  {
+    "id": "jsw-tech-showcase",
+    "components": [
+      "jsw-tech-showcase-item"
     ]
   },
   {

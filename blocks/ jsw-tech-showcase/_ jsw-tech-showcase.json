@@ -1,0 +1,104 @@
+{
+  "definitions": [
+    {
+      "title": "Jsw Tech Showcase",
+      "id": "jsw-tech-showcase",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Jsw Tech Showcase",
+              "model": "jsw-tech-showcase",
+              "filter": "jsw-tech-showcase"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Jsw Powertrain",
+      "id": "jsw-tech-showcase-item",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Jsw Powertrain",
+              "model": "jsw-tech-showcase-item"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "jsw-tech-showcase",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "heading",
+          "label": "Heading",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "id": "jsw-tech-showcase-item",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "media_thumbnail",
+          "label": "Thumbnail",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "media_thumbnailAlt",
+          "label": "Thumbnail alt",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "media_image",
+          "label": "Showcase image (chassis / engine)",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "media_imageAlt",
+          "label": "Showcase image alt",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "text",
+          "label": "Title and description",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "hotspots",
+          "label": "Hotspots: one list item each, as 'x%, y% | TITLE | description' (position over the showcase image)",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "jsw-tech-showcase",
+      "components": [
+        "jsw-tech-showcase-item"
+      ]
+    }
+  ]
+}
