@@ -5,7 +5,46 @@
  * Values from the "NEV / Tech 1-3 1280x720" frames.
  */
 
+/* the block's own faces (from the JSW NEV page): display, body and label */
+@font-face {
+  font-family: Michroma;
+  font-display: swap;
+  src: url('../../fonts/michroma.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: Inter;
+  font-display: swap;
+  src: url('../../fonts/inter.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../fonts/roboto-mono-regular.woff2') format('woff2');
+}
+
+/* the card spans the page, inset 8px on every side (not the site's 1200px content column) */
+main > .section > .interactive-showcase-wrapper {
+  max-width: none;
+  padding: 8px;
+}
+
 .interactive-showcase {
+  /* design tokens, as on the JSW NEV page; a page can override any of them */
+  --interactive-showcase-ink: #0d0d0d;
+  --interactive-showcase-white: #fff;
+  --interactive-showcase-text-dark: #111;
+  --interactive-showcase-text-muted-dark: #5c5c5c;
+  --interactive-showcase-font-display: michroma, sequel, 'Helvetica Neue', arial, sans-serif;
+  --interactive-showcase-font-body: inter, 'Helvetica Neue', arial, sans-serif;
+  --interactive-showcase-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+  --interactive-showcase-radius-card: 24px;
+  --interactive-showcase-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --interactive-showcase-edge: 20px;
+
   /* one hundredth of the screen's height (vh / svh, svh falling back to vh): every size taken
      from the screen's height goes through these, so the editor can fix them (see below) */
   --interactive-showcase-vh: 1vh;
@@ -19,6 +58,22 @@
   border-radius: var(--interactive-showcase-radius-card, 24px);
   color: var(--interactive-showcase-text-dark, #111);
   background: linear-gradient(100deg, #fff 0%, #fff 40%, #dadada 100%);
+  font-family: var(--interactive-showcase-font-body);
+  font-size: 16px;
+  letter-spacing: 0.16px;
+  line-height: 1.35;
+}
+
+@media (width >= 900px) {
+  .interactive-showcase {
+    --interactive-showcase-edge: 5.4vw;
+  }
+}
+
+/* the site's default heading and paragraph margins do not apply in the card: every gap in it
+   is set below */
+.interactive-showcase :is(h1, h2, h3, h4, p) {
+  margin: 0;
 }
 
 @supports (height: 1svh) {
@@ -81,13 +136,6 @@
   font-size: clamp(15px, 1.3vw, 19px);
   font-weight: 400;
   line-height: 1.3;
-}
-
-.interactive-showcase .interactive-showcase-text p {
-  max-width: 430px;
-  color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
-  font-size: 13.5px;
-  line-height: 1.55;
 }
 
 .interactive-showcase .interactive-showcase-text[hidden] {
@@ -517,10 +565,10 @@
     font-size: 14px;
   }
 
-  .interactive-showcase .interactive-showcase-text p {
+  /* the description (its own cell, title and description being separate fields) spans the
+     row below the counter and the title */
+  .interactive-showcase .interactive-showcase-description {
     grid-column: 1 / -1;
-    max-width: none;
-    font-size: 12.5px;
   }
 
   .interactive-showcase .interactive-showcase-description p {

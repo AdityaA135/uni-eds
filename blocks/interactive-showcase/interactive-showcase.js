@@ -170,7 +170,9 @@ export default function decorate(block) {
   if (headRow) {
     headRow.className = 'interactive-showcase-heading';
     const mainTitle = fieldCell(headRow, 'title');
-    (mainTitle || headRow.querySelector('h1, h2, h3'))?.classList.add('interactive-showcase-title');
+    // published, the plain-text title is the row's only cell (no heading element, no field name)
+    (mainTitle || headRow.querySelector('h1, h2, h3') || headRow.firstElementChild)
+      ?.classList.add('interactive-showcase-title');
     copy.append(headRow);
   }
   const detail = el('div', 'interactive-showcase-detail');
