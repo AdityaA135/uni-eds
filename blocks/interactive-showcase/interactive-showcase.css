@@ -1,0 +1,620 @@
+/*
+ * interactive-showcase: white rounded card, 2 columns.
+ * Left: heading, then counter, powertrain title + copy and the thumbnail tray.
+ * Right: showcase image (cut out, straight on the card) with "+" hotspots and a frosted tooltip.
+ * Values from the "NEV / Tech 1-3 1280x720" frames.
+ */
+
+.interactive-showcase {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--interactive-showcase-panel-height, calc(100svh - 16px));
+  overflow: hidden;
+  border-radius: var(--interactive-showcase-radius-card, 24px);
+  color: var(--interactive-showcase-text-dark, #111);
+  background: linear-gradient(100deg, #fff 0%, #fff 40%, #dadada 100%);
+}
+
+.interactive-showcase .interactive-showcase-copy {
+  display: contents;
+}
+
+.interactive-showcase .interactive-showcase-heading {
+  order: 1;
+  padding: 92px var(--interactive-showcase-edge, 20px) 24px;
+}
+
+.interactive-showcase .interactive-showcase-title {
+  max-width: 16em; /* "A NEW WAY TO MOVE" / "POWERED BY TECH" */
+  font-family: var(--interactive-showcase-font-display);
+  font-size: clamp(19px, 2.2vw, 36px);
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.interactive-showcase .interactive-showcase-description p {
+  max-width: 430px;
+  color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.interactive-showcase .interactive-showcase-detail {
+  order: 3;
+  padding: 24px var(--interactive-showcase-edge, 20px) 32px;
+}
+
+.interactive-showcase .interactive-showcase-counter {
+  margin-bottom: 10px;
+  color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
+  font-family: var(--interactive-showcase-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.interactive-showcase .interactive-showcase-item-title {
+  margin-bottom: 12px;
+  font-family: var(--interactive-showcase-font-display);
+  font-size: clamp(15px, 1.3vw, 19px);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.interactive-showcase .interactive-showcase-text p {
+  max-width: 430px;
+  color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.interactive-showcase .interactive-showcase-text[hidden] {
+  display: none;
+}
+
+.interactive-showcase .interactive-showcase-figure picture,
+.interactive-showcase .interactive-showcase-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.interactive-showcase .interactive-showcase-figure img {
+  object-fit: contain;
+}
+
+/* thumbnail tray: inactive thumbnails are greyscale */
+.interactive-showcase .interactive-showcase-thumbs {
+  display: flex;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.interactive-showcase .interactive-showcase-thumb {
+  flex: none;
+  width: clamp(84px, 9.8vw, 140px);
+  aspect-ratio: 87 / 107;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: var(--interactive-showcase-ink, #0d0d0d);
+  transition: transform 0.5s var(--interactive-showcase-ease);
+}
+
+.interactive-showcase .interactive-showcase-thumb picture,
+.interactive-showcase .interactive-showcase-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.interactive-showcase .interactive-showcase-thumb img {
+  object-fit: cover;
+  filter: grayscale(1) brightness(0.78);
+  transition: filter 0.5s var(--interactive-showcase-ease);
+}
+
+.interactive-showcase .interactive-showcase-thumb:hover img {
+  filter: grayscale(0.6) brightness(0.92);
+}
+
+.interactive-showcase .interactive-showcase-thumb[aria-selected='true'] img {
+  filter: none;
+}
+
+/* "NEV / Tech 2": the Rotax engine is black and grey in the frame; the photo's blue cast is
+   taken out and it is darkened to the frame's tones (parallax-collage carries this over
+   when it flies the image on) */
+.interactive-showcase .interactive-showcase-panel:nth-child(2) .interactive-showcase-figure img {
+  filter: grayscale(1) brightness(0.7) contrast(1.2);
+}
+
+.interactive-showcase .interactive-showcase-thumb[aria-selected='true'] {
+  transform: translateY(-4px);
+}
+
+/* stage: holds the showcase images; they are cut out, so they sit straight on the light card */
+.interactive-showcase .interactive-showcase-stage {
+  position: relative;
+  order: 2;
+  height: min(64vh, 118vw);
+  height: min(64svh, 118vw);
+  margin: 0 12px;
+  overflow: hidden;
+  container-type: size;
+}
+
+/* upright tablets (600-899px wide; wider ones and landscape use the two columns below): the
+   card is exactly one screen and the image takes the room the heading and copy leave, so the
+   thumbnails stay on the screen (and can be tapped) instead of running past its bottom */
+@media (min-width: 600px) and (max-width: 899.98px) and (orientation: portrait) {
+  .interactive-showcase {
+    height: var(--interactive-showcase-panel-height, calc(100vh - 16px));
+  }
+
+  .interactive-showcase .interactive-showcase-stage {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+/* picking a thumbnail (interactive-showcase.js): a vertical carousel inside the card. To the
+   right, the current image slides up and out while the new one rises from the bottom edge;
+   to the left, the current one slides down while the new one comes in from the top. The
+   outgoing image fades out as it slides, in step with its movement. */
+.interactive-showcase .interactive-showcase-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: transform 0.9s var(--interactive-showcase-ease), opacity 0.9s var(--interactive-showcase-ease);
+}
+
+.interactive-showcase .interactive-showcase-panel.is-active {
+  z-index: 1;
+  opacity: 1;
+  transform: none;
+  transition: transform 0.9s var(--interactive-showcase-ease);
+}
+
+/* the figure has the image's own ratio, so hotspot percentages stay on the artwork */
+.interactive-showcase .interactive-showcase-figure {
+  position: relative;
+  width: min(100cqw, 100cqh * var(--interactive-showcase-ratio, 0.8));
+  aspect-ratio: var(--interactive-showcase-ratio, 0.8);
+}
+
+.interactive-showcase .interactive-showcase-hotspot-source {
+  display: none;
+}
+
+/* hotspots */
+.interactive-showcase .interactive-showcase-hotspot {
+  position: absolute;
+  top: var(--interactive-showcase-y);
+  left: var(--interactive-showcase-x);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--interactive-showcase-white, #fff);
+  background-color: rgb(24 24 24 / 58%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transform: translate(-50%, -50%);
+  transition: background-color 0.3s var(--interactive-showcase-ease);
+}
+
+.interactive-showcase .interactive-showcase-hotspot::before,
+.interactive-showcase .interactive-showcase-hotspot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 1.5px;
+  background-color: currentcolor;
+  transform: translate(-50%, -50%);
+  transition: transform 0.3s var(--interactive-showcase-ease);
+}
+
+.interactive-showcase .interactive-showcase-hotspot::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.interactive-showcase .interactive-showcase-hotspot:hover {
+  background-color: rgb(80 80 80 / 70%);
+}
+
+/* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip */
+.interactive-showcase .interactive-showcase-hotspot[aria-expanded='true'] {
+  z-index: 4;
+  border-color: transparent;
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* ...except beside a tooltip opened below / above it: then it keeps its own box */
+.interactive-showcase .interactive-showcase-hotspot.interactive-showcase-hotspot-apart[aria-expanded='true'] {
+  border-color: rgb(255 255 255 / 16%);
+  background-color: rgb(80 80 80 / 70%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.interactive-showcase .interactive-showcase-hotspot[aria-expanded='true']::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+/* frosted tooltip ("NEV / Tech 1": 270 x 119): its hotspot sits in its top corner, 25px in
+   from the side and the top. It opens to the left and down; interactive-showcase.js flips it
+   right / up (data-side, data-align) and nudges it (--interactive-showcase-sx) so it always stays inside
+   the card and the screen */
+.interactive-showcase .interactive-showcase-tooltip {
+  --interactive-showcase-tx: calc(-100% + 25px);
+  --interactive-showcase-ty: -25px;
+
+  position: absolute;
+  top: var(--interactive-showcase-y);
+  left: var(--interactive-showcase-x);
+  z-index: 3;
+  box-sizing: border-box;
+  width: min(270px, calc(100cqw - 16px));
+
+  /* the minus shares only the title's row; the text below runs the full width, so its
+     lines break as in the frame (this font is a little wider) */
+  padding: 16px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 12px;
+  color: var(--interactive-showcase-white, #fff);
+  background-color: rgb(12 12 12 / 44%);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+  transform: translate(calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)), var(--interactive-showcase-ty));
+}
+
+.interactive-showcase .interactive-showcase-tooltip[data-side='right'] {
+  --interactive-showcase-tx: -25px;
+}
+
+/* opening upwards, the minus sits in the bottom corner: keep that row free of text */
+.interactive-showcase .interactive-showcase-tooltip[data-align='bottom'] {
+  --interactive-showcase-ty: calc(-100% + 25px);
+
+  padding-bottom: 50px;
+}
+
+/* narrow screens: just below / above the hotspot, centred on it */
+.interactive-showcase .interactive-showcase-tooltip[data-side='center'] {
+  --interactive-showcase-tx: -50%;
+}
+
+.interactive-showcase .interactive-showcase-tooltip[data-align='below'] {
+  --interactive-showcase-ty: 28px;
+}
+
+.interactive-showcase .interactive-showcase-tooltip[data-align='above'] {
+  --interactive-showcase-ty: calc(-100% - 28px);
+}
+
+.interactive-showcase .interactive-showcase-tooltip[hidden] {
+  display: none;
+}
+
+/* the title shares its row with the minus (centred 25px in from the corner) */
+.interactive-showcase .interactive-showcase-tooltip-title {
+  margin-bottom: 22px;
+  padding-right: 20px;
+  font-family: var(--interactive-showcase-font-mono);
+  font-size: 14px;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+
+.interactive-showcase .interactive-showcase-tooltip[data-side='right'] .interactive-showcase-tooltip-title {
+  padding: 0 0 0 20px;
+}
+
+.interactive-showcase .interactive-showcase-tooltip[data-side='center'] .interactive-showcase-tooltip-title {
+  padding: 0;
+}
+
+/* a touch tighter than Inter's default, so the lines break as in the frame */
+.interactive-showcase .interactive-showcase-tooltip-text {
+  color: rgb(255 255 255 / 80%);
+  font-size: 12px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* the close button lies under the hotspot's minus, in the same corner (for keyboard users;
+   the minus is the visible control) */
+.interactive-showcase .interactive-showcase-tooltip-close {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: inherit;
+  background: none;
+}
+
+.interactive-showcase .interactive-showcase-tooltip[data-side='right'] .interactive-showcase-tooltip-close {
+  right: auto;
+  left: 3px;
+}
+
+.interactive-showcase .interactive-showcase-tooltip[data-align='bottom'] .interactive-showcase-tooltip-close {
+  top: auto;
+  bottom: 3px;
+}
+
+/* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
+   in, a phone turned sideways), where the stacked layout would push the copy off screen */
+@media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+  .interactive-showcase {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
+    height: var(--interactive-showcase-panel-height, calc(100svh - 16px));
+  }
+
+  .interactive-showcase .interactive-showcase-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+    padding: 0 0 7vh;
+    padding: 0 0 7svh;
+  }
+
+  .interactive-showcase .interactive-showcase-heading {
+    padding: 0 24px 0 var(--interactive-showcase-edge);
+    padding-top: max(108px, 17vh);
+    padding-top: max(108px, 17svh);
+  }
+
+  .interactive-showcase .interactive-showcase-detail {
+    padding: 0 24px 0 var(--interactive-showcase-edge);
+  }
+
+  /* the stage covers the whole card, so each image can sit where its frame has it: partly
+     cut off by the card's right (and bottom) edge; only the hotspots take clicks */
+  .interactive-showcase .interactive-showcase-stage {
+    position: absolute;
+    inset: 0;
+    height: auto;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .interactive-showcase .interactive-showcase-panel {
+    display: block;
+  }
+
+  /* --fx / --fy: the image's left / top edge and --fh its height, in px of the 1280x720 frame;
+     on other screens it scales with the card (height first, never wider than the frame allows),
+     keeping its distance from the card's right edge */
+  .interactive-showcase .interactive-showcase-figure {
+    --u: min(calc(100cqh / 720), calc(100cqw / 1280));
+
+    position: absolute;
+    top: calc((100cqh - 720 * var(--u)) / 2 + var(--fy) * var(--u));
+    left: calc(100cqw - (1280 - var(--fx)) * var(--u));
+    width: auto;
+    height: calc(var(--fh) * var(--u));
+  }
+
+  /* "NEV / Tech 1": chassis, its body running off the right edge */
+  .interactive-showcase .interactive-showcase-panel:nth-child(1) .interactive-showcase-figure {
+    --fx: 707;
+    --fy: 107;
+    --fh: 554;
+  }
+
+  /* "NEV / Tech 2": Rotax engine, cut off by the right and bottom edges */
+  .interactive-showcase .interactive-showcase-panel:nth-child(2) .interactive-showcase-figure {
+    --fx: 660;
+    --fy: 133;
+    --fh: 650;
+  }
+
+  /* "NEV / Tech 3": the engine section 3 starts with, cut off by the right edge */
+  .interactive-showcase .interactive-showcase-panel:nth-child(3) .interactive-showcase-figure {
+    --fx: 670;
+    --fy: 110;
+    --fh: 592;
+  }
+
+  .interactive-showcase .interactive-showcase-hotspot,
+  .interactive-showcase .interactive-showcase-tooltip {
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 900px) and (max-height: 679.98px), (orientation: landscape) and (min-width: 600px) and (max-height: 679.98px) {
+  .interactive-showcase .interactive-showcase-thumb {
+    width: clamp(72px, 15vh, 120px);
+    width: clamp(72px, 15svh, 120px);
+  }
+
+  .interactive-showcase .interactive-showcase-thumbs {
+    margin-top: 18px;
+  }
+}
+
+/* phones ("M / What is NEV 375x815"): one screen, top to bottom: heading; "1/3" beside the
+   powertrain's name, its copy and the thumbnails; then the showcase image filling the rest
+   of the card, running off its right edge (tablets keep the layout above) */
+@media (max-width: 599.98px) {
+  /* vertical gaps follow the screen height (frame values at 815px tall) */
+  .interactive-showcase .interactive-showcase-heading {
+    padding: min(78px, 9.6vh) 24px 0;
+    padding: min(78px, 9.6svh) 24px 0;
+  }
+
+  .interactive-showcase .interactive-showcase-title {
+    max-width: none; /* the card's width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
+    font-size: min(24px, 6.4vw);
+    line-height: 1.3;
+  }
+
+  /* the counter and the powertrain's name share the first row */
+  .interactive-showcase .interactive-showcase-detail {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 10px;
+    order: 2;
+    padding: min(30px, 3.7vh) 24px 0;
+    padding: min(30px, 3.7svh) 24px 0;
+  }
+
+  .interactive-showcase .interactive-showcase-texts,
+  .interactive-showcase .interactive-showcase-text:not([hidden]) {
+    display: contents;
+  }
+
+  .interactive-showcase .interactive-showcase-counter {
+    grid-column: 1;
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .interactive-showcase .interactive-showcase-item-title {
+    grid-column: 2;
+    margin: 0 0 10px;
+    font-size: 14px;
+  }
+
+  .interactive-showcase .interactive-showcase-text p {
+    grid-column: 1 / -1;
+    max-width: none;
+    font-size: 12.5px;
+  }
+
+  .interactive-showcase .interactive-showcase-description p {
+    max-width: none;
+    font-size: 12.5px;
+  }
+
+  .interactive-showcase .interactive-showcase-thumbs {
+    grid-column: 1 / -1;
+    gap: 6px;
+    margin-top: 18px;
+  }
+
+  .interactive-showcase .interactive-showcase-thumb {
+    width: 63px;
+  }
+
+  /* the image sits in what is left of the screen: as on the 375x815 frame, 87% of the card's
+     width, its right edge on the card's right edge, centred between the thumbnails and the
+     card's bottom (about 35px above and below); on shorter phones those gaps narrow first, then
+     the image shrinks */
+  .interactive-showcase .interactive-showcase-stage {
+    flex: 1 0 170px;
+    order: 3;
+    height: auto;
+    margin: min(24px, 2.9vh) 0 0;
+    margin: min(24px, 2.9svh) 0 0;
+  }
+
+  .interactive-showcase .interactive-showcase-panel {
+    justify-content: flex-end;
+  }
+
+  .interactive-showcase .interactive-showcase-figure {
+    flex: none;
+    width: min(87.2cqw, (100cqh - clamp(16px, 100cqh - 250px, 40px)) * var(--interactive-showcase-ratio, 0.8));
+    height: auto;
+  }
+}
+
+/* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
+   the screen, and the + buttons stay inside the image, clear of the card's bottom edge */
+@media (max-width: 599.98px) and (max-height: 600px) {
+  .interactive-showcase .interactive-showcase-stage {
+    flex-basis: 140px;
+  }
+
+  .interactive-showcase .interactive-showcase-hotspot {
+    top: min(var(--interactive-showcase-y), 100% - 44px);
+  }
+}
+
+/* browsers without container units: the same sizes, from the stage's size as measured by
+   interactive-showcase.js (--interactive-showcase-cq-w / --interactive-showcase-cq-h in place of 100cqw / 100cqh) */
+@supports not (container-type: size) {
+  .interactive-showcase .interactive-showcase-figure {
+    width: min(var(--interactive-showcase-cq-w), var(--interactive-showcase-cq-h) * var(--interactive-showcase-ratio, 0.8));
+  }
+
+  .interactive-showcase .interactive-showcase-tooltip {
+    width: min(270px, calc(var(--interactive-showcase-cq-w) - 16px));
+  }
+
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+    .interactive-showcase .interactive-showcase-figure {
+      --u: min(calc(var(--interactive-showcase-cq-h) / 720), calc(var(--interactive-showcase-cq-w) / 1280));
+
+      top: calc((var(--interactive-showcase-cq-h) - 720 * var(--u)) / 2 + var(--fy) * var(--u));
+      left: calc(var(--interactive-showcase-cq-w) - (1280 - var(--fx)) * var(--u));
+      width: auto;
+    }
+  }
+
+  @media (max-width: 599.98px) {
+    .interactive-showcase .interactive-showcase-figure {
+      width: min(var(--interactive-showcase-cq-w) * 0.872, (var(--interactive-showcase-cq-h) - clamp(16px, var(--interactive-showcase-cq-h) - 250px, 40px)) * var(--interactive-showcase-ratio, 0.8));
+    }
+  }
+}
+
+/* "white curtain" entrance (interactive-showcase.js): the card slides up empty, then its
+   content slides up from 80px lower once it fills the screen; it fades in quickly so the
+   slide, longer and gentler, is seen almost all the way */
+.interactive-showcase.interactive-showcase-curtain :is(.interactive-showcase-heading, .interactive-showcase-detail, .interactive-showcase-stage) {
+  opacity: 0;
+  transform: translateY(80px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.interactive-showcase.interactive-showcase-curtain.interactive-showcase-revealed :is(.interactive-showcase-heading, .interactive-showcase-detail, .interactive-showcase-stage) {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.45s ease-out 0.1s,
+    transform 1.2s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-showcase .interactive-showcase-panel,
+  .interactive-showcase .interactive-showcase-thumb,
+  .interactive-showcase .interactive-showcase-thumb img,
+  .interactive-showcase .interactive-showcase-hotspot,
+  .interactive-showcase .interactive-showcase-hotspot::before,
+  .interactive-showcase .interactive-showcase-hotspot::after {
+    transition: none;
+  }
+}

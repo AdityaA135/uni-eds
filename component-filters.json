@@ -15,9 +15,7 @@
       "hero",
       "cards",
       "columns",
-      "fragment",
-      "nev-tech",
-      "jsw-tech-showcase"
+      "fragment"
     ]
   },
   {
@@ -51,6 +49,12 @@
     "id": "dell-hero-block",
     "components": [
       "dell-hero-slide"
+    ]
+  },
+  {
+    "id": "interactive-showcase",
+    "components": [
+      "interactive-showcase-item"
     ]
   },
   {
