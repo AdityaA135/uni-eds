@@ -9,10 +9,10 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: var(--jsw-panel-height, calc(100svh - 16px));
+  min-height: var(--interactive-showcase-panel-height, calc(100svh - 16px));
   overflow: hidden;
-  border-radius: var(--jsw-radius-card, 24px);
-  color: var(--jsw-text-dark, #111);
+  border-radius: var(--interactive-showcase-radius-card, 24px);
+  color: var(--interactive-showcase-text-dark, #111);
   background: linear-gradient(100deg, #fff 0%, #fff 40%, #dadada 100%);
 }
 
@@ -22,12 +22,12 @@
 
 .interactive-showcase .interactive-showcase-heading {
   order: 1;
-  padding: 92px var(--jsw-edge, 20px) 24px;
+  padding: 92px var(--interactive-showcase-edge, 20px) 24px;
 }
 
 .interactive-showcase .interactive-showcase-title {
   max-width: 16em; /* "A NEW WAY TO MOVE" / "POWERED BY TECH" */
-  font-family: var(--jsw-font-display);
+  font-family: var(--interactive-showcase-font-display);
   font-size: clamp(19px, 2.2vw, 36px);
   font-weight: 400;
   line-height: 1.16;
@@ -35,22 +35,29 @@
   text-transform: uppercase;
 }
 
+.interactive-showcase .interactive-showcase-description p {
+  max-width: 430px;
+  color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
 .interactive-showcase .interactive-showcase-detail {
   order: 3;
-  padding: 24px var(--jsw-edge, 20px) 32px;
+  padding: 24px var(--interactive-showcase-edge, 20px) 32px;
 }
 
 .interactive-showcase .interactive-showcase-counter {
   margin-bottom: 10px;
-  color: var(--jsw-text-muted-dark, #5c5c5c);
-  font-family: var(--jsw-font-mono);
+  color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
+  font-family: var(--interactive-showcase-font-mono);
   font-size: 12px;
   letter-spacing: 0.12em;
 }
 
 .interactive-showcase .interactive-showcase-item-title {
   margin-bottom: 12px;
-  font-family: var(--jsw-font-display);
+  font-family: var(--interactive-showcase-font-display);
   font-size: clamp(15px, 1.3vw, 19px);
   font-weight: 400;
   line-height: 1.3;
@@ -58,14 +65,9 @@
 
 .interactive-showcase .interactive-showcase-text p {
   max-width: 430px;
-  color: var(--jsw-text-muted-dark, #5c5c5c);
+  color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
   font-size: 13.5px;
   line-height: 1.55;
-}
-
-/* the description is a textarea: its line breaks are kept */
-.interactive-showcase .interactive-showcase-description {
-  white-space: pre-line;
 }
 
 .interactive-showcase .interactive-showcase-text[hidden] {
@@ -100,8 +102,8 @@
   border: 0;
   border-radius: 8px;
   cursor: pointer;
-  background-color: var(--jsw-ink, #0d0d0d);
-  transition: transform 0.5s var(--jsw-ease);
+  background-color: var(--interactive-showcase-ink, #0d0d0d);
+  transition: transform 0.5s var(--interactive-showcase-ease);
 }
 
 .interactive-showcase .interactive-showcase-thumb picture,
@@ -114,7 +116,7 @@
 .interactive-showcase .interactive-showcase-thumb img {
   object-fit: cover;
   filter: grayscale(1) brightness(0.78);
-  transition: filter 0.5s var(--jsw-ease);
+  transition: filter 0.5s var(--interactive-showcase-ease);
 }
 
 .interactive-showcase .interactive-showcase-thumb:hover img {
@@ -150,9 +152,9 @@
 /* upright tablets (600-899px wide; wider ones and landscape use the two columns below): the
    card is exactly one screen and the image takes the room the heading and copy leave, so the
    thumbnails stay on the screen (and can be tapped) instead of running past its bottom */
-@media (width >= 600px) and (width <= 899.98px) and (orientation: portrait) {
+@media (min-width: 600px) and (max-width: 899.98px) and (orientation: portrait) {
   .interactive-showcase {
-    height: var(--jsw-panel-height, calc(100vh - 16px));
+    height: var(--interactive-showcase-panel-height, calc(100vh - 16px));
   }
 
   .interactive-showcase .interactive-showcase-stage {
@@ -174,21 +176,21 @@
   justify-content: center;
   opacity: 0;
   transform: translateY(100%);
-  transition: transform 0.9s var(--jsw-ease), opacity 0.9s var(--jsw-ease);
+  transition: transform 0.9s var(--interactive-showcase-ease), opacity 0.9s var(--interactive-showcase-ease);
 }
 
 .interactive-showcase .interactive-showcase-panel.is-active {
   z-index: 1;
   opacity: 1;
   transform: none;
-  transition: transform 0.9s var(--jsw-ease);
+  transition: transform 0.9s var(--interactive-showcase-ease);
 }
 
 /* the figure has the image's own ratio, so hotspot percentages stay on the artwork */
 .interactive-showcase .interactive-showcase-figure {
   position: relative;
-  width: min(100cqw, 100cqh * var(--showcase-ratio, 0.8));
-  aspect-ratio: var(--showcase-ratio, 0.8);
+  width: min(100cqw, 100cqh * var(--interactive-showcase-ratio, 0.8));
+  aspect-ratio: var(--interactive-showcase-ratio, 0.8);
 }
 
 .interactive-showcase .interactive-showcase-hotspot-source {
@@ -198,8 +200,8 @@
 /* hotspots */
 .interactive-showcase .interactive-showcase-hotspot {
   position: absolute;
-  top: var(--showcase-y);
-  left: var(--showcase-x);
+  top: var(--interactive-showcase-y);
+  left: var(--interactive-showcase-x);
   z-index: 2;
   width: 44px;
   height: 44px;
@@ -208,11 +210,12 @@
   border: 1px solid rgb(255 255 255 / 16%);
   border-radius: 8px;
   cursor: pointer;
-  color: var(--jsw-white, #fff);
+  color: var(--interactive-showcase-white, #fff);
   background-color: rgb(24 24 24 / 58%);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: translate(-50%, -50%);
-  transition: background-color 0.3s var(--jsw-ease);
+  transition: background-color 0.3s var(--interactive-showcase-ease);
 }
 
 .interactive-showcase .interactive-showcase-hotspot::before,
@@ -225,7 +228,7 @@
   height: 1.5px;
   background-color: currentcolor;
   transform: translate(-50%, -50%);
-  transition: transform 0.3s var(--jsw-ease);
+  transition: transform 0.3s var(--interactive-showcase-ease);
 }
 
 .interactive-showcase .interactive-showcase-hotspot::after {
@@ -241,6 +244,7 @@
   z-index: 4;
   border-color: transparent;
   background-color: transparent;
+  -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
 
@@ -248,6 +252,7 @@
 .interactive-showcase .interactive-showcase-hotspot.interactive-showcase-hotspot-apart[aria-expanded='true'] {
   border-color: rgb(255 255 255 / 16%);
   background-color: rgb(80 80 80 / 70%);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -257,15 +262,15 @@
 
 /* frosted tooltip ("NEV / Tech 1": 270 x 119): its hotspot sits in its top corner, 25px in
    from the side and the top. It opens to the left and down; interactive-showcase.js flips it
-   right / up (data-side, data-align) and nudges it (--showcase-sx) so it always stays inside
+   right / up (data-side, data-align) and nudges it (--interactive-showcase-sx) so it always stays inside
    the card and the screen */
 .interactive-showcase .interactive-showcase-tooltip {
-  --showcase-tx: calc(-100% + 25px);
-  --showcase-ty: -25px;
+  --interactive-showcase-tx: calc(-100% + 25px);
+  --interactive-showcase-ty: -25px;
 
   position: absolute;
-  top: var(--showcase-y);
-  left: var(--showcase-x);
+  top: var(--interactive-showcase-y);
+  left: var(--interactive-showcase-x);
   z-index: 3;
   box-sizing: border-box;
   width: min(270px, calc(100cqw - 16px));
@@ -275,35 +280,36 @@
   padding: 16px;
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 12px;
-  color: var(--jsw-white, #fff);
+  color: var(--interactive-showcase-white, #fff);
   background-color: rgb(12 12 12 / 44%);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
   backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
-  transform: translate(calc(var(--showcase-tx) + var(--showcase-sx, 0px)), var(--showcase-ty));
+  transform: translate(calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)), var(--interactive-showcase-ty));
 }
 
 .interactive-showcase .interactive-showcase-tooltip[data-side='right'] {
-  --showcase-tx: -25px;
+  --interactive-showcase-tx: -25px;
 }
 
 /* opening upwards, the minus sits in the bottom corner: keep that row free of text */
 .interactive-showcase .interactive-showcase-tooltip[data-align='bottom'] {
-  --showcase-ty: calc(-100% + 25px);
+  --interactive-showcase-ty: calc(-100% + 25px);
 
   padding-bottom: 50px;
 }
 
 /* narrow screens: just below / above the hotspot, centred on it */
 .interactive-showcase .interactive-showcase-tooltip[data-side='center'] {
-  --showcase-tx: -50%;
+  --interactive-showcase-tx: -50%;
 }
 
 .interactive-showcase .interactive-showcase-tooltip[data-align='below'] {
-  --showcase-ty: 28px;
+  --interactive-showcase-ty: 28px;
 }
 
 .interactive-showcase .interactive-showcase-tooltip[data-align='above'] {
-  --showcase-ty: calc(-100% - 28px);
+  --interactive-showcase-ty: calc(-100% - 28px);
 }
 
 .interactive-showcase .interactive-showcase-tooltip[hidden] {
@@ -314,7 +320,7 @@
 .interactive-showcase .interactive-showcase-tooltip-title {
   margin-bottom: 22px;
   padding-right: 20px;
-  font-family: var(--jsw-font-mono);
+  font-family: var(--interactive-showcase-font-mono);
   font-size: 14px;
   line-height: 18px;
   text-transform: uppercase;
@@ -365,12 +371,12 @@
 
 /* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
    in, a phone turned sideways), where the stacked layout would push the copy off screen */
-@media (width >= 900px), (orientation: landscape) and (width >= 600px) {
+@media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
   .interactive-showcase {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
-    height: var(--jsw-panel-height, calc(100svh - 16px));
+    height: var(--interactive-showcase-panel-height, calc(100svh - 16px));
   }
 
   .interactive-showcase .interactive-showcase-copy {
@@ -383,13 +389,13 @@
   }
 
   .interactive-showcase .interactive-showcase-heading {
-    padding: 0 24px 0 var(--jsw-edge);
+    padding: 0 24px 0 var(--interactive-showcase-edge);
     padding-top: max(108px, 17vh);
     padding-top: max(108px, 17svh);
   }
 
   .interactive-showcase .interactive-showcase-detail {
-    padding: 0 24px 0 var(--jsw-edge);
+    padding: 0 24px 0 var(--interactive-showcase-edge);
   }
 
   /* the stage covers the whole card, so each image can sit where its frame has it: partly
@@ -446,7 +452,7 @@
   }
 }
 
-@media (width >= 900px) and (height <= 679.98px), (orientation: landscape) and (width >= 600px) and (height <= 679.98px) {
+@media (min-width: 900px) and (max-height: 679.98px), (orientation: landscape) and (min-width: 600px) and (max-height: 679.98px) {
   .interactive-showcase .interactive-showcase-thumb {
     width: clamp(72px, 15vh, 120px);
     width: clamp(72px, 15svh, 120px);
@@ -460,7 +466,7 @@
 /* phones ("M / What is NEV 375x815"): one screen, top to bottom: heading; "1/3" beside the
    powertrain's name, its copy and the thumbnails; then the showcase image filling the rest
    of the card, running off its right edge (tablets keep the layout above) */
-@media (width <= 599.98px) {
+@media (max-width: 599.98px) {
   /* vertical gaps follow the screen height (frame values at 815px tall) */
   .interactive-showcase .interactive-showcase-heading {
     padding: min(78px, 9.6vh) 24px 0;
@@ -507,6 +513,11 @@
     font-size: 12.5px;
   }
 
+  .interactive-showcase .interactive-showcase-description p {
+    max-width: none;
+    font-size: 12.5px;
+  }
+
   .interactive-showcase .interactive-showcase-thumbs {
     grid-column: 1 / -1;
     gap: 6px;
@@ -535,47 +546,47 @@
 
   .interactive-showcase .interactive-showcase-figure {
     flex: none;
-    width: min(87.2cqw, (100cqh - clamp(16px, 100cqh - 250px, 40px)) * var(--showcase-ratio, 0.8));
+    width: min(87.2cqw, (100cqh - clamp(16px, 100cqh - 250px, 40px)) * var(--interactive-showcase-ratio, 0.8));
     height: auto;
   }
 }
 
 /* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
    the screen, and the + buttons stay inside the image, clear of the card's bottom edge */
-@media (width <= 599.98px) and (height <= 600px) {
+@media (max-width: 599.98px) and (max-height: 600px) {
   .interactive-showcase .interactive-showcase-stage {
     flex-basis: 140px;
   }
 
   .interactive-showcase .interactive-showcase-hotspot {
-    top: min(var(--showcase-y), 100% - 44px);
+    top: min(var(--interactive-showcase-y), 100% - 44px);
   }
 }
 
 /* browsers without container units: the same sizes, from the stage's size as measured by
-   interactive-showcase.js (--showcase-cq-w / --showcase-cq-h in place of 100cqw / 100cqh) */
+   interactive-showcase.js (--interactive-showcase-cq-w / --interactive-showcase-cq-h in place of 100cqw / 100cqh) */
 @supports not (container-type: size) {
   .interactive-showcase .interactive-showcase-figure {
-    width: min(var(--showcase-cq-w), var(--showcase-cq-h) * var(--showcase-ratio, 0.8));
+    width: min(var(--interactive-showcase-cq-w), var(--interactive-showcase-cq-h) * var(--interactive-showcase-ratio, 0.8));
   }
 
   .interactive-showcase .interactive-showcase-tooltip {
-    width: min(270px, calc(var(--showcase-cq-w) - 16px));
+    width: min(270px, calc(var(--interactive-showcase-cq-w) - 16px));
   }
 
-  @media (width >= 900px), (orientation: landscape) and (width >= 600px) {
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
     .interactive-showcase .interactive-showcase-figure {
-      --u: min(calc(var(--showcase-cq-h) / 720), calc(var(--showcase-cq-w) / 1280));
+      --u: min(calc(var(--interactive-showcase-cq-h) / 720), calc(var(--interactive-showcase-cq-w) / 1280));
 
-      top: calc((var(--showcase-cq-h) - 720 * var(--u)) / 2 + var(--fy) * var(--u));
-      left: calc(var(--showcase-cq-w) - (1280 - var(--fx)) * var(--u));
+      top: calc((var(--interactive-showcase-cq-h) - 720 * var(--u)) / 2 + var(--fy) * var(--u));
+      left: calc(var(--interactive-showcase-cq-w) - (1280 - var(--fx)) * var(--u));
       width: auto;
     }
   }
 
-  @media (width <= 599.98px) {
+  @media (max-width: 599.98px) {
     .interactive-showcase .interactive-showcase-figure {
-      width: min(var(--showcase-cq-w) * 0.872, (var(--showcase-cq-h) - clamp(16px, var(--showcase-cq-h) - 250px, 40px)) * var(--showcase-ratio, 0.8));
+      width: min(var(--interactive-showcase-cq-w) * 0.872, (var(--interactive-showcase-cq-h) - clamp(16px, var(--interactive-showcase-cq-h) - 250px, 40px)) * var(--interactive-showcase-ratio, 0.8));
     }
   }
 }

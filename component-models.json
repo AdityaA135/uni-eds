@@ -334,7 +334,7 @@
         "component": "reference",
         "valueType": "string",
         "name": "media_image",
-        "label": "Showcase image (chassis / engine)",
+        "label": "Showcase image",
         "multi": false
       },
       {
@@ -364,7 +364,7 @@
         "name": "hotspots",
         "label": "Hotspots (+ points)",
         "value": "",
-        "description": "Up to 4 bullets, one per + point, written as: x, y | TITLE | description. x and y are percentages of the showcase image from its bottom-left corner (0, 0), x to the right and y upwards; \"40\" and \"40%\" mean the same, and a missing value counts as 0. Bullets after the 4th are not shown."
+        "description": "Up to 4 bullets, one per + point, written as: x, y | TITLE | description. x and y are percentages of the showcase image from its bottom-left corner (0, 0); x to the right and y upwards; \"40\" and \"40%\" mean the same, and a missing value counts as 0. Bullets after the 4th are not shown."
       }
     ]
   },

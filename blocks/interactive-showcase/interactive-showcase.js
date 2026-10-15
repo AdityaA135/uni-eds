@@ -1,11 +1,11 @@
 /*
  * interactive-showcase: white card, copy + thumbnail tray on the left, showcase image with
  * hotspots on the right.
- * Rows: a title row (plain text, shown as h2), then one row per powertrain with
- *   media       — thumbnail picture, then showcase picture
- *   title       — plain text, shown as h3
- *   description — plain text (textarea), shown as a paragraph
- *   hotspots    — list items "x, y | TITLE | description" (position over the showcase image,
+ * Rows: a heading row, then one row per showcase item with
+ *   media    — thumbnail picture, then showcase picture
+ *   title    — the item's title
+ *   description — the item's description
+ *   hotspots — list items "x, y | TITLE | description" (position over the showcase image,
  *              from its bottom-left corner; at most MAX_HOTSPOTS, see parseHotspots)
  * Thumbnails are tabs: selecting one swaps the showcase image, counter and copy.
  * A hotspot opens a frosted tooltip; clicking outside or Escape closes it.
@@ -100,7 +100,7 @@ function curtain(section, block) {
 function trackRatio(figure, img) {
   const apply = () => {
     if (img.naturalWidth && img.naturalHeight) {
-      figure.style.setProperty('--showcase-ratio', (img.naturalWidth / img.naturalHeight).toFixed(4));
+      figure.style.setProperty('--interactive-showcase-ratio', (img.naturalWidth / img.naturalHeight).toFixed(4));
     }
   };
   if (img.complete) apply();
@@ -109,27 +109,25 @@ function trackRatio(figure, img) {
 
 /**
  * browsers without CSS container units (cqw / cqh): the stage's own width and height as
- * --showcase-cq-w / --showcase-cq-h, which the CSS uses in their place
- * (@supports not container-type)
+ * --interactive-showcase-cq-w / --interactive-showcase-cq-h, which the CSS uses in their place (@supports not container-type)
  */
 function containerUnits(container) {
   if (window.CSS?.supports?.('container-type', 'size')) return;
   const measure = () => {
-    container.style.setProperty('--showcase-cq-w', `${container.clientWidth}px`);
-    container.style.setProperty('--showcase-cq-h', `${container.clientHeight}px`);
+    container.style.setProperty('--interactive-showcase-cq-w', `${container.clientWidth}px`);
+    container.style.setProperty('--interactive-showcase-cq-h', `${container.clientHeight}px`);
   };
   if (window.ResizeObserver) new ResizeObserver(measure).observe(container);
   else window.addEventListener('resize', measure);
 }
 
-// Universal Editor model of one powertrain (block/item); published rows carry no model, so
-// there a powertrain is any row with several cells (media | title | description | hotspots),
-// the title a single-cell row
+// Universal Editor model of one showcase item (block/item). Published rows carry no model, so
+// identify items by their image/hotspot content and leave the separate title/description heading row out.
 const ITEM_MODEL = 'interactive-showcase-item';
 
 /**
- * a part of a powertrain row moved elsewhere (its text to the copy column, its thumbnail to the
- * tray) stays that powertrain's in Universal Editor: its editable fields get the row's resource
+ * a part of a showcase item row moved elsewhere (its text to the copy column, its thumbnail to the
+ * tray) stays that showcase item's in Universal Editor: its editable fields get the row's resource
  */
 function keepResource(row, part) {
   const resource = row.dataset.aueResource;
@@ -141,29 +139,6 @@ function keepResource(row, part) {
   });
 }
 
-/** a plain-text cell's text: its paragraphs (or the cell itself), line breaks kept as "\n" */
-function plainText(cell) {
-  const paras = cell.querySelectorAll('p');
-  const lines = (p) => [...p.childNodes].map((n) => (n.nodeName === 'BR' ? '\n' : n.textContent));
-  return [...(paras.length ? paras : [cell])]
-    .map((p) => lines(p).join('').trim())
-    .filter(Boolean)
-    .join('\n');
-}
-
-/**
- * a plain-text field (text / textarea) as a new `tag` element holding the cell's text; it takes
- * over the field's Universal Editor instrumentation (on the cell or an element inside it).
- * Null when the field is empty outside the editor, so no empty heading or paragraph is left.
- */
-function fieldElement(cell, tag, className) {
-  if (!cell) return null;
-  const node = el(tag, className);
-  node.textContent = plainText(cell);
-  moveInstrumentation(cell.querySelector('[data-aue-prop]') || cell, node);
-  return node.textContent || node.hasAttribute('data-aue-prop') ? node : null;
-}
-
 /**
  * loads and decorates the block
  * @param {Element} block The block element
@@ -173,27 +148,33 @@ export default function decorate(block) {
   const id = `interactive-showcase-${instance}`;
   const section = block.closest('.section');
   if (section) {
-    section.dataset.jswTheme = 'light';
+    section.dataset.interactiveShowcaseTheme = 'light';
     if (!section.id && !document.getElementById('nev-tech')) section.id = 'nev-tech';
   }
 
   const rows = [...block.children];
-  // a powertrain just added in the editor has no images or text yet, but is shown (and editable)
-  const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL || r.children.length > 1);
-  const headRow = rows.find((r) => !itemRows.includes(r));
+  // In Universal Editor the model identifies rows. In published HTML, identify item rows by
+  // their image/hotspot content; the heading row contains only the main title field.
+  const parentRow = rows.find((r) => r.dataset.aueModel === 'interactive-showcase');
+  const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL
+    || (!r.dataset.aueModel && (r.querySelector('picture, li') || r.children.length > 2)));
+  const headRow = parentRow || rows.find((r) => !itemRows.includes(r));
 
+  // Item field cells are separate in the model: title is text and description is a textarea.
+  // The parent model has only a title. Keep a fallback for published markup without UE field attributes.
+  const fieldCell = (row, name) => [...(row?.children || [])].find((cell) =>
+    cell.matches(`[data-aue-prop="${name}"]`) || cell.querySelector(`[data-aue-prop="${name}"]`)) || null;
   const copy = el('div', 'interactive-showcase-copy');
   if (headRow) {
     headRow.className = 'interactive-showcase-heading';
-    const headCell = headRow.firstElementChild || headRow;
-    const heading = fieldElement(headCell, 'h2', 'interactive-showcase-title');
-    headCell.replaceChildren(...(heading ? [heading] : []));
+    const mainTitle = fieldCell(headRow, 'title');
+    (mainTitle || headRow.querySelector('h1, h2, h3'))?.classList.add('interactive-showcase-title');
     copy.append(headRow);
   }
   const detail = el('div', 'interactive-showcase-detail');
   const counter = el('p', 'interactive-showcase-counter');
   const texts = el('div', 'interactive-showcase-texts', { 'aria-live': 'polite' });
-  const thumbs = el('div', 'interactive-showcase-thumbs', { role: 'tablist', 'aria-label': 'Powertrains' });
+  const thumbs = el('div', 'interactive-showcase-thumbs', { role: 'tablist', 'aria-label': 'Showcase items' });
   detail.append(counter, texts, thumbs);
   copy.append(detail);
 
@@ -225,14 +206,14 @@ export default function decorate(block) {
       tooltip.dataset.align = align;
       return tooltip.getBoundingClientRect();
     };
-    tooltip.style.removeProperty('--showcase-sx');
+    tooltip.style.removeProperty('--interactive-showcase-sx');
     let box = set('left', 'top');
     if (box.left < left) box = set('right', 'top');
     const apart = box.left < left || box.right > right;
     if (apart) box = set('center', 'below');
     if (box.bottom > bottom) box = set(tooltip.dataset.side, apart ? 'above' : 'bottom');
-    if (box.right > right) tooltip.style.setProperty('--showcase-sx', `${right - box.right}px`);
-    else if (box.left < left) tooltip.style.setProperty('--showcase-sx', `${left - box.left}px`);
+    if (box.right > right) tooltip.style.setProperty('--interactive-showcase-sx', `${right - box.right}px`);
+    else if (box.left < left) tooltip.style.setProperty('--interactive-showcase-sx', `${left - box.left}px`);
     openSpot?.classList.toggle('interactive-showcase-hotspot-apart', apart);
   };
 
@@ -252,39 +233,32 @@ export default function decorate(block) {
     tipTitle.textContent = data.title;
     tipText.textContent = data.text;
     spot.closest('.interactive-showcase-figure').append(tooltip);
-    tooltip.style.setProperty('--showcase-x', `${data.x}%`);
-    tooltip.style.setProperty('--showcase-y', `${data.y}%`);
+    tooltip.style.setProperty('--interactive-showcase-x', `${data.x}%`);
+    tooltip.style.setProperty('--interactive-showcase-y', `${data.y}%`);
     tooltip.hidden = false;
     placeTooltip();
   };
 
   const items = itemRows.map((row, i) => {
-    // cells in model order (media | title | description | hotspots): in the editor each field
-    // names itself, published they go by position
     const cells = [...row.children];
-    const cellOf = (name, index) => {
-      const field = row.querySelector(`[data-aue-prop="${name}"]`);
-      return field ? cells.find((c) => c.contains(field)) : cells[index];
-    };
     const mediaCell = cells.find((c) => c.querySelector('picture')) || cells[0];
-    const titleCell = cellOf('title', 1);
-    const descriptionCell = cellOf('description', 2);
-    const hotCell = cellOf('hotspots', 3);
-    // the copy column's part: the title (h3) and description, in the same structure as before
-    const textCell = el('div', 'interactive-showcase-text');
-    const itemTitle = fieldElement(titleCell, 'h3', 'interactive-showcase-item-title');
-    const description = fieldElement(descriptionCell, 'p', 'interactive-showcase-description');
-    textCell.append(...[itemTitle, description].filter(Boolean));
-    [titleCell, descriptionCell].forEach((c) => {
-      if (c && c !== mediaCell && c !== hotCell) c.remove();
-    });
+    const hotCell = cells.find((c) => c !== mediaCell && c.querySelector('li'))
+      || (cells.length >= 3 ? cells[cells.length - 1] : null);
+    let titleCell = fieldCell(row, 'title');
+    let descriptionCell = fieldCell(row, 'description');
+    // Published markup may not carry data-aue-prop. Find the separate title/description cells
+    // by their content when Universal Editor field attributes are absent.
+    const contentCells = cells.filter((c) => c !== mediaCell && c !== hotCell);
+    if (!titleCell) titleCell = contentCells.find((c) => c.querySelector('h2, h3, h4')) || contentCells[0] || null;
+    if (!descriptionCell) descriptionCell = contentCells.find((c) => c !== titleCell) || null;
+    if (descriptionCell === titleCell) descriptionCell = null;
     const pictures = [...(mediaCell?.querySelectorAll('picture') || [])];
     // in the editor each image names its field; published, the thumbnail comes first
     const fieldPicture = (name) => mediaCell?.querySelector(`[data-aue-prop="${name}"]`)?.closest('picture');
     const thumbPicture = fieldPicture('media_thumbnail') || pictures[0];
     const imagePicture = fieldPicture('media_image')
       || pictures.find((p) => p !== thumbPicture) || thumbPicture?.cloneNode(true);
-    const title = itemTitle?.textContent || `Powertrain ${i + 1}`;
+    const title = titleCell?.textContent.trim() || `Showcase item ${i + 1}`;
 
     // the item row becomes its panel (keeps the editor's item instrumentation)
     row.className = 'interactive-showcase-panel';
@@ -302,8 +276,8 @@ export default function decorate(block) {
         'aria-expanded': 'false',
         'aria-controls': tooltip.id,
       });
-      btn.style.setProperty('--showcase-x', `${spot.x}%`);
-      btn.style.setProperty('--showcase-y', `${spot.y}%`);
+      btn.style.setProperty('--interactive-showcase-x', `${spot.x}%`);
+      btn.style.setProperty('--interactive-showcase-y', `${spot.y}%`);
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (openSpot === btn) closeTooltip();
@@ -316,8 +290,18 @@ export default function decorate(block) {
     row.prepend(figure);
     stage.append(row);
 
-    keepResource(row, textCell);
-    texts.append(textCell);
+    const textCell = el('div', 'interactive-showcase-text');
+    if (titleCell) {
+      titleCell.classList.add('interactive-showcase-item-title');
+      keepResource(row, titleCell);
+      textCell.append(titleCell);
+    }
+    if (descriptionCell) {
+      descriptionCell.classList.add('interactive-showcase-description');
+      keepResource(row, descriptionCell);
+      textCell.append(descriptionCell);
+    }
+    if (textCell.children.length) texts.append(textCell);
 
     const tab = el('button', 'interactive-showcase-thumb', {
       type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,

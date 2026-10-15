@@ -204,14 +204,14 @@
           }
         },
         {
-          "title": "Interactive Showcase Item",
+          "title": "Showcase Item",
           "id": "interactive-showcase-item",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block/item",
                 "template": {
-                  "name": "Interactive Showcase Item",
+                  "name": "Showcase Item",
                   "model": "interactive-showcase-item"
                 }
               }
