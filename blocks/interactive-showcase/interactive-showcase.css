@@ -6,14 +6,34 @@
  */
 
 .interactive-showcase {
+  /* one hundredth of the screen's height (vh / svh, svh falling back to vh): every size taken
+     from the screen's height goes through these, so the editor can fix them (see below) */
+  --interactive-showcase-vh: 1vh;
+  --interactive-showcase-svh: 1vh;
+
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: var(--interactive-showcase-panel-height, calc(100svh - 16px));
+  min-height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-svh) - 16px));
   overflow: hidden;
   border-radius: var(--interactive-showcase-radius-card, 24px);
   color: var(--interactive-showcase-text-dark, #111);
   background: linear-gradient(100deg, #fff 0%, #fff 40%, #dadada 100%);
+}
+
+@supports (height: 1svh) {
+  .interactive-showcase {
+    --interactive-showcase-svh: 1svh;
+  }
+}
+
+/* Universal Editor sizes its frame to the page's height, so a card sized from the screen's
+   height would make the page taller, the frame taller and the card taller again, without end.
+   In the editor the card is laid out for a fixed 800px-tall screen instead. */
+.interactive-showcase.interactive-showcase-editing {
+  --interactive-showcase-vh: 8px;
+  --interactive-showcase-svh: 8px;
+  --interactive-showcase-panel-height: calc(100 * var(--interactive-showcase-svh) - 16px);
 }
 
 .interactive-showcase .interactive-showcase-copy {
@@ -142,8 +162,7 @@
 .interactive-showcase .interactive-showcase-stage {
   position: relative;
   order: 2;
-  height: min(64vh, 118vw);
-  height: min(64svh, 118vw);
+  height: min(calc(64 * var(--interactive-showcase-svh)), 118vw);
   margin: 0 12px;
   overflow: hidden;
   container-type: size;
@@ -152,9 +171,9 @@
 /* upright tablets (600-899px wide; wider ones and landscape use the two columns below): the
    card is exactly one screen and the image takes the room the heading and copy leave, so the
    thumbnails stay on the screen (and can be tapped) instead of running past its bottom */
-@media (min-width: 600px) and (max-width: 899.98px) and (orientation: portrait) {
+@media (width >= 600px) and (width <= 899.98px) and (orientation: portrait) {
   .interactive-showcase {
-    height: var(--interactive-showcase-panel-height, calc(100vh - 16px));
+    height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-vh) - 16px));
   }
 
   .interactive-showcase .interactive-showcase-stage {
@@ -212,7 +231,6 @@
   cursor: pointer;
   color: var(--interactive-showcase-white, #fff);
   background-color: rgb(24 24 24 / 58%);
-  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: translate(-50%, -50%);
   transition: background-color 0.3s var(--interactive-showcase-ease);
@@ -244,7 +262,6 @@
   z-index: 4;
   border-color: transparent;
   background-color: transparent;
-  -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
 
@@ -252,7 +269,6 @@
 .interactive-showcase .interactive-showcase-hotspot.interactive-showcase-hotspot-apart[aria-expanded='true'] {
   border-color: rgb(255 255 255 / 16%);
   background-color: rgb(80 80 80 / 70%);
-  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -282,7 +298,6 @@
   border-radius: 12px;
   color: var(--interactive-showcase-white, #fff);
   background-color: rgb(12 12 12 / 44%);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
   backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
   transform: translate(calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)), var(--interactive-showcase-ty));
@@ -371,12 +386,12 @@
 
 /* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
    in, a phone turned sideways), where the stacked layout would push the copy off screen */
-@media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+@media (width >= 900px), (orientation: landscape) and (width >= 600px) {
   .interactive-showcase {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
-    height: var(--interactive-showcase-panel-height, calc(100svh - 16px));
+    height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-svh) - 16px));
   }
 
   .interactive-showcase .interactive-showcase-copy {
@@ -384,14 +399,12 @@
     flex-direction: column;
     justify-content: space-between;
     min-height: 0;
-    padding: 0 0 7vh;
-    padding: 0 0 7svh;
+    padding: 0 0 calc(7 * var(--interactive-showcase-svh));
   }
 
   .interactive-showcase .interactive-showcase-heading {
     padding: 0 24px 0 var(--interactive-showcase-edge);
-    padding-top: max(108px, 17vh);
-    padding-top: max(108px, 17svh);
+    padding-top: max(108px, calc(17 * var(--interactive-showcase-svh)));
   }
 
   .interactive-showcase .interactive-showcase-detail {
@@ -452,10 +465,9 @@
   }
 }
 
-@media (min-width: 900px) and (max-height: 679.98px), (orientation: landscape) and (min-width: 600px) and (max-height: 679.98px) {
+@media (width >= 900px) and (height <= 679.98px), (orientation: landscape) and (width >= 600px) and (height <= 679.98px) {
   .interactive-showcase .interactive-showcase-thumb {
-    width: clamp(72px, 15vh, 120px);
-    width: clamp(72px, 15svh, 120px);
+    width: clamp(72px, calc(15 * var(--interactive-showcase-svh)), 120px);
   }
 
   .interactive-showcase .interactive-showcase-thumbs {
@@ -466,11 +478,10 @@
 /* phones ("M / What is NEV 375x815"): one screen, top to bottom: heading; "1/3" beside the
    powertrain's name, its copy and the thumbnails; then the showcase image filling the rest
    of the card, running off its right edge (tablets keep the layout above) */
-@media (max-width: 599.98px) {
+@media (width <= 599.98px) {
   /* vertical gaps follow the screen height (frame values at 815px tall) */
   .interactive-showcase .interactive-showcase-heading {
-    padding: min(78px, 9.6vh) 24px 0;
-    padding: min(78px, 9.6svh) 24px 0;
+    padding: min(78px, calc(9.6 * var(--interactive-showcase-svh))) 24px 0;
   }
 
   .interactive-showcase .interactive-showcase-title {
@@ -486,8 +497,7 @@
     align-items: baseline;
     column-gap: 10px;
     order: 2;
-    padding: min(30px, 3.7vh) 24px 0;
-    padding: min(30px, 3.7svh) 24px 0;
+    padding: min(30px, calc(3.7 * var(--interactive-showcase-svh))) 24px 0;
   }
 
   .interactive-showcase .interactive-showcase-texts,
@@ -536,8 +546,7 @@
     flex: 1 0 170px;
     order: 3;
     height: auto;
-    margin: min(24px, 2.9vh) 0 0;
-    margin: min(24px, 2.9svh) 0 0;
+    margin: min(24px, calc(2.9 * var(--interactive-showcase-svh))) 0 0;
   }
 
   .interactive-showcase .interactive-showcase-panel {
@@ -553,7 +562,7 @@
 
 /* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
    the screen, and the + buttons stay inside the image, clear of the card's bottom edge */
-@media (max-width: 599.98px) and (max-height: 600px) {
+@media (width <= 599.98px) and (height <= 600px) {
   .interactive-showcase .interactive-showcase-stage {
     flex-basis: 140px;
   }
@@ -574,7 +583,7 @@
     width: min(270px, calc(var(--interactive-showcase-cq-w) - 16px));
   }
 
-  @media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+  @media (width >= 900px), (orientation: landscape) and (width >= 600px) {
     .interactive-showcase .interactive-showcase-figure {
       --u: min(calc(var(--interactive-showcase-cq-h) / 720), calc(var(--interactive-showcase-cq-w) / 1280));
 
@@ -584,7 +593,7 @@
     }
   }
 
-  @media (max-width: 599.98px) {
+  @media (width <= 599.98px) {
     .interactive-showcase .interactive-showcase-figure {
       width: min(var(--interactive-showcase-cq-w) * 0.872, (var(--interactive-showcase-cq-h) - clamp(16px, var(--interactive-showcase-cq-h) - 250px, 40px)) * var(--interactive-showcase-ratio, 0.8));
     }
