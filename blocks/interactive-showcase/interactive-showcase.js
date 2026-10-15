@@ -1,10 +1,11 @@
 /*
- * jsw-tech-showcase: white card, copy + thumbnail tray on the left, showcase image with
+ * interactive-showcase: white card, copy + thumbnail tray on the left, showcase image with
  * hotspots on the right.
- * Rows: a heading row, then one row per powertrain with
- *   media    — thumbnail picture, then showcase picture
- *   text     — title (h3) + description
- *   hotspots — list items "x, y | TITLE | description" (position over the showcase image,
+ * Rows: a title row (plain text, shown as h2), then one row per powertrain with
+ *   media       — thumbnail picture, then showcase picture
+ *   title       — plain text, shown as h3
+ *   description — plain text (textarea), shown as a paragraph
+ *   hotspots    — list items "x, y | TITLE | description" (position over the showcase image,
  *              from its bottom-left corner; at most MAX_HOTSPOTS, see parseHotspots)
  * Thumbnails are tabs: selecting one swaps the showcase image, counter and copy.
  * A hotspot opens a frosted tooltip; clicking outside or Escape closes it.
@@ -13,6 +14,8 @@
  * The selected showcase image is marked data-zoom-source: a following parallax collage flies
  * it from here into its centre card on scroll.
  */
+
+import { moveInstrumentation } from '../../scripts/scripts.js';
 
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
 const MAX_HOTSPOTS = 4;
@@ -80,13 +83,13 @@ function curtain(section, block) {
     if (!section.offsetHeight) return;
     const { top } = section.getBoundingClientRect();
     // revealed once the card is in place; veiled again when it slides back down
-    if (top <= 2) block.classList.add('jsw-tech-revealed');
-    else if (top > window.innerHeight * 0.5) block.classList.remove('jsw-tech-revealed');
+    if (top <= 2) block.classList.add('interactive-showcase-revealed');
+    else if (top > window.innerHeight * 0.5) block.classList.remove('interactive-showcase-revealed');
   };
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(update);
   };
-  block.classList.add('jsw-tech-curtain');
+  block.classList.add('interactive-showcase-curtain');
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
   new ResizeObserver(schedule).observe(section);
@@ -97,7 +100,7 @@ function curtain(section, block) {
 function trackRatio(figure, img) {
   const apply = () => {
     if (img.naturalWidth && img.naturalHeight) {
-      figure.style.setProperty('--jsw-ratio', (img.naturalWidth / img.naturalHeight).toFixed(4));
+      figure.style.setProperty('--showcase-ratio', (img.naturalWidth / img.naturalHeight).toFixed(4));
     }
   };
   if (img.complete) apply();
@@ -106,22 +109,23 @@ function trackRatio(figure, img) {
 
 /**
  * browsers without CSS container units (cqw / cqh): the stage's own width and height as
- * --jsw-cq-w / --jsw-cq-h, which the CSS uses in their place (@supports not container-type)
+ * --showcase-cq-w / --showcase-cq-h, which the CSS uses in their place
+ * (@supports not container-type)
  */
 function containerUnits(container) {
   if (window.CSS?.supports?.('container-type', 'size')) return;
   const measure = () => {
-    container.style.setProperty('--jsw-cq-w', `${container.clientWidth}px`);
-    container.style.setProperty('--jsw-cq-h', `${container.clientHeight}px`);
+    container.style.setProperty('--showcase-cq-w', `${container.clientWidth}px`);
+    container.style.setProperty('--showcase-cq-h', `${container.clientHeight}px`);
   };
   if (window.ResizeObserver) new ResizeObserver(measure).observe(container);
   else window.addEventListener('resize', measure);
 }
 
 // Universal Editor model of one powertrain (block/item); published rows carry no model, so
-// there a powertrain is any row with several cells (media | text | hotspots), the heading a
-// single-cell row
-const ITEM_MODEL = 'jsw-tech-showcase-item';
+// there a powertrain is any row with several cells (media | title | description | hotspots),
+// the title a single-cell row
+const ITEM_MODEL = 'interactive-showcase-item';
 
 /**
  * a part of a powertrain row moved elsewhere (its text to the copy column, its thumbnail to the
@@ -137,13 +141,36 @@ function keepResource(row, part) {
   });
 }
 
+/** a plain-text cell's text: its paragraphs (or the cell itself), line breaks kept as "\n" */
+function plainText(cell) {
+  const paras = cell.querySelectorAll('p');
+  const lines = (p) => [...p.childNodes].map((n) => (n.nodeName === 'BR' ? '\n' : n.textContent));
+  return [...(paras.length ? paras : [cell])]
+    .map((p) => lines(p).join('').trim())
+    .filter(Boolean)
+    .join('\n');
+}
+
+/**
+ * a plain-text field (text / textarea) as a new `tag` element holding the cell's text; it takes
+ * over the field's Universal Editor instrumentation (on the cell or an element inside it).
+ * Null when the field is empty outside the editor, so no empty heading or paragraph is left.
+ */
+function fieldElement(cell, tag, className) {
+  if (!cell) return null;
+  const node = el(tag, className);
+  node.textContent = plainText(cell);
+  moveInstrumentation(cell.querySelector('[data-aue-prop]') || cell, node);
+  return node.textContent || node.hasAttribute('data-aue-prop') ? node : null;
+}
+
 /**
  * loads and decorates the block
  * @param {Element} block The block element
  */
 export default function decorate(block) {
   instance += 1;
-  const id = `jsw-tech-${instance}`;
+  const id = `interactive-showcase-${instance}`;
   const section = block.closest('.section');
   if (section) {
     section.dataset.jswTheme = 'light';
@@ -155,26 +182,28 @@ export default function decorate(block) {
   const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL || r.children.length > 1);
   const headRow = rows.find((r) => !itemRows.includes(r));
 
-  const copy = el('div', 'jsw-tech-copy');
+  const copy = el('div', 'interactive-showcase-copy');
   if (headRow) {
-    headRow.className = 'jsw-tech-heading';
-    headRow.querySelector('h1, h2, h3')?.classList.add('jsw-tech-title');
+    headRow.className = 'interactive-showcase-heading';
+    const headCell = headRow.firstElementChild || headRow;
+    const heading = fieldElement(headCell, 'h2', 'interactive-showcase-title');
+    headCell.replaceChildren(...(heading ? [heading] : []));
     copy.append(headRow);
   }
-  const detail = el('div', 'jsw-tech-detail');
-  const counter = el('p', 'jsw-tech-counter');
-  const texts = el('div', 'jsw-tech-texts', { 'aria-live': 'polite' });
-  const thumbs = el('div', 'jsw-tech-thumbs', { role: 'tablist', 'aria-label': 'Powertrains' });
+  const detail = el('div', 'interactive-showcase-detail');
+  const counter = el('p', 'interactive-showcase-counter');
+  const texts = el('div', 'interactive-showcase-texts', { 'aria-live': 'polite' });
+  const thumbs = el('div', 'interactive-showcase-thumbs', { role: 'tablist', 'aria-label': 'Powertrains' });
   detail.append(counter, texts, thumbs);
   copy.append(detail);
 
-  const stage = el('div', 'jsw-tech-stage');
+  const stage = el('div', 'interactive-showcase-stage');
   containerUnits(stage);
-  const tooltip = el('div', 'jsw-tech-tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
+  const tooltip = el('div', 'interactive-showcase-tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
   tooltip.hidden = true;
-  const tipTitle = el('p', 'jsw-tech-tooltip-title', { id: `${id}-tooltip-title` });
-  const tipText = el('p', 'jsw-tech-tooltip-text');
-  const tipClose = el('button', 'jsw-tech-tooltip-close', { type: 'button', 'aria-label': 'Close details' });
+  const tipTitle = el('p', 'interactive-showcase-tooltip-title', { id: `${id}-tooltip-title` });
+  const tipText = el('p', 'interactive-showcase-tooltip-text');
+  const tipClose = el('button', 'interactive-showcase-tooltip-close', { type: 'button', 'aria-label': 'Close details' });
   tooltip.setAttribute('aria-labelledby', tipTitle.id);
   tooltip.append(tipTitle, tipText, tipClose);
 
@@ -196,15 +225,15 @@ export default function decorate(block) {
       tooltip.dataset.align = align;
       return tooltip.getBoundingClientRect();
     };
-    tooltip.style.removeProperty('--jsw-sx');
+    tooltip.style.removeProperty('--showcase-sx');
     let box = set('left', 'top');
     if (box.left < left) box = set('right', 'top');
     const apart = box.left < left || box.right > right;
     if (apart) box = set('center', 'below');
     if (box.bottom > bottom) box = set(tooltip.dataset.side, apart ? 'above' : 'bottom');
-    if (box.right > right) tooltip.style.setProperty('--jsw-sx', `${right - box.right}px`);
-    else if (box.left < left) tooltip.style.setProperty('--jsw-sx', `${left - box.left}px`);
-    openSpot?.classList.toggle('jsw-hotspot-apart', apart);
+    if (box.right > right) tooltip.style.setProperty('--showcase-sx', `${right - box.right}px`);
+    else if (box.left < left) tooltip.style.setProperty('--showcase-sx', `${left - box.left}px`);
+    openSpot?.classList.toggle('interactive-showcase-hotspot-apart', apart);
   };
 
   const closeTooltip = (refocus = false) => {
@@ -212,7 +241,7 @@ export default function decorate(block) {
     const spot = openSpot;
     openSpot = null;
     spot.setAttribute('aria-expanded', 'false');
-    spot.classList.remove('jsw-hotspot-apart');
+    spot.classList.remove('interactive-showcase-hotspot-apart');
     tooltip.hidden = true;
     if (refocus) spot.focus();
   };
@@ -222,46 +251,59 @@ export default function decorate(block) {
     spot.setAttribute('aria-expanded', 'true');
     tipTitle.textContent = data.title;
     tipText.textContent = data.text;
-    spot.closest('.jsw-tech-figure').append(tooltip);
-    tooltip.style.setProperty('--jsw-x', `${data.x}%`);
-    tooltip.style.setProperty('--jsw-y', `${data.y}%`);
+    spot.closest('.interactive-showcase-figure').append(tooltip);
+    tooltip.style.setProperty('--showcase-x', `${data.x}%`);
+    tooltip.style.setProperty('--showcase-y', `${data.y}%`);
     tooltip.hidden = false;
     placeTooltip();
   };
 
   const items = itemRows.map((row, i) => {
-    // cells in model order (media | text | hotspots), found by content where it is there
+    // cells in model order (media | title | description | hotspots): in the editor each field
+    // names itself, published they go by position
     const cells = [...row.children];
+    const cellOf = (name, index) => {
+      const field = row.querySelector(`[data-aue-prop="${name}"]`);
+      return field ? cells.find((c) => c.contains(field)) : cells[index];
+    };
     const mediaCell = cells.find((c) => c.querySelector('picture')) || cells[0];
-    const hotCell = cells.find((c) => c !== mediaCell && c.querySelector('li'))
-      || (cells.length > 2 ? cells[2] : null);
-    const textCell = cells.find((c) => c !== mediaCell && c !== hotCell);
+    const titleCell = cellOf('title', 1);
+    const descriptionCell = cellOf('description', 2);
+    const hotCell = cellOf('hotspots', 3);
+    // the copy column's part: the title (h3) and description, in the same structure as before
+    const textCell = el('div', 'interactive-showcase-text');
+    const itemTitle = fieldElement(titleCell, 'h3', 'interactive-showcase-item-title');
+    const description = fieldElement(descriptionCell, 'p', 'interactive-showcase-description');
+    textCell.append(...[itemTitle, description].filter(Boolean));
+    [titleCell, descriptionCell].forEach((c) => {
+      if (c && c !== mediaCell && c !== hotCell) c.remove();
+    });
     const pictures = [...(mediaCell?.querySelectorAll('picture') || [])];
     // in the editor each image names its field; published, the thumbnail comes first
     const fieldPicture = (name) => mediaCell?.querySelector(`[data-aue-prop="${name}"]`)?.closest('picture');
     const thumbPicture = fieldPicture('media_thumbnail') || pictures[0];
     const imagePicture = fieldPicture('media_image')
       || pictures.find((p) => p !== thumbPicture) || thumbPicture?.cloneNode(true);
-    const title = textCell?.querySelector('h2, h3, h4')?.textContent.trim() || `Powertrain ${i + 1}`;
+    const title = itemTitle?.textContent || `Powertrain ${i + 1}`;
 
     // the item row becomes its panel (keeps the editor's item instrumentation)
-    row.className = 'jsw-tech-panel';
+    row.className = 'interactive-showcase-panel';
     row.id = `${id}-panel-${i}`;
     row.setAttribute('role', 'tabpanel');
     row.setAttribute('aria-labelledby', `${id}-tab-${i}`);
-    const figure = el('div', 'jsw-tech-figure');
+    const figure = el('div', 'interactive-showcase-figure');
     if (imagePicture) figure.append(imagePicture);
     const img = imagePicture?.querySelector('img');
     if (img) trackRatio(figure, img);
     parseHotspots(hotCell).forEach((spot) => {
-      const btn = el('button', 'jsw-hotspot', {
+      const btn = el('button', 'interactive-showcase-hotspot', {
         type: 'button',
         'aria-label': spot.title ? `Show details: ${spot.title}` : 'Show details',
         'aria-expanded': 'false',
         'aria-controls': tooltip.id,
       });
-      btn.style.setProperty('--jsw-x', `${spot.x}%`);
-      btn.style.setProperty('--jsw-y', `${spot.y}%`);
+      btn.style.setProperty('--showcase-x', `${spot.x}%`);
+      btn.style.setProperty('--showcase-y', `${spot.y}%`);
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (openSpot === btn) closeTooltip();
@@ -269,19 +311,15 @@ export default function decorate(block) {
       });
       figure.append(btn);
     });
-    if (hotCell) hotCell.classList.add('jsw-tech-hotspot-source');
+    if (hotCell) hotCell.classList.add('interactive-showcase-hotspot-source');
     mediaCell?.remove();
     row.prepend(figure);
     stage.append(row);
 
-    if (textCell) {
-      textCell.classList.add('jsw-tech-text');
-      textCell.querySelector('h2, h3, h4')?.classList.add('jsw-tech-item-title');
-      keepResource(row, textCell);
-      texts.append(textCell);
-    }
+    keepResource(row, textCell);
+    texts.append(textCell);
 
-    const tab = el('button', 'jsw-tech-thumb', {
+    const tab = el('button', 'interactive-showcase-thumb', {
       type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
     });
     if (thumbPicture) {
@@ -295,7 +333,7 @@ export default function decorate(block) {
 
   let current = 0;
   /**
-   * the images move like a vertical carousel (jsw-tech-showcase.css): picking a thumbnail to
+   * the images move like a vertical carousel (interactive-showcase.css): picking a thumbnail to
    * the right pushes the current image up and out while the new one rises from the bottom;
    * one to the left pushes it down while the new one comes in from the top
    */
@@ -319,7 +357,7 @@ export default function decorate(block) {
       const active = i === current;
       row.classList.toggle('is-active', active);
       // the selected image flies on into the next section's card (parallax-collage)
-      row.querySelector('.jsw-tech-figure')?.toggleAttribute('data-zoom-source', active);
+      row.querySelector('.interactive-showcase-figure')?.toggleAttribute('data-zoom-source', active);
       row.inert = !active;
       if (textCell) textCell.hidden = !active;
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -354,7 +392,7 @@ export default function decorate(block) {
   });
 
   block.replaceChildren(copy, stage);
-  if (block.closest('[data-aue-resource]')) block.classList.add('jsw-tech-editing');
+  if (block.closest('[data-aue-resource]')) block.classList.add('interactive-showcase-editing');
   else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     curtain(section, block);
   }

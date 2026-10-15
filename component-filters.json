@@ -17,13 +17,7 @@
       "columns",
       "fragment",
       "nev-tech",
-      "jsw-tech-showcase"
-    ]
-  },
-  {
-    "id": "jsw-tech-showcase",
-    "components": [
-      "jsw-tech-showcase-item"
+      "interactive-showcase"
     ]
   },
   {
@@ -51,6 +45,12 @@
     "id": "dell-hero-block",
     "components": [
       "dell-hero-slide"
+    ]
+  },
+  {
+    "id": "interactive-showcase",
+    "components": [
+      "interactive-showcase-item"
     ]
   },
   {

@@ -1,31 +1,31 @@
 {
   "definitions": [
     {
-      "title": "Jsw Tech Showcase",
-      "id": "jsw-tech-showcase",
+      "title": "Interactive Showcase",
+      "id": "interactive-showcase",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
-              "name": "Jsw Tech Showcase",
-              "model": "jsw-tech-showcase",
-              "filter": "jsw-tech-showcase"
+              "name": "Interactive Showcase",
+              "model": "interactive-showcase",
+              "filter": "interactive-showcase"
             }
           }
         }
       }
     },
     {
-      "title": "Jsw Powertrain",
-      "id": "jsw-tech-showcase-item",
+      "title": "Interactive Showcase Item",
+      "id": "interactive-showcase-item",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block/item",
             "template": {
-              "name": "Jsw Powertrain",
-              "model": "jsw-tech-showcase-item"
+              "name": "Interactive Showcase Item",
+              "model": "interactive-showcase-item"
             }
           }
         }
@@ -34,19 +34,19 @@
   ],
   "models": [
     {
-      "id": "jsw-tech-showcase",
+      "id": "interactive-showcase",
       "fields": [
         {
-          "component": "richtext",
+          "component": "text",
           "valueType": "string",
-          "name": "heading",
-          "label": "Heading",
+          "name": "title",
+          "label": "Title",
           "value": ""
         }
       ]
     },
     {
-      "id": "jsw-tech-showcase-item",
+      "id": "interactive-showcase-item",
       "fields": [
         {
           "component": "reference",
@@ -77,10 +77,17 @@
           "value": ""
         },
         {
-          "component": "richtext",
+          "component": "text",
           "valueType": "string",
-          "name": "text",
-          "label": "Title and description",
+          "name": "title",
+          "label": "Title",
+          "value": ""
+        },
+        {
+          "component": "textarea",
+          "valueType": "string",
+          "name": "description",
+          "label": "Description",
           "value": ""
         },
         {
@@ -96,9 +103,9 @@
   ],
   "filters": [
     {
-      "id": "jsw-tech-showcase",
+      "id": "interactive-showcase",
       "components": [
-        "jsw-tech-showcase-item"
+        "interactive-showcase-item"
       ]
     }
   ]
