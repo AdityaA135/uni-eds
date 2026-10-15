@@ -1,0 +1,13 @@
+{
+  "sites": {
+    "uni-eds": {
+      "previewOrg": "adityaa135",
+      "previewSite": "uni-eds",
+      "contentHostUrl": "author-p8803-e1283844.adobeaemcloud.com",
+      "aemSitePath": "/content/uni-eds",
+      "aemAssetsFolderPath": "/content/dam/uni-eds",
+      "aemSiteName": "uni-eds",
+      "aemSiteTitle": "adi-infy-eds"
+    }
+  }
+}
