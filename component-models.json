@@ -142,66 +142,6 @@
     ]
   },
   {
-    "id": "jsw-tech-showcase",
-    "fields": [
-      {
-        "component": "richtext",
-        "valueType": "string",
-        "name": "heading",
-        "label": "Heading",
-        "value": ""
-      }
-    ]
-  },
-  {
-    "id": "jsw-tech-showcase-item",
-    "fields": [
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "media_thumbnail",
-        "label": "Thumbnail",
-        "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "media_thumbnailAlt",
-        "label": "Thumbnail alt",
-        "value": ""
-      },
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "media_image",
-        "label": "Showcase image (chassis / engine)",
-        "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "media_imageAlt",
-        "label": "Showcase image alt",
-        "value": ""
-      },
-      {
-        "component": "richtext",
-        "valueType": "string",
-        "name": "text",
-        "label": "Title and description",
-        "value": ""
-      },
-      {
-        "component": "richtext",
-        "valueType": "string",
-        "name": "hotspots",
-        "label": "Hotspots (+ points)",
-        "value": "",
-        "description": "Up to 4 bullets, one per + point, written as: x, y | TITLE | description. x and y are percentages of the showcase image from its bottom-left corner (0, 0), x to the right and y upwards; \"40\" and \"40%\" mean the same, and a missing value counts as 0. Bullets after the 4th are not shown."
-      }
-    ]
-  },
-  {
     "id": "card",
     "fields": [
       {
