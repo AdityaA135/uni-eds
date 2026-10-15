@@ -15,8 +15,6 @@
  * it from here into its centre card on scroll.
  */
 
-import { moveInstrumentation } from '../../scripts/scripts.js';
-
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
 const MAX_HOTSPOTS = 4;
 let instance = 0;
@@ -109,7 +107,8 @@ function trackRatio(figure, img) {
 
 /**
  * browsers without CSS container units (cqw / cqh): the stage's own width and height as
- * --interactive-showcase-cq-w / --interactive-showcase-cq-h, which the CSS uses in their place (@supports not container-type)
+ * --interactive-showcase-cq-w / --interactive-showcase-cq-h, which the CSS uses in their place
+ * (@supports not container-type)
  */
 function containerUnits(container) {
   if (window.CSS?.supports?.('container-type', 'size')) return;
@@ -122,7 +121,8 @@ function containerUnits(container) {
 }
 
 // Universal Editor model of one showcase item (block/item). Published rows carry no model, so
-// identify items by their image/hotspot content and leave the separate title/description heading row out.
+// identify items by their image/hotspot content and leave the separate title/description
+// heading row out.
 const ITEM_MODEL = 'interactive-showcase-item';
 
 /**
@@ -161,14 +161,18 @@ export default function decorate(block) {
   const headRow = parentRow || rows.find((r) => !itemRows.includes(r));
 
   // Item field cells are separate in the model: title is text and description is a textarea.
-  // The parent model has only a title. Keep a fallback for published markup without UE field attributes.
-  const fieldCell = (row, name) => [...(row?.children || [])].find((cell) =>
-    cell.matches(`[data-aue-prop="${name}"]`) || cell.querySelector(`[data-aue-prop="${name}"]`)) || null;
+  // The parent model has only a title. Keep a fallback for published markup without UE field
+  // attributes.
+  const fieldCell = (row, name) => [...(row?.children || [])].find((cell) => (
+    cell.matches(`[data-aue-prop="${name}"]`) || cell.querySelector(`[data-aue-prop="${name}"]`)
+  )) || null;
   const copy = el('div', 'interactive-showcase-copy');
   if (headRow) {
     headRow.className = 'interactive-showcase-heading';
     const mainTitle = fieldCell(headRow, 'title');
-    (mainTitle || headRow.querySelector('h1, h2, h3'))?.classList.add('interactive-showcase-title');
+    // published, the plain-text title is the row's only cell (no heading element, no field name)
+    (mainTitle || headRow.querySelector('h1, h2, h3') || headRow.firstElementChild)
+      ?.classList.add('interactive-showcase-title');
     copy.append(headRow);
   }
   const detail = el('div', 'interactive-showcase-detail');
