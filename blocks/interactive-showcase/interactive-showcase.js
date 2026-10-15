@@ -152,23 +152,21 @@ export default function decorate(block) {
 
   const rows = [...block.children];
   // In Universal Editor the model identifies rows. In published HTML, identify item rows by
-  // their image/hotspot content; the heading row can now contain separate title + description cells.
+  // their image/hotspot content; the heading row contains only the main title field.
   const parentRow = rows.find((r) => r.dataset.aueModel === 'interactive-showcase');
   const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL
     || (!r.dataset.aueModel && (r.querySelector('picture, li') || r.children.length > 2)));
   const headRow = parentRow || rows.find((r) => !itemRows.includes(r));
 
-  // Field cells are separate in the model: title is a text field and description is a textarea.
-  // Keep a fallback for published markup where Universal Editor field attributes are not present.
+  // Item field cells are separate in the model: title is text and description is a textarea.
+  // The parent model has only a title. Keep a fallback for published markup without UE field attributes.
   const fieldCell = (row, name) => [...(row?.children || [])].find((cell) =>
     cell.matches(`[data-aue-prop="${name}"]`) || cell.querySelector(`[data-aue-prop="${name}"]`)) || null;
   const copy = el('div', 'interactive-showcase-copy');
   if (headRow) {
     headRow.className = 'interactive-showcase-heading';
     const mainTitle = fieldCell(headRow, 'title');
-    const mainDescription = fieldCell(headRow, 'description');
     (mainTitle || headRow.querySelector('h1, h2, h3'))?.classList.add('interactive-showcase-title');
-    mainDescription?.classList.add('interactive-showcase-description');
     copy.append(headRow);
   }
   const detail = el('div', 'interactive-showcase-detail');

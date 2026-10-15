@@ -42,13 +42,6 @@
           "name": "title",
           "label": "Title",
           "value": ""
-        },
-        {
-          "component": "richtext",
-          "valueType": "string",
-          "name": "description",
-          "label": "Description",
-          "value": ""
         }
       ]
     },
@@ -91,7 +84,7 @@
           "value": ""
         },
         {
-          "component": "richtext",
+          "component": "textarea",
           "valueType": "string",
           "name": "description",
           "label": "Description",
