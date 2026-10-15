@@ -273,7 +273,7 @@ export default function decorate(block) {
     if (imagePicture) figure.append(imagePicture);
     const img = imagePicture?.querySelector('img');
     if (img) trackRatio(figure, img);
-    parseHotspots(hotCell).forEach((spot) => {
+    const spots = parseHotspots(hotCell).map((spot) => {
       const btn = el('button', 'interactive-showcase-hotspot', {
         type: 'button',
         'aria-label': spot.title ? `Show details: ${spot.title}` : 'Show details',
@@ -288,6 +288,7 @@ export default function decorate(block) {
         else openTooltip(btn, spot);
       });
       figure.append(btn);
+      return { btn, spot };
     });
     if (hotCell) hotCell.classList.add('interactive-showcase-hotspot-source');
     mediaCell?.remove();
@@ -316,7 +317,9 @@ export default function decorate(block) {
       tab.append(thumbPicture);
     }
     thumbs.append(tab);
-    return { row, textCell, tab };
+    return {
+      row, textCell, tab, figure, hotCell, spots,
+    };
   });
 
   let current = 0;
@@ -385,4 +388,12 @@ export default function decorate(block) {
     curtain(section, block);
   }
   if (items.length) select(0);
+
+  // Universal Editor only: drag / nudge the + points and save their x, y (hotspot-editor.js)
+  if (block.classList.contains('interactive-showcase-editing') && items.length) {
+    import('./hotspot-editor.js')
+      .then(({ default: editHotspots }) => editHotspots(items, closeTooltip))
+      // optional: the block works the same without it
+      .catch(() => {});
+  }
 }
