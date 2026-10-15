@@ -4,7 +4,8 @@
  * Rows: a heading row, then one row per powertrain with
  *   media    — thumbnail picture, then showcase picture
  *   text     — title (h3) + description
- *   hotspots — list items "x%, y% | TITLE | description" (position over the showcase image)
+ *   hotspots — list items "x, y | TITLE | description" (position over the showcase image,
+ *              from its bottom-left corner; at most MAX_HOTSPOTS, see parseHotspots)
  * Thumbnails are tabs: selecting one swaps the showcase image, counter and copy.
  * A hotspot opens a frosted tooltip; clicking outside or Escape closes it.
  * Entrance ("white curtain"): the previous section holds still while this white card slides
@@ -13,7 +14,8 @@
  * it from here into its centre card on scroll.
  */
 
-const HOTSPOT = /^\s*(\d+(?:\.\d+)?)\s*%?\s*,\s*(\d+(?:\.\d+)?)\s*%?\s*\|\s*([^|]+?)\s*\|\s*([\s\S]+)$/;
+// at most this many + points per powertrain (the client's limit): further bullets are ignored
+const MAX_HOTSPOTS = 4;
 let instance = 0;
 
 function el(tag, className, attrs = {}) {
@@ -23,12 +25,37 @@ function el(tag, className, attrs = {}) {
   return node;
 }
 
+/**
+ * an authored coordinate as a number from 0 to 100: "40" and "40%" both give 40 (the % is
+ * added back where it is used); missing or not a number gives 0
+ */
+function normalizeCoordinate(value) {
+  const n = parseFloat(String(value ?? '').replace(/%/g, '').trim());
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 0;
+}
+
+/**
+ * the + points, one bullet each: "x, y | TITLE | description". x and y are percentages of the
+ * showcase image from its bottom-left corner, like the first quadrant of a graph (x to the
+ * right, y upwards); the + button's top-left corner sits on that point. A missing x or y is 0;
+ * only the first MAX_HOTSPOTS bullets are used (none is fine). Returned y is from the top, as
+ * the stylesheet places it.
+ */
 function parseHotspots(cell) {
   if (!cell) return [];
-  return [...cell.querySelectorAll('li')].map((li) => li.textContent.match(HOTSPOT)).filter(Boolean)
-    .map(([, x, y, title, text]) => ({
-      x: Math.min(100, +x), y: Math.min(100, +y), title: title.trim(), text: text.trim(),
-    }));
+  return [...cell.querySelectorAll('li')].slice(0, MAX_HOTSPOTS).map((li) => {
+    const parts = li.textContent.split('|').map((part) => part.trim());
+    // the coordinates come first; a bullet without any "|" is either just them or just a title
+    const coords = parts.length > 1 || /^[\d\s.,%]*$/.test(parts[0]) ? parts.shift() : '';
+    const [x, y] = coords.split(',');
+    const [title = '', ...text] = parts;
+    return {
+      x: normalizeCoordinate(x),
+      y: 100 - normalizeCoordinate(y),
+      title,
+      text: text.join(' | '),
+    };
+  });
 }
 
 /**
@@ -91,6 +118,25 @@ function containerUnits(container) {
   else window.addEventListener('resize', measure);
 }
 
+// Universal Editor model of one powertrain (block/item); published rows carry no model, so
+// there a powertrain is any row with several cells (media | text | hotspots), the heading a
+// single-cell row
+const ITEM_MODEL = 'jsw-tech-showcase-item';
+
+/**
+ * a part of a powertrain row moved elsewhere (its text to the copy column, its thumbnail to the
+ * tray) stays that powertrain's in Universal Editor: its editable fields get the row's resource
+ */
+function keepResource(row, part) {
+  const resource = row.dataset.aueResource;
+  if (!resource || !part) return;
+  [part, ...part.querySelectorAll('[data-aue-prop]')].forEach((node) => {
+    if (node.hasAttribute('data-aue-prop') && !node.hasAttribute('data-aue-resource')) {
+      node.setAttribute('data-aue-resource', resource);
+    }
+  });
+}
+
 /**
  * loads and decorates the block
  * @param {Element} block The block element
@@ -105,7 +151,8 @@ export default function decorate(block) {
   }
 
   const rows = [...block.children];
-  const itemRows = rows.filter((r) => r.querySelector('picture'));
+  // a powertrain just added in the editor has no images or text yet, but is shown (and editable)
+  const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL || r.children.length > 1);
   const headRow = rows.find((r) => !itemRows.includes(r));
 
   const copy = el('div', 'jsw-tech-copy');
@@ -183,13 +230,18 @@ export default function decorate(block) {
   };
 
   const items = itemRows.map((row, i) => {
+    // cells in model order (media | text | hotspots), found by content where it is there
     const cells = [...row.children];
-    const mediaCell = cells.find((c) => c.querySelector('picture'));
-    const pictures = [...mediaCell.querySelectorAll('picture')];
-    const thumbPicture = pictures[0];
-    const imagePicture = pictures[1] || pictures[0].cloneNode(true);
-    const hotCell = cells.find((c) => c !== mediaCell && c.querySelector('li'));
+    const mediaCell = cells.find((c) => c.querySelector('picture')) || cells[0];
+    const hotCell = cells.find((c) => c !== mediaCell && c.querySelector('li'))
+      || (cells.length > 2 ? cells[2] : null);
     const textCell = cells.find((c) => c !== mediaCell && c !== hotCell);
+    const pictures = [...(mediaCell?.querySelectorAll('picture') || [])];
+    // in the editor each image names its field; published, the thumbnail comes first
+    const fieldPicture = (name) => mediaCell?.querySelector(`[data-aue-prop="${name}"]`)?.closest('picture');
+    const thumbPicture = fieldPicture('media_thumbnail') || pictures[0];
+    const imagePicture = fieldPicture('media_image')
+      || pictures.find((p) => p !== thumbPicture) || thumbPicture?.cloneNode(true);
     const title = textCell?.querySelector('h2, h3, h4')?.textContent.trim() || `Powertrain ${i + 1}`;
 
     // the item row becomes its panel (keeps the editor's item instrumentation)
@@ -198,13 +250,13 @@ export default function decorate(block) {
     row.setAttribute('role', 'tabpanel');
     row.setAttribute('aria-labelledby', `${id}-tab-${i}`);
     const figure = el('div', 'jsw-tech-figure');
-    figure.append(imagePicture);
-    const img = imagePicture.querySelector('img');
+    if (imagePicture) figure.append(imagePicture);
+    const img = imagePicture?.querySelector('img');
     if (img) trackRatio(figure, img);
     parseHotspots(hotCell).forEach((spot) => {
       const btn = el('button', 'jsw-hotspot', {
         type: 'button',
-        'aria-label': `Show details: ${spot.title}`,
+        'aria-label': spot.title ? `Show details: ${spot.title}` : 'Show details',
         'aria-expanded': 'false',
         'aria-controls': tooltip.id,
       });
@@ -218,21 +270,25 @@ export default function decorate(block) {
       figure.append(btn);
     });
     if (hotCell) hotCell.classList.add('jsw-tech-hotspot-source');
-    mediaCell.remove();
+    mediaCell?.remove();
     row.prepend(figure);
     stage.append(row);
 
     if (textCell) {
       textCell.classList.add('jsw-tech-text');
       textCell.querySelector('h2, h3, h4')?.classList.add('jsw-tech-item-title');
+      keepResource(row, textCell);
       texts.append(textCell);
     }
 
     const tab = el('button', 'jsw-tech-thumb', {
       type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
     });
-    thumbPicture.querySelector('img')?.setAttribute('alt', '');
-    tab.append(thumbPicture);
+    if (thumbPicture) {
+      thumbPicture.querySelector('img')?.setAttribute('alt', '');
+      keepResource(row, thumbPicture);
+      tab.append(thumbPicture);
+    }
     thumbs.append(tab);
     return { row, textCell, tab };
   });
