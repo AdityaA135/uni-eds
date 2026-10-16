@@ -165,6 +165,13 @@ export default function decorate(block) {
   // items after the MAX_ITEMS-th are left out; in the editor they stay in the block (hidden) so
   // they can still be found and removed in the content tree
   const extraRows = itemRows.splice(MAX_ITEMS);
+  // Universal Editor filters cannot limit how many items a block takes, only which: once the
+  // block has MAX_ITEMS items it gets a filter that allows none (_interactive-showcase.json), so
+  // the editor offers no "Add"; below that it gets its own filter back
+  if (editing && block.dataset.aueFilter) {
+    const full = itemRows.length + extraRows.length >= MAX_ITEMS;
+    block.dataset.aueFilter = full ? 'interactive-showcase-full' : 'interactive-showcase';
+  }
 
   // Item field cells are separate in the model: title is text and description is a textarea.
   // The parent model has only a title. Keep a fallback for published markup without UE field
