@@ -17,6 +17,8 @@
 
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
 const MAX_HOTSPOTS = 4;
+// at most this many items (thumbnails): further items are not shown
+const MAX_ITEMS = 4;
 let instance = 0;
 
 function el(tag, className, attrs = {}) {
@@ -159,6 +161,10 @@ export default function decorate(block) {
   const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL
     || (!r.dataset.aueModel && (r.querySelector('picture, li') || r.children.length > 2)));
   const headRow = parentRow || rows.find((r) => !itemRows.includes(r));
+  const editing = Boolean(block.closest('[data-aue-resource]'));
+  // items after the MAX_ITEMS-th are left out; in the editor they stay in the block (hidden) so
+  // they can still be found and removed in the content tree
+  const extraRows = itemRows.splice(MAX_ITEMS);
 
   // Item field cells are separate in the model: title is text and description is a textarea.
   // The parent model has only a title. Keep a fallback for published markup without UE field
@@ -180,6 +186,16 @@ export default function decorate(block) {
   const texts = el('div', 'interactive-showcase-texts', { 'aria-live': 'polite' });
   const thumbs = el('div', 'interactive-showcase-thumbs', { role: 'tablist', 'aria-label': 'Showcase items' });
   detail.append(counter, texts, thumbs);
+  if (editing && extraRows.length) {
+    const extra = el('div', 'interactive-showcase-extra-items');
+    extra.hidden = true;
+    extra.append(...extraRows);
+    const note = el('p', 'interactive-showcase-limit-note');
+    note.textContent = `Only the first ${MAX_ITEMS} items are shown. `
+      + `${extraRows.length} more ${extraRows.length === 1 ? 'is' : 'are'} hidden: `
+      + 'remove or reorder them in the content tree.';
+    detail.append(note, extra);
+  }
   copy.append(detail);
 
   const stage = el('div', 'interactive-showcase-stage');
@@ -383,7 +399,7 @@ export default function decorate(block) {
   });
 
   block.replaceChildren(copy, stage);
-  if (block.closest('[data-aue-resource]')) block.classList.add('interactive-showcase-editing');
+  if (editing) block.classList.add('interactive-showcase-editing');
   else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     curtain(section, block);
   }
