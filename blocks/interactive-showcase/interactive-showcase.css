@@ -717,3 +717,15 @@ main > .section > .interactive-showcase-wrapper {
 .interactive-showcase .interactive-showcase-hotspot-coords[hidden] {
   display: none;
 }
+
+/* Universal Editor: items after the 4th are not shown; this note says so (interactive-showcase.js) */
+.interactive-showcase .interactive-showcase-limit-note {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #5c3b00;
+  background-color: #fff3d6;
+  font-size: 12px;
+  line-height: 1.4;
+}

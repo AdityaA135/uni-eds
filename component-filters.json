@@ -16,13 +16,8 @@
       "cards",
       "columns",
       "fragment",
+      "nev-tech",
       "interactive-showcase"
-    ]
-  },
-  {
-    "id": "jsw-tech-showcase",
-    "components": [
-      "jsw-tech-showcase-item"
     ]
   },
   {
@@ -57,6 +52,10 @@
     "components": [
       "interactive-showcase-item"
     ]
+  },
+  {
+    "id": "interactive-showcase-full",
+    "components": []
   },
   {
     "id": "nev-tech",
