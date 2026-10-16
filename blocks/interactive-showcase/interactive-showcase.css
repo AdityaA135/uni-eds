@@ -5,25 +5,13 @@
  * Values from the "NEV / Tech 1-3 1280x720" frames.
  */
 
-/* the block's own faces (from the JSW NEV page): display, body and label */
+/* the block's one face: every text in it is New Science (regular, the only weight used) */
 @font-face {
-  font-family: Michroma;
-  font-display: swap;
-  src: url('../../fonts/michroma.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: Inter;
-  font-display: swap;
-  src: url('../../fonts/inter.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Roboto Mono';
+  font-family: 'New Science';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../../fonts/roboto-mono-regular.woff2') format('woff2');
+  src: url('../../fonts/new-science-regular.woff2') format('woff2');
 }
 
 /* the card spans the page, inset 8px on every side (not the site's 1200px content column) */
@@ -38,9 +26,10 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-white: #fff;
   --interactive-showcase-text-dark: #111;
   --interactive-showcase-text-muted-dark: #5c5c5c;
-  --interactive-showcase-font-display: michroma, sequel, 'Helvetica Neue', arial, sans-serif;
-  --interactive-showcase-font-body: inter, 'Helvetica Neue', arial, sans-serif;
-  --interactive-showcase-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+  --interactive-showcase-font: 'New Science', 'Helvetica Neue', arial, sans-serif;
+  --interactive-showcase-font-display: var(--interactive-showcase-font);
+  --interactive-showcase-font-body: var(--interactive-showcase-font);
+  --interactive-showcase-font-mono: var(--interactive-showcase-font);
   --interactive-showcase-radius-card: 24px;
   --interactive-showcase-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --interactive-showcase-edge: 20px;
