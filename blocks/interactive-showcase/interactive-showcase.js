@@ -128,17 +128,19 @@ function containerUnits(container) {
 const ITEM_MODEL = 'interactive-showcase-item';
 
 /**
- * a part of a showcase item row moved elsewhere (its text to the copy column, its thumbnail to the
- * tray) stays that showcase item's in Universal Editor: its editable fields get the row's resource
+ * Universal Editor builds its content tree from what contains what on the page. An item's
+ * fields shown outside its row (title and description in the copy column, thumbnail in the
+ * tray) therefore stay in the row, hidden, so the tree lists them under their item; what is
+ * shown is this copy, without the editor's markers (it is edited in the item's properties)
  */
-function keepResource(row, part) {
-  const resource = row.dataset.aueResource;
-  if (!resource || !part) return;
-  [part, ...part.querySelectorAll('[data-aue-prop]')].forEach((node) => {
-    if (node.hasAttribute('data-aue-prop') && !node.hasAttribute('data-aue-resource')) {
-      node.setAttribute('data-aue-resource', resource);
-    }
+function displayCopy(node) {
+  const copy = node.cloneNode(true);
+  [copy, ...copy.querySelectorAll('*')].forEach((n) => {
+    [...n.attributes].forEach(({ name }) => {
+      if (name.startsWith('data-aue-') || name.startsWith('data-richtext-')) n.removeAttribute(name);
+    });
   });
+  return copy;
 }
 
 /**
@@ -318,16 +320,24 @@ export default function decorate(block) {
     row.prepend(figure);
     stage.append(row);
 
+    // published, the fields move to where they are shown; in the editor a copy is shown there
+    // and the field itself stays in the row, hidden (see displayCopy)
+    const show = (field) => {
+      if (!editing) return field;
+      const shown = displayCopy(field);
+      field.hidden = true;
+      return shown;
+    };
     const textCell = el('div', 'interactive-showcase-text');
     if (titleCell) {
-      titleCell.classList.add('interactive-showcase-item-title');
-      keepResource(row, titleCell);
-      textCell.append(titleCell);
+      const shownTitle = show(titleCell);
+      shownTitle.classList.add('interactive-showcase-item-title');
+      textCell.append(shownTitle);
     }
     if (descriptionCell) {
-      descriptionCell.classList.add('interactive-showcase-description');
-      keepResource(row, descriptionCell);
-      textCell.append(descriptionCell);
+      const shownDescription = show(descriptionCell);
+      shownDescription.classList.add('interactive-showcase-description');
+      textCell.append(shownDescription);
     }
     if (textCell.children.length) texts.append(textCell);
 
@@ -335,9 +345,16 @@ export default function decorate(block) {
       type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
     });
     if (thumbPicture) {
-      thumbPicture.querySelector('img')?.setAttribute('alt', '');
-      keepResource(row, thumbPicture);
-      tab.append(thumbPicture);
+      if (editing) {
+        // first in the row, as the thumbnail is first in the item's model
+        const thumbField = el('div');
+        thumbField.hidden = true;
+        row.prepend(thumbField);
+        thumbField.append(thumbPicture);
+      }
+      const shownThumb = show(thumbPicture);
+      shownThumb.querySelector('img')?.setAttribute('alt', '');
+      tab.append(shownThumb);
     }
     thumbs.append(tab);
     return {
@@ -418,5 +435,17 @@ export default function decorate(block) {
       .then(({ default: editHotspots }) => editHotspots(items, closeTooltip))
       // optional: the block works the same without it
       .catch(() => {});
+  }
+
+  // Universal Editor: selecting an item, or one of its fields, in the content tree or on the
+  // page shows that item. Listened to while capturing, so it is heard wherever it is dispatched
+  if (editing && items.length) {
+    document.addEventListener('aue:ui-select', (e) => {
+      if (!block.isConnected || !e.detail?.selected) return;
+      const { resource } = e.detail;
+      const index = items.findIndex(({ row }) => (resource && row.dataset.aueResource === resource)
+        || (e.target instanceof Node && row.contains(e.target)));
+      if (index >= 0 && index !== current) select(index);
+    }, true);
   }
 }
