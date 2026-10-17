@@ -324,9 +324,9 @@ export default function decorate(block) {
     // and the field itself stays in the row, hidden (see displayCopy)
     const show = (field) => {
       if (!editing) return field;
-      const copy = displayCopy(field);
+      const shown = displayCopy(field);
       field.hidden = true;
-      return copy;
+      return shown;
     };
     const textCell = el('div', 'interactive-showcase-text');
     if (titleCell) {
