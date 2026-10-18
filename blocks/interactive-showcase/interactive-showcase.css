@@ -460,29 +460,42 @@ main > .section > .interactive-showcase-wrapper {
   /* --fx / --fy: the image's left / top edge and --fh its height, in px of the 1280x720 frame;
      on other screens it scales with the card (height first, never wider than the frame allows),
      keeping its distance from the card's right edge. Every image starts from the "NEV / Tech 3"
-     frame (the engine section 3 starts with, cut off by the right edge), so the third item and
-     any added after it share that placement; the first two have their own frames below */
+     frame, so the third item and any added after it share that placement; the first two have
+     their own frames below.
+     The whole image is always shown (hotspots anywhere on it are visible, on every screen): the
+     frame's height is the most it gets; where the image, at that height, would run past the
+     card's right or bottom edge (--gap short of it), it is made smaller to fit and centred in
+     the height the frame gave it. --cw / --ch: the card's size (the stage covers it) */
   .interactive-showcase .interactive-showcase-figure {
-    --u: min(calc(100cqh / 720), calc(100cqw / 1280));
+    --cw: 100cqw;
+    --ch: 100cqh;
+    --u: min(calc(var(--ch) / 720), calc(var(--cw) / 1280));
     --fx: 670;
     --fy: 110;
     --fh: 592;
+    --gap: calc(24 * var(--u));
+    --left: calc(var(--cw) - (1280 - var(--fx)) * var(--u));
+    --top: calc((var(--ch) - 720 * var(--u)) / 2 + var(--fy) * var(--u));
+    --room-h: min(var(--fh) * var(--u), var(--ch) - var(--top) - var(--gap));
+    --room-w: calc(var(--cw) - var(--left) - var(--gap));
+    --h: min(var(--room-h), var(--room-w) / var(--interactive-showcase-ratio, 0.8));
 
     position: absolute;
-    top: calc((100cqh - 720 * var(--u)) / 2 + var(--fy) * var(--u));
-    left: calc(100cqw - (1280 - var(--fx)) * var(--u));
+    top: calc(var(--top) + (var(--room-h) - var(--h)) / 2);
+    left: var(--left);
     width: auto;
-    height: calc(var(--fh) * var(--u));
+    height: var(--h);
   }
 
-  /* "NEV / Tech 1": chassis, its body running off the right edge */
+  /* "NEV / Tech 1": chassis */
   .interactive-showcase .interactive-showcase-panel:nth-child(1) .interactive-showcase-figure {
     --fx: 707;
     --fy: 107;
     --fh: 554;
   }
 
-  /* "NEV / Tech 2": Rotax engine, cut off by the right and bottom edges */
+  /* "NEV / Tech 2": Rotax engine (its frame ran it off the right and bottom edges; it is now
+     made smaller to fit) */
   .interactive-showcase .interactive-showcase-panel:nth-child(2) .interactive-showcase-figure {
     --fx: 660;
     --fy: 133;
@@ -615,10 +628,9 @@ main > .section > .interactive-showcase-wrapper {
 
   @media (width >= 900px), (orientation: landscape) and (width >= 600px) {
     .interactive-showcase .interactive-showcase-figure {
-      --u: min(calc(var(--interactive-showcase-cq-h) / 720), calc(var(--interactive-showcase-cq-w) / 1280));
+      --cw: var(--interactive-showcase-cq-w);
+      --ch: var(--interactive-showcase-cq-h);
 
-      top: calc((var(--interactive-showcase-cq-h) - 720 * var(--u)) / 2 + var(--fy) * var(--u));
-      left: calc(var(--interactive-showcase-cq-w) - (1280 - var(--fx)) * var(--u));
       width: auto;
     }
   }
