@@ -676,6 +676,13 @@ main > .section > .interactive-showcase-wrapper {
   outline-offset: 2px;
 }
 
+/* a + authored in the part of the image the card cuts off: drawn at the nearest visible edge,
+   outlined, until it is moved in (hotspot-editor.js) */
+.interactive-showcase .interactive-showcase-hotspot-draggable.is-outside {
+  outline: 2px dashed #ff5a52;
+  outline-offset: 2px;
+}
+
 .interactive-showcase .interactive-showcase-hotspot-coords {
   position: absolute;
   top: var(--interactive-showcase-y);

@@ -5,6 +5,9 @@
  * of the item's Hotspots field (title and text kept) and saved to the item. Clicking the image
  * anywhere else shows the x, y at that spot and copies it, for writing a new bullet.
  * x and y are as authored: percentages of the image from its bottom-left corner.
+ * The frames run some images off the card's edges (cut off, as designed): a + can only be moved
+ * within the part of the image the card shows, and one authored in the cut-off part is drawn at
+ * the nearest visible edge, outlined, until it is moved in.
  */
 
 const STEP = 0.5;
@@ -12,9 +15,41 @@ const BIG_STEP = 5;
 const SAVE_DELAY = 700;
 // a press that moves less than this (px) is a click: it opens the tooltip as usual
 const DRAG_THRESHOLD = 4;
+// a + stays this far (px) inside the card's edges, so all of it is seen
+const EDGE = 24;
+const MOVE_HINT = 'Drag to move (arrow keys nudge, Shift for bigger steps)';
 
-const clamp = (n) => Math.min(100, Math.max(0, n));
+const clamp = (n, min = 0, max = 100) => Math.min(max, Math.max(min, n));
 const round = (n) => Math.round(n * 10) / 10;
+
+/**
+ * the part of the image the card shows, in % of the image (y from the top), EDGE px inside the
+ * card's edges; measured from offsets, which leave out the slide animation's transforms
+ */
+function visibleArea(figure) {
+  const stage = figure.closest('.interactive-showcase-stage');
+  const w = figure.offsetWidth;
+  const h = figure.offsetHeight;
+  if (!stage || !w || !h) {
+    return {
+      x0: 0, x1: 100, y0: 0, y1: 100,
+    };
+  }
+  let left = 0;
+  let top = 0;
+  for (let n = figure; n && n !== stage; n = n.offsetParent) {
+    left += n.offsetLeft;
+    top += n.offsetTop;
+  }
+  const x0 = clamp(((EDGE - left) / w) * 100);
+  const y0 = clamp(((EDGE - top) / h) * 100);
+  return {
+    x0,
+    y0,
+    x1: Math.max(x0, clamp(((stage.clientWidth - EDGE - left) / w) * 100)),
+    y1: Math.max(y0, clamp(((stage.clientHeight - EDGE - top) / h) * 100)),
+  };
+}
 
 /** "x, y" as authored (spot.y is kept from the top, as the stylesheet places it) */
 const coordinates = (x, yFromTop) => `${round(x)}, ${round(100 - yFromTop)}`;
@@ -98,13 +133,52 @@ function editItem({
     }
   };
 
+  const draw = (entry, x, y) => {
+    entry.btn.style.setProperty('--interactive-showcase-x', `${x}%`);
+    entry.btn.style.setProperty('--interactive-showcase-y', `${y}%`);
+  };
+
+  // moved by the author: only within the part of the image the card shows
   const place = (entry, x, y) => {
-    entry.spot.x = round(clamp(x));
-    entry.spot.y = round(clamp(y));
-    entry.btn.style.setProperty('--interactive-showcase-x', `${entry.spot.x}%`);
-    entry.btn.style.setProperty('--interactive-showcase-y', `${entry.spot.y}%`);
+    const area = visibleArea(figure);
+    entry.spot.x = round(clamp(x, area.x0, area.x1));
+    entry.spot.y = round(clamp(y, area.y0, area.y1));
+    draw(entry, entry.spot.x, entry.spot.y);
+    entry.btn.classList.remove('is-outside');
+    entry.btn.title = MOVE_HINT;
     showBadge(entry.spot.x, entry.spot.y, coordinates(entry.spot.x, entry.spot.y));
   };
+
+  // where a + is seen: its x, y, or for one in the cut-off part the nearest visible point
+  const shownAt = (entry) => {
+    const area = visibleArea(figure);
+    return {
+      x: clamp(entry.spot.x, area.x0, area.x1),
+      y: clamp(entry.spot.y, area.y0, area.y1),
+    };
+  };
+
+  // a + authored in the cut-off part is drawn at the nearest visible edge, outlined, until it
+  // is moved in (its saved x, y is left as it is until then)
+  const markHidden = () => {
+    spots.forEach((entry) => {
+      const { x, y } = entry.spot;
+      const { x: shownX, y: shownY } = shownAt(entry);
+      const outside = Math.abs(shownX - x) > 0.05 || Math.abs(shownY - y) > 0.05;
+      draw(entry, outside ? shownX : x, outside ? shownY : y);
+      entry.btn.classList.toggle('is-outside', outside);
+      entry.btn.title = outside
+        ? `At ${coordinates(x, y)} this point is in the part of the image the card cuts off, so it is not seen: drag it in`
+        : MOVE_HINT;
+    });
+  };
+  markHidden();
+  // a quick first move would start the browser's own drag of the image under the +, which
+  // cancels the + 's drag
+  figure.addEventListener('dragstart', (e) => e.preventDefault());
+  // sizes change as the image loads and the screen is resized
+  if (window.ResizeObserver) new ResizeObserver(markHidden).observe(figure);
+  window.addEventListener('resize', markHidden);
 
   // saves run one after the other, each with the field as it is by then
   let saving = Promise.resolve();
@@ -130,13 +204,14 @@ function editItem({
   spots.forEach((entry, index) => {
     const { btn } = entry;
     btn.classList.add('interactive-showcase-hotspot-draggable');
-    btn.title = 'Drag to move (arrow keys nudge, Shift for bigger steps)';
 
     btn.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
       const box = figure.getBoundingClientRect();
+      // from where the + is seen (an outlined one is not at its own x, y)
+      const seen = shownAt(entry);
       const start = {
-        x: e.clientX, y: e.clientY, sx: entry.spot.x, sy: entry.spot.y,
+        x: e.clientX, y: e.clientY, sx: seen.x, sy: seen.y,
       };
       let moving = false;
       btn.setPointerCapture(e.pointerId);
@@ -173,7 +248,8 @@ function editItem({
       e.stopPropagation();
       closeTooltip();
       const step = e.shiftKey ? BIG_STEP : STEP;
-      place(entry, entry.spot.x + dx * step, entry.spot.y + dy * step);
+      const seen = shownAt(entry);
+      place(entry, seen.x + dx * step, seen.y + dy * step);
       clearTimeout(nudgeTimer);
       nudgeTimer = setTimeout(() => commit(entry, index), SAVE_DELAY);
     });
