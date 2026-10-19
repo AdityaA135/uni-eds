@@ -5,10 +5,6 @@
  * Values from the "NEV / Tech 1-3 1280x720" frames.
  */
 
-/* the block's one face: every text in it is New Science (regular, the only weight used), from
-   the project's Adobe Fonts (Typekit) web project qil0qom, which serves it as "new-science" */
-@import url('https://use.typekit.net/qil0qom.css');
-
 /* the card spans the page, inset 8px on every side (not the site's 1200px content column) */
 main > .section > .interactive-showcase-wrapper {
   max-width: none;
@@ -21,7 +17,11 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-white: #fff;
   --interactive-showcase-text-dark: #111;
   --interactive-showcase-text-muted-dark: #5c5c5c;
-  --interactive-showcase-font: new-science, 'Helvetica Neue', arial, sans-serif;
+
+  /* every text in the block is New Science (regular, the only weight used), the project's own
+     text font: its --text-font-family (with its metric-matched fallback) where the project
+     defines one, else New Science itself. The Adobe Fonts kit is loaded by head.html */
+  --interactive-showcase-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
   --interactive-showcase-font-display: var(--interactive-showcase-font);
   --interactive-showcase-font-body: var(--interactive-showcase-font);
   --interactive-showcase-font-mono: var(--interactive-showcase-font);
