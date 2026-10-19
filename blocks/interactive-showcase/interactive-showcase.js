@@ -18,7 +18,7 @@
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
 const MAX_HOTSPOTS = 4;
 // at most this many items (thumbnails): further items are not shown
-const MAX_ITEMS = 4;
+const MAX_ITEMS = 3;
 let instance = 0;
 
 function el(tag, className, attrs = {}) {
