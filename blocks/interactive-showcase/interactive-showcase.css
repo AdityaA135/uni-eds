@@ -309,9 +309,10 @@ main > .section > .interactive-showcase-wrapper {
 }
 
 /* frosted tooltip ("NEV / Tech 1": 270 x 119): its hotspot sits in its top corner, 25px in
-   from the side and the top. It opens to the left and down; interactive-showcase.js flips it
-   right / up (data-side, data-align) and nudges it (--interactive-showcase-sx) so it always stays inside
-   the card and the screen */
+   from the side and the top. interactive-showcase.js opens it to the side and up or down by
+   the hotspot's quadrant (data-side, data-align) and nudges it across / up or down
+   (--interactive-showcase-sx / -sy) so it always stays inside the card and the screen, clear
+   of the copy column */
 .interactive-showcase .interactive-showcase-tooltip {
   --interactive-showcase-tx: calc(-100% + 25px);
   --interactive-showcase-ty: -25px;
@@ -332,7 +333,11 @@ main > .section > .interactive-showcase-wrapper {
   background-color: rgb(12 12 12 / 44%);
   backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
-  transform: translate(calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)), var(--interactive-showcase-ty));
+  transform:
+    translate(
+      calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
+      calc(var(--interactive-showcase-ty) + var(--interactive-showcase-sy, 0px))
+    );
 }
 
 .interactive-showcase .interactive-showcase-tooltip[data-side='right'] {
@@ -377,7 +382,9 @@ main > .section > .interactive-showcase-wrapper {
   padding: 0 0 0 20px;
 }
 
-.interactive-showcase .interactive-showcase-tooltip[data-side='center'] .interactive-showcase-tooltip-title {
+.interactive-showcase .interactive-showcase-tooltip[data-side='center'] .interactive-showcase-tooltip-title,
+.interactive-showcase .interactive-showcase-tooltip[data-align='bottom'] .interactive-showcase-tooltip-title {
+  /* no minus beside the title: it is below the text (opening up) or apart (centred) */
   padding: 0;
 }
 
