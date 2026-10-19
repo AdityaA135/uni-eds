@@ -219,31 +219,73 @@ export default function decorate(block) {
 
   let openSpot = null;
   /**
-   * the tooltip opens to the left of its hotspot and down, the hotspot in its top corner (as
-   * in the design); where that would cut it off at the card's or the screen's edge it opens
-   * to the right / up instead. Where neither side fits (narrow screens) it opens just below
-   * (or above) the hotspot, centred on it and nudged in, the hotspot keeping its own box.
+   * where a tooltip may go: the part of the card on screen, 8px in from its edges, and - where
+   * the copy column sits beside the image (desktop) - clear of its heading, text and thumbnails
+   */
+  const freeArea = (spot) => {
+    const gap = 8;
+    const card = stage.getBoundingClientRect();
+    const area = {
+      left: Math.max(card.left, 0) + gap,
+      right: Math.min(card.right, document.documentElement.clientWidth) - gap,
+      top: Math.max(card.top, 0) + gap,
+      bottom: Math.min(card.bottom, window.innerHeight) - gap,
+    };
+    copy.querySelectorAll('.interactive-showcase-title, .interactive-showcase-counter, .interactive-showcase-text:not([hidden]), .interactive-showcase-thumbs, .interactive-showcase-limit-note')
+      .forEach((part) => {
+        const r = part.getBoundingClientRect();
+        const beside = r.width && r.bottom > area.top && r.top < area.bottom;
+        if (beside && r.right <= spot.left) area.left = Math.max(area.left, r.right + gap);
+      });
+    return area;
+  };
+
+  /**
+   * the tooltip opens away from the edges, by the quadrant of the free area its hotspot is in:
+   * from a hotspot in the right half it opens to the left, from one in the left half to the
+   * right; from the lower half it opens up, from the upper half down (the hotspot in its
+   * corner, as in the design). Where that side does not fit it takes the other one; where
+   * neither does (narrow screens) it opens just below or above the hotspot, centred on it and
+   * nudged in, the hotspot keeping its own box. Up or down: the one that fits, else the one
+   * with more room.
    */
   const placeTooltip = () => {
-    const area = stage.getBoundingClientRect();
-    const gap = 8;
-    const left = Math.max(area.left, 0) + gap;
-    const right = Math.min(area.right, document.documentElement.clientWidth) - gap;
-    const bottom = Math.min(area.bottom, window.innerHeight) - gap;
+    if (!openSpot) return;
+    const spot = openSpot.getBoundingClientRect();
+    const area = freeArea(spot);
     const set = (side, align) => {
       tooltip.dataset.side = side;
       tooltip.dataset.align = align;
       return tooltip.getBoundingClientRect();
     };
+    const fitsAcross = (b) => b.left >= area.left && b.right <= area.right;
+    const overflowY = (b) => Math.max(0, area.top - b.top) + Math.max(0, b.bottom - area.bottom);
+    const spotX = (spot.left + spot.right) / 2;
+    const spotY = (spot.top + spot.bottom) / 2;
     tooltip.style.removeProperty('--interactive-showcase-sx');
-    let box = set('left', 'top');
-    if (box.left < left) box = set('right', 'top');
-    const apart = box.left < left || box.right > right;
-    if (apart) box = set('center', 'below');
-    if (box.bottom > bottom) box = set(tooltip.dataset.side, apart ? 'above' : 'bottom');
-    if (box.right > right) tooltip.style.setProperty('--interactive-showcase-sx', `${right - box.right}px`);
-    else if (box.left < left) tooltip.style.setProperty('--interactive-showcase-sx', `${left - box.left}px`);
-    openSpot?.classList.toggle('interactive-showcase-hotspot-apart', apart);
+    tooltip.style.removeProperty('--interactive-showcase-sy');
+
+    const sides = spotX > (area.left + area.right) / 2 ? ['left', 'right'] : ['right', 'left'];
+    const side = sides.find((s) => fitsAcross(set(s, 'top'))) || 'center';
+    const apart = side === 'center';
+    const aligns = apart ? ['below', 'above'] : ['top', 'bottom'];
+    if (spotY > (area.top + area.bottom) / 2) aligns.reverse();
+    const [align] = aligns
+      .map((a) => [a, overflowY(set(side, a))])
+      .sort((a, b) => a[1] - b[1]);
+    const box = set(side, align[0]);
+
+    // nudged in where it still does not fit (across, and up or down); taller than the free
+    // area (the shortest phones) it keeps to its top. It may then cover some of the image, never
+    // the copy or the edges; its hotspot stays above it, so it can still be closed
+    if (box.right > area.right) tooltip.style.setProperty('--interactive-showcase-sx', `${area.right - box.right}px`);
+    else if (box.left < area.left) tooltip.style.setProperty('--interactive-showcase-sx', `${area.left - box.left}px`);
+    const sy = box.top < area.top || box.height > area.bottom - area.top
+      ? area.top - box.top
+      : Math.min(0, area.bottom - box.bottom);
+    if (sy) tooltip.style.setProperty('--interactive-showcase-sy', `${sy}px`);
+    // a tooltip moved off its hotspot's corner leaves the hotspot its own box
+    openSpot.classList.toggle('interactive-showcase-hotspot-apart', apart || Boolean(sy));
   };
 
   const closeTooltip = (refocus = false) => {
