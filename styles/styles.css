@@ -19,9 +19,24 @@
   --link-color: #3b63fb;
   --link-hover-color: #1d3ecf;
 
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  /* --- Font families (as in the JSW Motors project) ---
+     Every text layer in the Figma UAT designs is New Science (Adobe Fonts kit,
+     see head.html): headings in the Extended width, everything else in the
+     normal width. 'Anek Latin' is a graceful fallback while the kit loads. */
+  --text-font-family: 'new-science', new-science-fallback, 'Anek Latin', arial, sans-serif;
+  --font-family-base: 'new-science', 'Anek Latin', arial, sans-serif;
+  --font-family-display: 'new-science-extended', var(--font-family-base);
+  --nav-font-family: var(--font-family-base);
+
+  /* --- Font weights --- */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* this project's own font names (header, buttons) follow the families above */
+  --body-font-family: var(--font-family-base);
+  --heading-font-family: var(--font-family-display);
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -53,6 +68,28 @@
   src: local('Arial');
 }
 
+/* Arial scaled to the Adobe Fonts kit's average glyph widths (measured
+   against Arial metrics), so text keeps its line breaks when the kit swaps in */
+@font-face {
+  font-family: new-science-extended-fallback;
+  size-adjust: 134.5%;
+  src: local('Arial');
+}
+
+/* Placeholder until the New Science kit arrives — the device's own Arial, or
+   Roboto on Android, which has no Arial — scaled to regular New Science's
+   widths (both need ~106%) and given its ascent/descent, so text keeps its
+   line breaks and baseline when the kit swaps in. Not a design font: New
+   Science replaces it everywhere once loaded. */
+@font-face {
+  font-family: new-science-fallback;
+  size-adjust: 106%;
+  ascent-override: 103.8%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+  src: local('Arial'), local('Roboto'), local('Roboto-Regular');
+}
+
 @media (width >= 900px) {
   :root {
     /* body sizes */
@@ -75,7 +112,7 @@ body {
   margin: 0;
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: var(--body-font-family);
+  font-family: var(--font-family-base);
   font-size: var(--body-font-size-m);
   line-height: 1.6;
 }
@@ -106,8 +143,8 @@ h5,
 h6 {
   margin-top: 0.8em;
   margin-bottom: 0.25em;
-  font-family: var(--heading-font-family);
-  font-weight: 600;
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.25;
   scroll-margin: 40px;
 }
