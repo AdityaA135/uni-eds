@@ -15,8 +15,9 @@ main > .section > .interactive-showcase-wrapper {
   /* design tokens, as on the JSW NEV page; a page can override any of them */
   --interactive-showcase-ink: #0d0d0d;
   --interactive-showcase-white: #fff;
-  --interactive-showcase-text-dark: #111;
-  --interactive-showcase-text-muted-dark: #5c5c5c;
+  --interactive-showcase-text-dark: var(--color-black, #000);
+  --interactive-showcase-text-muted-dark: var(--color-gray-70, #4d4d4d);
+  --interactive-showcase-text-counter: var(--color-gray-60, #666);
 
   /* every text in the block is New Science (regular, the only weight used), the project's own
      text font: its --text-font-family (with its metric-matched fallback) where the project
@@ -41,14 +42,17 @@ main > .section > .interactive-showcase-wrapper {
   overflow: hidden;
   border-radius: var(--interactive-showcase-radius-card, 24px);
   color: var(--interactive-showcase-text-dark, #111);
-  background: linear-gradient(100deg, #fff 0%, #fff 40%, #dadada 100%);
+  background:
+    linear-gradient(291.69deg, rgb(0 0 0 / 18.24%) 0.96%, rgb(246 246 246 / 38%) 48.73%, rgb(255 255 255 / 38%) 62.61%),
+    #fff;
   font-family: var(--interactive-showcase-font-body);
   font-size: 16px;
   letter-spacing: 0.16px;
   line-height: 1.35;
 
   @media (width >= 900px) {
-    --interactive-showcase-edge: 5.4vw;
+    /* 48px of the 1280px frame */
+    --interactive-showcase-edge: 3.75vw;
   }
 
   /* the site's default heading and paragraph margins do not apply in the card: every gap in it
@@ -80,22 +84,23 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .title {
-    max-width: 16em;
+    max-width: 15em;
 
-    /* "A NEW WAY TO MOVE" / "POWERED BY TECH" */
+    /* "A NEW WAY TO MOVE" / "POWERED BY TECH": 30px of the 1280px frame */
+    color: var(--interactive-showcase-text-dark, #000);
     font-family: var(--interactive-showcase-font-display);
-    font-size: clamp(19px, 2.2vw, 36px);
-    font-weight: 400;
-    line-height: 1.16;
+    font-size: clamp(19px, 2.34vw, 40px);
+    font-weight: 500;
+    line-height: 1.2;
     letter-spacing: 0.01em;
     text-transform: uppercase;
   }
 
   .description p {
-    max-width: 430px;
-    color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
-    font-size: 13.5px;
-    line-height: 1.55;
+    max-width: 416px;
+    color: var(--interactive-showcase-text-muted-dark, #4d4d4d);
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   .detail {
@@ -104,19 +109,22 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .counter {
-    margin-bottom: 10px;
-    color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
+    margin-bottom: 11px;
+    color: var(--interactive-showcase-text-counter, #666);
     font-family: var(--interactive-showcase-font-mono);
-    font-size: 12px;
-    letter-spacing: 0.12em;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.1;
+    text-transform: uppercase;
   }
 
   .item-title {
-    margin-bottom: 12px;
+    margin-bottom: 9px;
+    color: var(--interactive-showcase-text-dark, #000);
     font-family: var(--interactive-showcase-font-display);
-    font-size: clamp(15px, 1.3vw, 19px);
-    font-weight: 400;
-    line-height: 1.3;
+    font-size: clamp(15px, 1.41vw, 22px);
+    font-weight: 500;
+    line-height: 1.25;
   }
 
   .text[hidden] {
@@ -137,19 +145,20 @@ main > .section > .interactive-showcase-wrapper {
   /* thumbnail tray: inactive thumbnails are greyscale */
   .thumbs {
     display: flex;
-    gap: 14px;
-    margin-top: 26px;
+    gap: 18px;
+    margin-top: 24px;
   }
 
   .thumb {
+    position: relative;
     flex: none;
-    width: clamp(84px, 9.8vw, 140px);
-    aspect-ratio: 87 / 107;
+    width: clamp(84px, 9.92vw, 150px);
+    aspect-ratio: 127 / 157;
     margin: 0;
     padding: 0;
     overflow: hidden;
     border: 0;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     background-color: var(--interactive-showcase-ink, #0d0d0d);
     transition: transform 0.5s var(--interactive-showcase-ease);
@@ -160,6 +169,19 @@ main > .section > .interactive-showcase-wrapper {
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  /* the frames' corner shading: blurred near-black patches over the thumbnail's corners */
+  .thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 0 0, rgb(0 0 0 / 85%), transparent 26%),
+      radial-gradient(circle at 100% 0, rgb(0 0 0 / 85%), transparent 26%),
+      radial-gradient(circle at 0 100%, rgb(0 0 0 / 80%), transparent 22%),
+      radial-gradient(circle at 100% 100%, rgb(0 0 0 / 80%), transparent 22%);
   }
 
   .thumb img {
@@ -253,12 +275,11 @@ main > .section > .interactive-showcase-wrapper {
     height: 36px;
     margin: 0;
     padding: 0;
-    border: 1px solid rgb(255 255 255 / 16%);
-    border-radius: 8px;
+    border: 0;
+    border-radius: 7px;
     cursor: pointer;
     color: var(--interactive-showcase-white, #fff);
-    background-color: rgb(24 24 24 / 58%);
-    backdrop-filter: blur(8px);
+    background-color: rgb(0 0 0 / 20%);
     transform: translate(-50%, -50%);
     transition: background-color 0.3s var(--interactive-showcase-ease);
   }
@@ -281,29 +302,32 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .hotspot:hover {
-    background-color: rgb(80 80 80 / 70%);
+    background-color: rgb(0 0 0 / 35%);
   }
 
   /* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip */
   .hotspot[aria-expanded='true'] {
     z-index: 4;
-    border-color: transparent;
     background-color: transparent;
-    backdrop-filter: none;
+  }
+
+  /* the frame's minus: 12 x 1px */
+  .hotspot[aria-expanded='true']::before,
+  .hotspot[aria-expanded='true']::after {
+    width: 12px;
+    height: 1px;
   }
 
   /* ...except beside a tooltip opened below / above it: then it keeps its own box */
   .hotspot.hotspot-apart[aria-expanded='true'] {
-    border-color: rgb(255 255 255 / 16%);
-    background-color: rgb(80 80 80 / 70%);
-    backdrop-filter: blur(8px);
+    background-color: rgb(0 0 0 / 40%);
   }
 
   .hotspot[aria-expanded='true']::after {
     transform: translate(-50%, -50%) rotate(0deg);
   }
 
-  /* frosted tooltip ("NEV / Tech 1": 270 x 119): its hotspot sits in its top corner, 25px in
+  /* tooltip ("Additional info" in NEV / Tech 1, 272 x 120): its hotspot sits in its top corner, 25px in
      from the side and the top. interactive-showcase.js opens it to the side and up or down by
      the hotspot's quadrant (data-side, data-align) and nudges it across / up or down
      (--interactive-showcase-sx / -sy) so it always stays inside the card and the screen, clear
@@ -317,17 +341,14 @@ main > .section > .interactive-showcase-wrapper {
     left: var(--interactive-showcase-x);
     z-index: 3;
     box-sizing: border-box;
-    width: min(270px, calc(100cqw - 16px));
+    width: min(272px, calc(100cqw - 16px));
 
     /* the minus shares only the title's row; the text below runs the full width, so its
-       lines break as in the frame (this font is a little wider) */
+       lines break as in the frame */
     padding: 16px;
-    border: 1px solid rgb(255 255 255 / 10%);
     border-radius: 12px;
     color: var(--interactive-showcase-white, #fff);
-    background-color: rgb(12 12 12 / 44%);
-    backdrop-filter: blur(14px) saturate(1.2);
-    box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+    background-color: rgb(0 0 0 / 40%);
     transform:
       translate(
         calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
@@ -383,16 +404,18 @@ main > .section > .interactive-showcase-wrapper {
 
   /* the title shares its row with the minus (centred 25px in from the corner) */
   .tooltip-title {
-    margin-bottom: 22px;
-    padding-right: 20px;
+    margin-bottom: 20px;
+    padding-right: 33px;
     font-family: var(--interactive-showcase-font-mono);
     font-size: 14px;
-    line-height: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
   }
 
   .tooltip[data-side='right'] .tooltip-title {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 33px;
   }
 
   .tooltip[data-side='center'] .tooltip-title,
@@ -401,11 +424,10 @@ main > .section > .interactive-showcase-wrapper {
     padding: 0;
   }
 
-  /* a touch tighter than Inter's default, so the lines break as in the frame */
   .tooltip-text {
     color: rgb(255 255 255 / 80%);
     font-size: 12px;
-    line-height: 1.3;
+    line-height: 1.35;
     letter-spacing: -0.02em;
   }
 
@@ -444,21 +466,30 @@ main > .section > .interactive-showcase-wrapper {
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
     height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-svh) - 16px));
 
+    /* the heading's top 152px and the copy's bottom 68px of the 720px frame, as shares of the
+       card's height */
     .copy {
+      --card-height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-svh) - 16px));
+
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       min-height: 0;
-      padding: 0 0 calc(7 * var(--interactive-showcase-svh));
+      padding: 0 0 calc(var(--card-height) * 68 / 720);
     }
 
     .heading {
       padding: 0 24px 0 var(--interactive-showcase-edge);
-      padding-top: max(108px, calc(17 * var(--interactive-showcase-svh)));
+      padding-top: calc(var(--card-height) * 152 / 720);
     }
 
     .detail {
       padding: 0 24px 0 var(--interactive-showcase-edge);
+    }
+
+    /* 127 x 157 of the 720px-tall frame, scaled with the card like its spacing */
+    .thumb {
+      width: clamp(72px, calc(var(--card-height) * 127 / 720), 160px);
     }
 
     /* the stage covers the whole card, so each image can sit where its frame has it: partly
@@ -482,9 +513,11 @@ main > .section > .interactive-showcase-wrapper {
        any added after it share that placement; the first two have their own frames below */
     .figure {
       --u: min(calc(100cqh / 720), calc(100cqw / 1280));
-      --fx: 670;
-      --fy: 110;
-      --fh: 592;
+
+      /* "NEV / Tech 3" image 1560 (849 x 700), cut off by the right and bottom edges */
+      --fx: 605;
+      --fy: 52;
+      --fh: 700;
 
       position: absolute;
       top: calc((100cqh - 720 * var(--u)) / 2 + var(--fy) * var(--u));
@@ -493,18 +526,18 @@ main > .section > .interactive-showcase-wrapper {
       height: calc(var(--fh) * var(--u));
     }
 
-    /* "NEV / Tech 1": chassis, its body running off the right edge */
+    /* "NEV / Tech 1" image 1584 (609 x 605): chassis, its right edge on the card's */
     .panel:nth-child(1) .figure {
-      --fx: 707;
-      --fy: 107;
-      --fh: 554;
+      --fx: 671;
+      --fy: 95;
+      --fh: 605;
     }
 
-    /* "NEV / Tech 2": Rotax engine, cut off by the right and bottom edges */
+    /* "NEV / Tech 2" image 1556 (1102 x 654): Rotax engine, cut off by the right and bottom edges */
     .panel:nth-child(2) .figure {
-      --fx: 660;
-      --fy: 133;
-      --fh: 650;
+      --fx: 525;
+      --fy: 71;
+      --fh: 654;
     }
 
     .hotspot,
