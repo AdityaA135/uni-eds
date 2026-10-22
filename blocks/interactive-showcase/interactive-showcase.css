@@ -537,19 +537,27 @@ main > .section > .interactive-showcase-wrapper {
       /* "NEV / Tech 3" image 1560 (849 x 700), cut off by the right and bottom edges */
       --fx: 605;
       --fy: 52;
+      --fw: 849;
       --fh: 700;
 
       position: absolute;
       top: calc((100cqh - 720 * var(--u)) / 2 + var(--fy) * var(--u));
       left: calc(100cqw - (1280 - var(--fx)) * var(--u));
-      width: auto;
+      width: calc(var(--fw) * var(--u));
       height: calc(var(--fh) * var(--u));
+    }
+
+    /* the box is the image layer's (--fw x --fh); the picture fills it as a Figma image fill does,
+       scaled to cover it, centred */
+    .figure img {
+      object-fit: cover;
     }
 
     /* "NEV / Tech 1" image 1584 (609 x 605): chassis, its right edge on the card's */
     .panel:nth-child(1) .figure {
       --fx: 671;
       --fy: 95;
+      --fw: 609;
       --fh: 605;
     }
 
@@ -557,6 +565,7 @@ main > .section > .interactive-showcase-wrapper {
     .panel:nth-child(2) .figure {
       --fx: 525;
       --fy: 71;
+      --fw: 1102;
       --fh: 654;
     }
 
@@ -740,7 +749,7 @@ main > .section > .interactive-showcase-wrapper {
 
         top: calc((var(--interactive-showcase-cq-h) - 720 * var(--u)) / 2 + var(--fy) * var(--u));
         left: calc(var(--interactive-showcase-cq-w) - (1280 - var(--fx)) * var(--u));
-        width: auto;
+        width: calc(var(--fw) * var(--u));
       }
     }
 
