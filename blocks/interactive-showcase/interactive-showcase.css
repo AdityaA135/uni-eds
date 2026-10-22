@@ -97,10 +97,11 @@ main > .section > .interactive-showcase-wrapper {
     /* room for "A NEW WAY TO MOVE" in New Science Extended, not for the next word */
     max-width: 16.5em;
 
-    /* "A NEW WAY TO MOVE" / "POWERED BY TECH": 30px of the 1280px frame */
+    /* "A NEW WAY TO MOVE" / "POWERED BY TECH": Figma's 30px from 1280px wide up, smaller below
+       (the copy column narrows with the screen) */
     color: var(--interactive-showcase-text-dark, #000);
     font-family: var(--interactive-showcase-font-display);
-    font-size: clamp(19px, 2.34vw, 40px);
+    font-size: clamp(19px, 2.3438vw, 30px);
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: 0.01em;
@@ -129,11 +130,12 @@ main > .section > .interactive-showcase-wrapper {
     text-transform: uppercase;
   }
 
+  /* Figma's 18px from 1280px wide up, smaller below */
   .item-title {
     margin-bottom: 9px;
     color: var(--interactive-showcase-text-dark, #000);
     font-family: var(--interactive-showcase-font-body);
-    font-size: clamp(15px, 1.41vw, 22px);
+    font-size: clamp(15px, 1.4063vw, 18px);
     font-weight: 500;
     line-height: 1.25;
   }
@@ -361,7 +363,7 @@ main > .section > .interactive-showcase-wrapper {
     background-color: rgb(0 0 0 / 40%);
 
     /* the open module's glass: what is behind it is frosted */
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(3px);
     transform:
       translate(
         calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
