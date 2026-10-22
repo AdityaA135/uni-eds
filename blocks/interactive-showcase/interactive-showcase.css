@@ -161,7 +161,6 @@ main > .section > .interactive-showcase-wrapper {
     border-radius: 6px;
     cursor: pointer;
     background-color: var(--interactive-showcase-ink, #0d0d0d);
-    transition: transform 0.5s var(--interactive-showcase-ease);
   }
 
   .thumb picture,
@@ -203,10 +202,6 @@ main > .section > .interactive-showcase-wrapper {
      when it flies the image on) */
   .panel:nth-child(2) .figure img {
     filter: grayscale(1) brightness(0.7) contrast(1.2);
-  }
-
-  .thumb[aria-selected='true'] {
-    transform: translateY(-4px);
   }
 
   /* stage: holds the showcase images; they are cut out, so they sit straight on the light card */
@@ -271,12 +266,12 @@ main > .section > .interactive-showcase-wrapper {
     top: var(--interactive-showcase-y);
     left: var(--interactive-showcase-x);
     z-index: 2;
-    width: 36px;
-    height: 36px;
+    width: 60px;
+    height: 60px;
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: 7px;
+    border-radius: 12px;
     cursor: pointer;
     color: var(--interactive-showcase-white, #fff);
     background-color: rgb(0 0 0 / 20%);
@@ -290,8 +285,8 @@ main > .section > .interactive-showcase-wrapper {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 14px;
-    height: 1.5px;
+    width: 16px;
+    height: 1.67px;
     background-color: currentcolor;
     transform: translate(-50%, -50%);
     transition: transform 0.3s var(--interactive-showcase-ease);
@@ -387,13 +382,13 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .tooltip[data-align='below'] {
-    --interactive-showcase-ty: 24px;
+    --interactive-showcase-ty: 36px;
 
     transform-origin: 50% 0;
   }
 
   .tooltip[data-align='above'] {
-    --interactive-showcase-ty: calc(-100% - 24px);
+    --interactive-showcase-ty: calc(-100% - 36px);
 
     transform-origin: 50% 100%;
   }
@@ -651,7 +646,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .hotspot {
-      top: min(var(--interactive-showcase-y), 100% - 36px);
+      top: min(var(--interactive-showcase-y), 100% - 60px);
     }
   }
 

@@ -15,8 +15,8 @@ const BIG_STEP = 5;
 const SAVE_DELAY = 700;
 // a press that moves less than this (px) is a click: it opens the tooltip as usual
 const DRAG_THRESHOLD = 4;
-// a + stays this far (px) inside the card's edges, so all of it is seen
-const EDGE = 24;
+// a + (60px) stays this far (px) inside the card's edges, so all of it is seen
+const EDGE = 34;
 const MOVE_HINT = 'Drag to move (arrow keys nudge, Shift for bigger steps)';
 
 const clamp = (n, min = 0, max = 100) => Math.min(max, Math.max(min, n));
