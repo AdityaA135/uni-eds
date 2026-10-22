@@ -291,6 +291,9 @@ main > .section > .interactive-showcase-wrapper {
     cursor: pointer;
     color: var(--interactive-showcase-white, #fff);
     background-color: rgb(0 0 0 / 20%);
+
+    /* the same glass as the open module */
+    backdrop-filter: blur(3px);
     transform: translate(-50%, -50%);
     transition: background-color 0.3s var(--interactive-showcase-ease);
   }
@@ -320,6 +323,7 @@ main > .section > .interactive-showcase-wrapper {
   .hotspot[aria-expanded='true'] {
     z-index: 4;
     background-color: transparent;
+    backdrop-filter: none;
   }
 
   /* the frame's minus: 12 x 1px */
@@ -332,6 +336,7 @@ main > .section > .interactive-showcase-wrapper {
   /* ...except beside a tooltip opened below / above it: then it keeps its own box */
   .hotspot.hotspot-apart[aria-expanded='true'] {
     background-color: rgb(0 0 0 / 40%);
+    backdrop-filter: blur(3px);
   }
 
   .hotspot[aria-expanded='true']::after {
@@ -582,12 +587,13 @@ main > .section > .interactive-showcase-wrapper {
       padding: min(78px, calc(9.6 * var(--interactive-showcase-svh))) 24px 0;
     }
 
+    /* New Science Medium Extended 24px / 135%, -1% (narrower phones scale it down); the card's
+       width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
     .title {
       max-width: none;
-
-      /* the card's width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
       font-size: min(24px, 6.4vw);
-      line-height: 1.3;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
     }
 
     /* the counter and the powertrain's name share the first row */
@@ -605,16 +611,21 @@ main > .section > .interactive-showcase-wrapper {
       display: contents;
     }
 
+    /* Roboto Mono Medium 16px / 140% */
     .counter {
       grid-column: 1;
       margin: 0;
-      font-size: 13px;
+      font-size: 16px;
+      line-height: 1.4;
     }
 
+    /* New Science Regular 16px / 150% */
     .item-title {
       grid-column: 2;
       margin: 0 0 10px;
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.5;
     }
 
     /* the description (its own cell, title and description being separate fields) spans the
@@ -623,19 +634,59 @@ main > .section > .interactive-showcase-wrapper {
       grid-column: 1 / -1;
     }
 
+    /* New Science Regular 14px / 135%, -2% */
     .description p {
       max-width: none;
-      font-size: 12.5px;
+      font-size: 14px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
     }
 
+    /* the tray 200 x 79: three 64 x 79 thumbnails, 4px apart */
     .thumbs {
       grid-column: 1 / -1;
-      gap: 6px;
+      gap: 4px;
       margin-top: 18px;
     }
 
     .thumb {
-      width: 63px;
+      width: 64px;
+    }
+
+    /* the + : 36 x 36, radius 8, 40% black with the same glass */
+    .hotspot {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background-color: rgb(0 0 0 / 40%);
+    }
+
+    .hotspot::before,
+    .hotspot::after {
+      width: 14px;
+      height: 1.5px;
+    }
+
+    /* a tooltip just below / above its + : half of it (18px) and 6px apart */
+    .tooltip[data-align='below'] {
+      --interactive-showcase-ty: 24px;
+    }
+
+    .tooltip[data-align='above'] {
+      --interactive-showcase-ty: calc(-100% - 24px);
+    }
+
+    /* the open module: title Roboto Mono Medium 10px / 140%, text New Science Regular
+       10px / 140%, -1% */
+    .tooltip-title {
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .tooltip-text {
+      font-size: 10px;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
     }
 
     /* the image sits in what is left of the screen: as on the 375x815 frame, 87% of the card's
@@ -668,7 +719,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .hotspot {
-      top: min(var(--interactive-showcase-y), 100% - 60px);
+      top: min(var(--interactive-showcase-y), 100% - 36px);
     }
   }
 
