@@ -249,8 +249,8 @@ main > .section > .interactive-showcase-wrapper {
     top: var(--interactive-showcase-y);
     left: var(--interactive-showcase-x);
     z-index: 2;
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
     margin: 0;
     padding: 0;
     border: 1px solid rgb(255 255 255 / 16%);
@@ -330,13 +330,22 @@ main > .section > .interactive-showcase-wrapper {
     box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
     transform:
       translate(
-      calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
-      calc(var(--interactive-showcase-ty) + var(--interactive-showcase-sy, 0px))
+        calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
+        calc(var(--interactive-showcase-ty) + var(--interactive-showcase-sy, 0px))
       );
+    transform-origin: calc(100% - 25px) 25px;
+  }
+
+  /* opening (interactive-showcase.js adds .is-opening): a slight fade and grow out of its
+     hotspot's corner (transform-origin, by data-side / data-align) */
+  .tooltip.is-opening {
+    animation: interactive-showcase-tooltip-in 0.2s var(--interactive-showcase-ease);
   }
 
   .tooltip[data-side='right'] {
     --interactive-showcase-tx: -25px;
+
+    transform-origin: 25px 25px;
   }
 
   /* opening upwards, the minus sits in the bottom corner: keep that row free of text */
@@ -344,6 +353,11 @@ main > .section > .interactive-showcase-wrapper {
     --interactive-showcase-ty: calc(-100% + 25px);
 
     padding-bottom: 50px;
+    transform-origin: calc(100% - 25px) calc(100% - 25px);
+  }
+
+  .tooltip[data-side='right'][data-align='bottom'] {
+    transform-origin: 25px calc(100% - 25px);
   }
 
   /* narrow screens: just below / above the hotspot, centred on it */
@@ -352,11 +366,15 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .tooltip[data-align='below'] {
-    --interactive-showcase-ty: 28px;
+    --interactive-showcase-ty: 24px;
+
+    transform-origin: 50% 0;
   }
 
   .tooltip[data-align='above'] {
-    --interactive-showcase-ty: calc(-100% - 28px);
+    --interactive-showcase-ty: calc(-100% - 24px);
+
+    transform-origin: 50% 100%;
   }
 
   .tooltip[hidden] {
@@ -395,10 +413,10 @@ main > .section > .interactive-showcase-wrapper {
      the minus is the visible control) */
   .tooltip-close {
     position: absolute;
-    top: 3px;
-    right: 3px;
-    width: 44px;
-    height: 44px;
+    top: 7px;
+    right: 7px;
+    width: 36px;
+    height: 36px;
     margin: 0;
     padding: 0;
     border: 0;
@@ -410,12 +428,12 @@ main > .section > .interactive-showcase-wrapper {
 
   .tooltip[data-side='right'] .tooltip-close {
     right: auto;
-    left: 3px;
+    left: 7px;
   }
 
   .tooltip[data-align='bottom'] .tooltip-close {
     top: auto;
-    bottom: 3px;
+    bottom: 7px;
   }
 
   /* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
@@ -600,7 +618,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .hotspot {
-      top: min(var(--interactive-showcase-y), 100% - 44px);
+      top: min(var(--interactive-showcase-y), 100% - 36px);
     }
   }
 
@@ -657,6 +675,10 @@ main > .section > .interactive-showcase-wrapper {
     .hotspot::before,
     .hotspot::after {
       transition: none;
+    }
+
+    .tooltip.is-opening {
+      animation: none;
     }
   }
 
@@ -721,5 +743,18 @@ main > .section > .interactive-showcase-wrapper {
     background-color: #fff3d6;
     font-size: 12px;
     line-height: 1.4;
+  }
+}
+
+/* the tooltip opening (.tooltip.is-opening): keyframes cannot be nested in the block rule */
+@keyframes interactive-showcase-tooltip-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
   }
 }

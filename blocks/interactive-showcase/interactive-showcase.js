@@ -306,8 +306,13 @@ export default function decorate(block) {
     spot.closest('.figure').append(tooltip);
     tooltip.style.setProperty('--interactive-showcase-x', `${data.x}%`);
     tooltip.style.setProperty('--interactive-showcase-y', `${data.y}%`);
+    // placed at its full size, then opened with a slight fade and grow (restarted each time,
+    // also when going straight from one hotspot to another)
+    tooltip.classList.remove('is-opening');
     tooltip.hidden = false;
     placeTooltip();
+    tooltip.getBoundingClientRect();
+    tooltip.classList.add('is-opening');
   };
 
   const items = itemRows.map((row, i) => {
