@@ -336,14 +336,15 @@ main > .section > .interactive-showcase-wrapper {
     transform: translate(-50%, -50%) rotate(0deg);
   }
 
-  /* tooltip ("Additional info" in NEV / Tech 1, 272 x 120): its hotspot sits in its top corner, 25px in
-     from the side and the top. interactive-showcase.js opens it to the side and up or down by
+  /* tooltip ("Additional info" in NEV / Tech 1, 272 x 120): its hotspot's minus is the 17px icon in its
+     top corner, centred 24.5px in from the side and 26px from the top. interactive-showcase.js
+     opens it to the side and up or down by
      the hotspot's quadrant (data-side, data-align) and nudges it across / up or down
      (--interactive-showcase-sx / -sy) so it always stays inside the card and the screen, clear
      of the copy column */
   .tooltip {
-    --interactive-showcase-tx: calc(-100% + 25px);
-    --interactive-showcase-ty: -25px;
+    --interactive-showcase-tx: calc(-100% + 24.5px);
+    --interactive-showcase-ty: -26px;
 
     position: absolute;
     top: var(--interactive-showcase-y);
@@ -363,7 +364,7 @@ main > .section > .interactive-showcase-wrapper {
         calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
         calc(var(--interactive-showcase-ty) + var(--interactive-showcase-sy, 0px))
       );
-    transform-origin: calc(100% - 25px) 25px;
+    transform-origin: calc(100% - 24.5px) 26px;
   }
 
   /* opening (interactive-showcase.js adds .is-opening): a slight fade and grow out of its
@@ -373,21 +374,21 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .tooltip[data-side='right'] {
-    --interactive-showcase-tx: -25px;
+    --interactive-showcase-tx: -24.5px;
 
-    transform-origin: 25px 25px;
+    transform-origin: 24.5px 26px;
   }
 
   /* opening upwards, the minus sits in the bottom corner: keep that row free of text */
   .tooltip[data-align='bottom'] {
-    --interactive-showcase-ty: calc(-100% + 25px);
+    --interactive-showcase-ty: calc(-100% + 26px);
 
     padding-bottom: 50px;
-    transform-origin: calc(100% - 25px) calc(100% - 25px);
+    transform-origin: calc(100% - 24.5px) calc(100% - 26px);
   }
 
   .tooltip[data-side='right'][data-align='bottom'] {
-    transform-origin: 25px calc(100% - 25px);
+    transform-origin: 24.5px calc(100% - 26px);
   }
 
   /* narrow screens: just below / above the hotspot, centred on it */
@@ -411,15 +412,15 @@ main > .section > .interactive-showcase-wrapper {
     display: none;
   }
 
-  /* the title shares its row with the minus (centred 25px in from the corner) */
+  /* the title shares its row with the minus (the 17px icon, 16px after it) */
   .tooltip-title {
     margin-bottom: 20px;
     padding-right: 33px;
-    font-family: var(--interactive-showcase-font-body);
+    font-family: var(--interactive-showcase-font-mono);
     font-size: 14px;
     font-weight: 500;
     line-height: 1.4;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 
@@ -434,7 +435,7 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .tooltip-text {
-    color: rgb(255 255 255 / 80%);
+    color: var(--interactive-showcase-white, #fff);
     font-size: 12px;
     line-height: 1.35;
     letter-spacing: -0.02em;
@@ -444,8 +445,8 @@ main > .section > .interactive-showcase-wrapper {
      the minus is the visible control) */
   .tooltip-close {
     position: absolute;
-    top: 7px;
-    right: 7px;
+    top: 8px;
+    right: 6.5px;
     width: 36px;
     height: 36px;
     margin: 0;
@@ -459,12 +460,12 @@ main > .section > .interactive-showcase-wrapper {
 
   .tooltip[data-side='right'] .tooltip-close {
     right: auto;
-    left: 7px;
+    left: 6.5px;
   }
 
   .tooltip[data-align='bottom'] .tooltip-close {
     top: auto;
-    bottom: 7px;
+    bottom: 8px;
   }
 
   /* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
