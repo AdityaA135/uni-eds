@@ -83,13 +83,13 @@ function curtain(section, block) {
     if (!section.offsetHeight) return;
     const { top } = section.getBoundingClientRect();
     // revealed once the card is in place; veiled again when it slides back down
-    if (top <= 2) block.classList.add('interactive-showcase-revealed');
-    else if (top > window.innerHeight * 0.5) block.classList.remove('interactive-showcase-revealed');
+    if (top <= 2) block.classList.add('revealed');
+    else if (top > window.innerHeight * 0.5) block.classList.remove('revealed');
   };
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(update);
   };
-  block.classList.add('interactive-showcase-curtain');
+  block.classList.add('curtain');
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
   new ResizeObserver(schedule).observe(section);
@@ -181,25 +181,25 @@ export default function decorate(block) {
   const fieldCell = (row, name) => [...(row?.children || [])].find((cell) => (
     cell.matches(`[data-aue-prop="${name}"]`) || cell.querySelector(`[data-aue-prop="${name}"]`)
   )) || null;
-  const copy = el('div', 'interactive-showcase-copy');
+  const copy = el('div', 'copy');
   if (headRow) {
-    headRow.className = 'interactive-showcase-heading';
+    headRow.className = 'heading';
     const mainTitle = fieldCell(headRow, 'title');
     // published, the plain-text title is the row's only cell (no heading element, no field name)
     (mainTitle || headRow.querySelector('h1, h2, h3') || headRow.firstElementChild)
-      ?.classList.add('interactive-showcase-title');
+      ?.classList.add('title');
     copy.append(headRow);
   }
-  const detail = el('div', 'interactive-showcase-detail');
-  const counter = el('p', 'interactive-showcase-counter');
-  const texts = el('div', 'interactive-showcase-texts', { 'aria-live': 'polite' });
-  const thumbs = el('div', 'interactive-showcase-thumbs', { role: 'tablist', 'aria-label': 'Showcase items' });
+  const detail = el('div', 'detail');
+  const counter = el('p', 'counter');
+  const texts = el('div', 'texts', { 'aria-live': 'polite' });
+  const thumbs = el('div', 'thumbs', { role: 'tablist', 'aria-label': 'Showcase items' });
   detail.append(counter, texts, thumbs);
   if (editing && extraRows.length) {
-    const extra = el('div', 'interactive-showcase-extra-items');
+    const extra = el('div', 'extra-items');
     extra.hidden = true;
     extra.append(...extraRows);
-    const note = el('p', 'interactive-showcase-limit-note');
+    const note = el('p', 'limit-note');
     note.textContent = `Only the first ${MAX_ITEMS} items are shown. `
       + `${extraRows.length} more ${extraRows.length === 1 ? 'is' : 'are'} hidden: `
       + 'remove or reorder them in the content tree.';
@@ -207,13 +207,13 @@ export default function decorate(block) {
   }
   copy.append(detail);
 
-  const stage = el('div', 'interactive-showcase-stage');
+  const stage = el('div', 'stage');
   containerUnits(stage);
-  const tooltip = el('div', 'interactive-showcase-tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
+  const tooltip = el('div', 'tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
   tooltip.hidden = true;
-  const tipTitle = el('p', 'interactive-showcase-tooltip-title', { id: `${id}-tooltip-title` });
-  const tipText = el('p', 'interactive-showcase-tooltip-text');
-  const tipClose = el('button', 'interactive-showcase-tooltip-close', { type: 'button', 'aria-label': 'Close details' });
+  const tipTitle = el('p', 'tooltip-title', { id: `${id}-tooltip-title` });
+  const tipText = el('p', 'tooltip-text');
+  const tipClose = el('button', 'tooltip-close', { type: 'button', 'aria-label': 'Close details' });
   tooltip.setAttribute('aria-labelledby', tipTitle.id);
   tooltip.append(tipTitle, tipText, tipClose);
 
@@ -231,7 +231,7 @@ export default function decorate(block) {
       top: Math.max(card.top, 0) + gap,
       bottom: Math.min(card.bottom, window.innerHeight) - gap,
     };
-    copy.querySelectorAll('.interactive-showcase-title, .interactive-showcase-counter, .interactive-showcase-text:not([hidden]), .interactive-showcase-thumbs, .interactive-showcase-limit-note')
+    copy.querySelectorAll('.title, .counter, .text:not([hidden]), .thumbs, .limit-note')
       .forEach((part) => {
         const r = part.getBoundingClientRect();
         const beside = r.width && r.bottom > area.top && r.top < area.bottom;
@@ -285,7 +285,7 @@ export default function decorate(block) {
       : Math.min(0, area.bottom - box.bottom);
     if (sy) tooltip.style.setProperty('--interactive-showcase-sy', `${sy}px`);
     // a tooltip moved off its hotspot's corner leaves the hotspot its own box
-    openSpot.classList.toggle('interactive-showcase-hotspot-apart', apart || Boolean(sy));
+    openSpot.classList.toggle('hotspot-apart', apart || Boolean(sy));
   };
 
   const closeTooltip = (refocus = false) => {
@@ -293,7 +293,7 @@ export default function decorate(block) {
     const spot = openSpot;
     openSpot = null;
     spot.setAttribute('aria-expanded', 'false');
-    spot.classList.remove('interactive-showcase-hotspot-apart');
+    spot.classList.remove('hotspot-apart');
     tooltip.hidden = true;
     if (refocus) spot.focus();
   };
@@ -303,11 +303,16 @@ export default function decorate(block) {
     spot.setAttribute('aria-expanded', 'true');
     tipTitle.textContent = data.title;
     tipText.textContent = data.text;
-    spot.closest('.interactive-showcase-figure').append(tooltip);
+    spot.closest('.figure').append(tooltip);
     tooltip.style.setProperty('--interactive-showcase-x', `${data.x}%`);
     tooltip.style.setProperty('--interactive-showcase-y', `${data.y}%`);
+    // placed at its full size, then opened with a slight fade and grow (restarted each time,
+    // also when going straight from one hotspot to another)
+    tooltip.classList.remove('is-opening');
     tooltip.hidden = false;
     placeTooltip();
+    tooltip.getBoundingClientRect();
+    tooltip.classList.add('is-opening');
   };
 
   const items = itemRows.map((row, i) => {
@@ -332,16 +337,16 @@ export default function decorate(block) {
     const title = titleCell?.textContent.trim() || `Showcase item ${i + 1}`;
 
     // the item row becomes its panel (keeps the editor's item instrumentation)
-    row.className = 'interactive-showcase-panel';
+    row.className = 'panel';
     row.id = `${id}-panel-${i}`;
     row.setAttribute('role', 'tabpanel');
     row.setAttribute('aria-labelledby', `${id}-tab-${i}`);
-    const figure = el('div', 'interactive-showcase-figure');
+    const figure = el('div', 'figure');
     if (imagePicture) figure.append(imagePicture);
     const img = imagePicture?.querySelector('img');
     if (img) trackRatio(figure, img);
     const spots = parseHotspots(hotCell).map((spot) => {
-      const btn = el('button', 'interactive-showcase-hotspot', {
+      const btn = el('button', 'hotspot', {
         type: 'button',
         'aria-label': spot.title ? `Show details: ${spot.title}` : 'Show details',
         'aria-expanded': 'false',
@@ -357,7 +362,7 @@ export default function decorate(block) {
       figure.append(btn);
       return { btn, spot };
     });
-    if (hotCell) hotCell.classList.add('interactive-showcase-hotspot-source');
+    if (hotCell) hotCell.classList.add('hotspot-source');
     mediaCell?.remove();
     row.prepend(figure);
     stage.append(row);
@@ -370,20 +375,20 @@ export default function decorate(block) {
       field.hidden = true;
       return shown;
     };
-    const textCell = el('div', 'interactive-showcase-text');
+    const textCell = el('div', 'text');
     if (titleCell) {
       const shownTitle = show(titleCell);
-      shownTitle.classList.add('interactive-showcase-item-title');
+      shownTitle.classList.add('item-title');
       textCell.append(shownTitle);
     }
     if (descriptionCell) {
       const shownDescription = show(descriptionCell);
-      shownDescription.classList.add('interactive-showcase-description');
+      shownDescription.classList.add('description');
       textCell.append(shownDescription);
     }
     if (textCell.children.length) texts.append(textCell);
 
-    const tab = el('button', 'interactive-showcase-thumb', {
+    const tab = el('button', 'thumb', {
       type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
     });
     if (thumbPicture) {
@@ -430,7 +435,7 @@ export default function decorate(block) {
       const active = i === current;
       row.classList.toggle('is-active', active);
       // the selected image flies on into the next section's card (parallax-collage)
-      row.querySelector('.interactive-showcase-figure')?.toggleAttribute('data-zoom-source', active);
+      row.querySelector('.figure')?.toggleAttribute('data-zoom-source', active);
       row.inert = !active;
       if (textCell) textCell.hidden = !active;
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -465,14 +470,14 @@ export default function decorate(block) {
   });
 
   block.replaceChildren(copy, stage);
-  if (editing) block.classList.add('interactive-showcase-editing');
+  if (editing) block.classList.add('editing');
   else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     curtain(section, block);
   }
   if (items.length) select(0);
 
   // Universal Editor only: drag / nudge the + points and save their x, y (hotspot-editor.js)
-  if (block.classList.contains('interactive-showcase-editing') && items.length) {
+  if (block.classList.contains('editing') && items.length) {
     import('./hotspot-editor.js')
       .then(({ default: editHotspots }) => editHotspots(items, closeTooltip))
       // optional: the block works the same without it
