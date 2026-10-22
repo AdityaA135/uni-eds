@@ -359,6 +359,9 @@ main > .section > .interactive-showcase-wrapper {
     border-radius: 12px;
     color: var(--interactive-showcase-white, #fff);
     background-color: rgb(0 0 0 / 40%);
+
+    /* the open module's glass: what is behind it is frosted */
+    backdrop-filter: blur(16px);
     transform:
       translate(
         calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
