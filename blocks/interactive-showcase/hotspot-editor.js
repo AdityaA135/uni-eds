@@ -27,7 +27,7 @@ const round = (n) => Math.round(n * 10) / 10;
  * card's edges; measured from offsets, which leave out the slide animation's transforms
  */
 function visibleArea(figure) {
-  const stage = figure.closest('.interactive-showcase-stage');
+  const stage = figure.closest('.stage');
   const w = figure.offsetWidth;
   const h = figure.offsetHeight;
   if (!stage || !w || !h) {
@@ -115,7 +115,7 @@ function editItem({
 
   // the x, y badge beside the point being moved, and the save status
   const badge = document.createElement('span');
-  badge.className = 'interactive-showcase-hotspot-coords';
+  badge.className = 'hotspot-coords';
   badge.hidden = true;
   figure.append(badge);
   let badgeTimer = 0;
@@ -203,7 +203,7 @@ function editItem({
   let dragged = false;
   spots.forEach((entry, index) => {
     const { btn } = entry;
-    btn.classList.add('interactive-showcase-hotspot-draggable');
+    btn.classList.add('hotspot-draggable');
 
     btn.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
@@ -263,7 +263,7 @@ function editItem({
       e.preventDefault();
       return;
     }
-    if (e.target.closest('.interactive-showcase-hotspot, .interactive-showcase-tooltip')) return;
+    if (e.target.closest('.hotspot, .tooltip')) return;
     // anywhere else on the image: show (and copy) the x, y of that spot
     const box = figure.getBoundingClientRect();
     const x = round(clamp(((e.clientX - box.left) / box.width) * 100));
