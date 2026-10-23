@@ -603,11 +603,15 @@ main > .section > .interactive-showcase-wrapper {
       height: calc(var(--fh) * var(--u));
     }
 
-    /* "NEV / Tech 1": chassis, its body running off the right edge */
+    /* "NEV / Tech 1": chassis, its body running off the right edge: its right edge is the
+       card's right edge on every screen (placed from the left, the photo's proportions left it
+       about 8px of the frame short of it) */
     .panel:nth-child(1) .figure {
-      --fx: 707;
       --fy: 107;
       --fh: 554;
+
+      right: 0;
+      left: auto;
     }
 
     /* "NEV / Tech 2": Rotax engine, cut off by the right and bottom edges */
