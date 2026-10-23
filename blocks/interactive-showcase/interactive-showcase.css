@@ -97,6 +97,8 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .title {
+    --interactive-showcase-lines: 3;
+
     /* room for "A NEW WAY TO MOVE" in New Science Extended, not for the next word */
     max-width: 16.5em;
 
@@ -116,6 +118,31 @@ main > .section > .interactive-showcase-wrapper {
     color: var(--interactive-showcase-text-muted-dark, #4d4d4d);
     font-size: 13px;
     line-height: 1.5;
+  }
+
+  /* the most lines each text may take on any screen: within its character limit
+     (interactive-showcase.js) a text never reaches them; one saved longer before the limits
+     ends there with an ellipsis rather than pushing the card apart */
+  .title,
+  .item-title,
+  .description,
+  .tooltip-title,
+  .tooltip-text {
+    /* stylelint-disable-next-line value-no-vendor-prefix */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--interactive-showcase-lines);
+    overflow: hidden;
+  }
+
+  .item-title,
+  .tooltip-title {
+    --interactive-showcase-lines: 2;
+  }
+
+  .description,
+  .tooltip-text {
+    --interactive-showcase-lines: 5;
   }
 
   .detail {
@@ -870,7 +897,8 @@ main > .section > .interactive-showcase-wrapper {
     display: none;
   }
 
-  /* Universal Editor: items after the 4th are not shown; this note says so (interactive-showcase.js) */
+  /* Universal Editor: items after the 3rd are not shown, and texts over their character limit
+     are shortened; these notes say so (interactive-showcase.js) */
   .limit-note {
     grid-column: 1 / -1;
     margin-top: 12px;
