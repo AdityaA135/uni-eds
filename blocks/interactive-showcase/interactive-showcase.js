@@ -286,7 +286,6 @@ export default function decorate(block) {
     if (sy) tooltip.style.setProperty('--interactive-showcase-sy', `${sy}px`);
     // a tooltip moved off its hotspot's corner leaves the hotspot its own box
     openSpot.classList.toggle('hotspot-apart', apart || Boolean(sy));
-    tooltip.classList.toggle('is-apart', apart || Boolean(sy));
   };
 
   // the hotspot whose tooltip is shrinking back into it (closeTooltip with animate)
