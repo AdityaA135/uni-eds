@@ -809,21 +809,31 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
-  /* "white curtain" entrance (interactive-showcase.js): the card slides up empty, then its
-     content slides up from 80px lower once it fills the screen; it fades in quickly so the
-     slide, longer and gentler, is seen almost all the way */
+  /* "white curtain" entrance (interactive-showcase.js): the card slides up empty (with the
+     scroll), then its content slides up from 80px lower once it fills the screen; it fades in
+     sooner than it slides, so the slide, longer and gentler, is seen almost all the way.
+     Scrolling back up to the section before, the content fades and drops away again, a little
+     quicker than it came. */
+  &.curtain {
+    --interactive-showcase-reveal-time: 1.8s;
+    --interactive-showcase-reveal-fade: 0.8s;
+    --interactive-showcase-veil-time: 0.6s;
+  }
+
   &.curtain :is(.heading, .detail, .stage) {
     opacity: 0;
     transform: translateY(80px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+      opacity var(--interactive-showcase-veil-time) ease,
+      transform var(--interactive-showcase-veil-time) ease;
   }
 
   &.curtain.revealed :is(.heading, .detail, .stage) {
     opacity: 1;
     transform: none;
     transition:
-      opacity 0.45s ease-out 0.1s,
-      transform 1.2s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
+      opacity var(--interactive-showcase-reveal-fade) ease-out 0.15s,
+      transform var(--interactive-showcase-reveal-time) cubic-bezier(0.33, 1, 0.68, 1) 0.15s;
   }
 
   @media (prefers-reduced-motion: reduce) {
