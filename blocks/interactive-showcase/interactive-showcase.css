@@ -47,7 +47,10 @@ main > .section > .interactive-showcase-wrapper {
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
   --interactive-showcase-spot: 60px;
   --interactive-showcase-spot-radius: 12px;
-  --interactive-showcase-spot-bg: rgb(0 0 0 / 20%);
+
+  /* one colour for the closed hotspot and its open tooltip (40% black, the open module's), so the
+     box never changes colour as it opens and closes */
+  --interactive-showcase-spot-bg: rgb(0 0 0 / 40%);
   --interactive-showcase-edge: 20px;
 
   /* one hundredth of the screen's height (vh / svh, svh falling back to vh): every size taken
@@ -323,10 +326,6 @@ main > .section > .interactive-showcase-wrapper {
 
   .hotspot::after {
     transform: translate(-50%, -50%) rotate(90deg);
-  }
-
-  .hotspot:hover {
-    background-color: rgb(0 0 0 / 35%);
   }
 
   /* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip. Its
@@ -697,7 +696,6 @@ main > .section > .interactive-showcase-wrapper {
     /* the + : 36 x 36, radius 8, 40% black with the same glass */
     --interactive-showcase-spot: 36px;
     --interactive-showcase-spot-radius: 8px;
-    --interactive-showcase-spot-bg: rgb(0 0 0 / 40%);
 
     .hotspot::before,
     .hotspot::after {
