@@ -5,6 +5,16 @@
  * Values from the "NEV / Tech 1-3 1280x720" frames.
  */
 
+/* the counter's face (Figma: Roboto Mono, Medium), not in the Adobe Fonts kit: self-hosted */
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../fonts/roboto-mono-medium.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* the card spans the page, inset 8px on every side (not the site's 1200px content column) */
 main > .section > .interactive-showcase-wrapper {
   max-width: none;
@@ -15,18 +25,32 @@ main > .section > .interactive-showcase-wrapper {
   /* design tokens, as on the JSW NEV page; a page can override any of them */
   --interactive-showcase-ink: #0d0d0d;
   --interactive-showcase-white: #fff;
-  --interactive-showcase-text-dark: #111;
-  --interactive-showcase-text-muted-dark: #5c5c5c;
+  --interactive-showcase-text-dark: var(--color-black, #000);
+  --interactive-showcase-text-muted-dark: var(--color-gray-70, #4d4d4d);
+  --interactive-showcase-text-counter: var(--color-gray-60, #666);
 
   /* every text in the block is New Science (regular, the only weight used), the project's own
      text font: its --text-font-family (with its metric-matched fallback) where the project
      defines one, else New Science itself. The Adobe Fonts kit is loaded by head.html */
   --interactive-showcase-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
-  --interactive-showcase-font-display: var(--interactive-showcase-font);
+  --interactive-showcase-font-display: var(--font-family-display, new-science-extended, var(--interactive-showcase-font));
   --interactive-showcase-font-body: var(--interactive-showcase-font);
-  --interactive-showcase-font-mono: var(--interactive-showcase-font);
+  --interactive-showcase-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
   --interactive-showcase-radius-card: 24px;
   --interactive-showcase-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* a tooltip growing out of its hotspot and shrinking back: the same time and an even curve
+     (slow - fast - slow) both ways, so closing is opening played backwards */
+  --interactive-showcase-grow-time: 0.75s;
+  --interactive-showcase-grow-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
+  --interactive-showcase-spot: 60px;
+  --interactive-showcase-spot-radius: 12px;
+
+  /* one colour for the closed hotspot and its open tooltip (40% black, the open module's), so the
+     box never changes colour as it opens and closes */
+  --interactive-showcase-spot-bg: rgb(0 0 0 / 40%);
   --interactive-showcase-edge: 20px;
 
   /* one hundredth of the screen's height (vh / svh, svh falling back to vh): every size taken
@@ -41,14 +65,17 @@ main > .section > .interactive-showcase-wrapper {
   overflow: hidden;
   border-radius: var(--interactive-showcase-radius-card, 24px);
   color: var(--interactive-showcase-text-dark, #111);
-  background: linear-gradient(100deg, #fff 0%, #fff 40%, #dadada 100%);
+  background:
+    linear-gradient(291.69deg, rgb(0 0 0 / 18.24%) 0.96%, rgb(246 246 246 / 38%) 48.73%, rgb(255 255 255 / 38%) 62.61%),
+    #fff;
   font-family: var(--interactive-showcase-font-body);
   font-size: 16px;
-  letter-spacing: 0.16px;
+  letter-spacing: 0;
   line-height: 1.35;
 
   @media (width >= 900px) {
-    --interactive-showcase-edge: 5.4vw;
+    /* 48px of the 1280px frame */
+    --interactive-showcase-edge: 3.75vw;
   }
 
   /* the site's default heading and paragraph margins do not apply in the card: every gap in it
@@ -80,22 +107,25 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .title {
-    max-width: 16em;
+    /* room for "A NEW WAY TO MOVE" in New Science Extended, not for the next word */
+    max-width: 16.5em;
 
-    /* "A NEW WAY TO MOVE" / "POWERED BY TECH" */
+    /* "A NEW WAY TO MOVE" / "POWERED BY TECH": Figma's 30px from 1280px wide up, smaller below
+       (the copy column narrows with the screen) */
+    color: var(--interactive-showcase-text-dark, #000);
     font-family: var(--interactive-showcase-font-display);
-    font-size: clamp(19px, 2.2vw, 36px);
-    font-weight: 400;
-    line-height: 1.16;
+    font-size: clamp(19px, 2.3438vw, 30px);
+    font-weight: 500;
+    line-height: 1.2;
     letter-spacing: 0.01em;
     text-transform: uppercase;
   }
 
   .description p {
-    max-width: 430px;
-    color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
-    font-size: 13.5px;
-    line-height: 1.55;
+    max-width: 416px;
+    color: var(--interactive-showcase-text-muted-dark, #4d4d4d);
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   .detail {
@@ -104,19 +134,23 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .counter {
-    margin-bottom: 10px;
-    color: var(--interactive-showcase-text-muted-dark, #5c5c5c);
+    margin-bottom: 11px;
+    color: var(--interactive-showcase-text-counter, #666);
     font-family: var(--interactive-showcase-font-mono);
-    font-size: 12px;
-    letter-spacing: 0.12em;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.1;
+    text-transform: uppercase;
   }
 
+  /* Figma's 18px from 1280px wide up, smaller below */
   .item-title {
-    margin-bottom: 12px;
-    font-family: var(--interactive-showcase-font-display);
-    font-size: clamp(15px, 1.3vw, 19px);
-    font-weight: 400;
-    line-height: 1.3;
+    margin-bottom: 9px;
+    color: var(--interactive-showcase-text-dark, #000);
+    font-family: var(--interactive-showcase-font-body);
+    font-size: clamp(15px, 1.4063vw, 18px);
+    font-weight: 500;
+    line-height: 1.25;
   }
 
   .text[hidden] {
@@ -137,22 +171,22 @@ main > .section > .interactive-showcase-wrapper {
   /* thumbnail tray: inactive thumbnails are greyscale */
   .thumbs {
     display: flex;
-    gap: 14px;
-    margin-top: 26px;
+    gap: 18px;
+    margin-top: 24px;
   }
 
   .thumb {
+    position: relative;
     flex: none;
-    width: clamp(84px, 9.8vw, 140px);
-    aspect-ratio: 87 / 107;
+    width: clamp(84px, 9.92vw, 150px);
+    aspect-ratio: 127 / 157;
     margin: 0;
     padding: 0;
     overflow: hidden;
     border: 0;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     background-color: var(--interactive-showcase-ink, #0d0d0d);
-    transition: transform 0.5s var(--interactive-showcase-ease);
   }
 
   .thumb picture,
@@ -162,7 +196,23 @@ main > .section > .interactive-showcase-wrapper {
     height: 100%;
   }
 
+  /* the frames' corner shading: blurred near-black patches over the thumbnail's corners */
+  .thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 0 0, rgb(0 0 0 / 85%), transparent 26%),
+      radial-gradient(circle at 100% 0, rgb(0 0 0 / 85%), transparent 26%),
+      radial-gradient(circle at 0 100%, rgb(0 0 0 / 80%), transparent 22%),
+      radial-gradient(circle at 100% 100%, rgb(0 0 0 / 80%), transparent 22%);
+  }
+
   .thumb img {
+    width: calc(100% * 157 / 127);
+    max-width: none;
+    margin-left: calc(-100% * 15 / 127);
     object-fit: cover;
     filter: grayscale(1) brightness(0.78);
     transition: filter 0.5s var(--interactive-showcase-ease);
@@ -181,10 +231,6 @@ main > .section > .interactive-showcase-wrapper {
      when it flies the image on) */
   .panel:nth-child(2) .figure img {
     filter: grayscale(1) brightness(0.7) contrast(1.2);
-  }
-
-  .thumb[aria-selected='true'] {
-    transform: translateY(-4px);
   }
 
   /* stage: holds the showcase images; they are cut out, so they sit straight on the light card */
@@ -249,16 +295,18 @@ main > .section > .interactive-showcase-wrapper {
     top: var(--interactive-showcase-y);
     left: var(--interactive-showcase-x);
     z-index: 2;
-    width: 36px;
-    height: 36px;
+    width: var(--interactive-showcase-spot);
+    height: var(--interactive-showcase-spot);
     margin: 0;
     padding: 0;
-    border: 1px solid rgb(255 255 255 / 16%);
-    border-radius: 8px;
+    border: 0;
+    border-radius: var(--interactive-showcase-spot-radius);
     cursor: pointer;
     color: var(--interactive-showcase-white, #fff);
-    background-color: rgb(24 24 24 / 58%);
-    backdrop-filter: blur(8px);
+    background-color: var(--interactive-showcase-spot-bg);
+
+    /* the same glass as the open module */
+    backdrop-filter: blur(3px);
     transform: translate(-50%, -50%);
     transition: background-color 0.3s var(--interactive-showcase-ease);
   }
@@ -269,8 +317,8 @@ main > .section > .interactive-showcase-wrapper {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 14px;
-    height: 1.5px;
+    width: 16px;
+    height: 1.67px;
     background-color: currentcolor;
     transform: translate(-50%, -50%);
     transition: transform 0.3s var(--interactive-showcase-ease);
@@ -280,119 +328,152 @@ main > .section > .interactive-showcase-wrapper {
     transform: translate(-50%, -50%) rotate(90deg);
   }
 
-  .hotspot:hover {
-    background-color: rgb(80 80 80 / 70%);
-  }
-
-  /* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip */
-  .hotspot[aria-expanded='true'] {
+  /* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip. Its
+     box is then the tooltip's, which grows out of exactly this box and, closing (.is-closing),
+     shrinks back into it: the hotspot's own glass goes at once, so there is only ever one box */
+  .hotspot[aria-expanded='true'],
+  .hotspot.is-closing {
     z-index: 4;
-    border-color: transparent;
     background-color: transparent;
     backdrop-filter: none;
+    transition: none;
+  }
+
+  /* the frame's minus: 12 x 1px */
+  .hotspot[aria-expanded='true']::before,
+  .hotspot[aria-expanded='true']::after {
+    width: 12px;
+    height: 1px;
   }
 
   /* ...except beside a tooltip opened below / above it: then it keeps its own box */
-  .hotspot.hotspot-apart[aria-expanded='true'] {
-    border-color: rgb(255 255 255 / 16%);
-    background-color: rgb(80 80 80 / 70%);
-    backdrop-filter: blur(8px);
+  .hotspot.hotspot-apart[aria-expanded='true'],
+  .hotspot.hotspot-apart.is-closing {
+    background-color: rgb(0 0 0 / 40%);
+    backdrop-filter: blur(3px);
   }
 
   .hotspot[aria-expanded='true']::after {
     transform: translate(-50%, -50%) rotate(0deg);
   }
 
-  /* frosted tooltip ("NEV / Tech 1": 270 x 119): its hotspot sits in its top corner, 25px in
-     from the side and the top. interactive-showcase.js opens it to the side and up or down by
-     the hotspot's quadrant (data-side, data-align) and nudges it across / up or down
-     (--interactive-showcase-sx / -sy) so it always stays inside the card and the screen, clear
-     of the copy column */
+  /* the plus turns into the minus as its tooltip grows, and back as it shrinks */
+  .hotspot[aria-expanded='true']::before,
+  .hotspot[aria-expanded='true']::after,
+  .hotspot.is-closing::before,
+  .hotspot.is-closing::after {
+    transition-property: transform, width, height;
+    transition-duration: var(--interactive-showcase-grow-time);
+    transition-timing-function: var(--interactive-showcase-grow-ease);
+  }
+
+  /* tooltip ("Additional info" in NEV / Tech 1, 272 x 120). Its corner is its hotspot's corner:
+     the hotspot's box is the tooltip's corner, the minus (the hotspot's own icon) centred in it.
+     interactive-showcase.js opens it to the side and up or down by the hotspot's quadrant
+     (data-side, data-align) and nudges it across / up or down (--interactive-showcase-sx / -sy)
+     so it always stays inside the card and the screen, clear of the copy column */
   .tooltip {
-    --interactive-showcase-tx: calc(-100% + 25px);
-    --interactive-showcase-ty: -25px;
+    --interactive-showcase-tx: calc(-100% + var(--interactive-showcase-spot) / 2);
+    --interactive-showcase-ty: calc(var(--interactive-showcase-spot) / -2);
+
+    /* what it grows out of and shrinks back into: exactly its hotspot's box, in its corner (only
+       a tooltip nudged off that corner starts moved back onto it) */
+    --interactive-showcase-grow-from: inset(0 0 calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) round var(--interactive-showcase-spot-radius));
 
     position: absolute;
     top: var(--interactive-showcase-y);
     left: var(--interactive-showcase-x);
     z-index: 3;
     box-sizing: border-box;
-    width: min(270px, calc(100cqw - 16px));
+    width: min(272px, calc(100cqw - 16px));
 
     /* the minus shares only the title's row; the text below runs the full width, so its
-       lines break as in the frame (this font is a little wider) */
+       lines break as in the frame */
     padding: 16px;
-    border: 1px solid rgb(255 255 255 / 10%);
     border-radius: 12px;
     color: var(--interactive-showcase-white, #fff);
-    background-color: rgb(12 12 12 / 44%);
-    backdrop-filter: blur(14px) saturate(1.2);
-    box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+    background-color: rgb(0 0 0 / 40%);
+
+    /* the open module's glass: what is behind it is frosted */
+    backdrop-filter: blur(3px);
     transform:
       translate(
         calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
         calc(var(--interactive-showcase-ty) + var(--interactive-showcase-sy, 0px))
       );
-    transform-origin: calc(100% - 25px) 25px;
   }
 
-  /* opening (interactive-showcase.js adds .is-opening): a slight fade and grow out of its
-     hotspot's corner (transform-origin, by data-side / data-align) */
+  /* opening (interactive-showcase.js adds .is-opening) it grows out of its hotspot's box: the
+     two edges at the hotspot's corner do not move at all while the other two move out (opening
+     down and to the left: top and right stay, bottom and left move). Closing (.is-closing) it
+     shrinks back into the hotspot the same way, backwards. Nothing fades: the text is simply
+     uncovered as the box grows and covered as it shrinks */
   .tooltip.is-opening {
-    animation: interactive-showcase-tooltip-in 0.2s var(--interactive-showcase-ease);
+    animation: interactive-showcase-tooltip-in var(--interactive-showcase-grow-time) var(--interactive-showcase-grow-ease);
+  }
+
+  .tooltip.is-closing {
+    pointer-events: none;
+    animation: interactive-showcase-tooltip-out var(--interactive-showcase-grow-time) var(--interactive-showcase-grow-ease) forwards;
+  }
+
+  /* the minus's row: the title's centre on the minus */
+  .tooltip[data-align='top'] {
+    padding-top: calc(var(--interactive-showcase-spot) / 2 - 10px);
   }
 
   .tooltip[data-side='right'] {
-    --interactive-showcase-tx: -25px;
-
-    transform-origin: 25px 25px;
+    --interactive-showcase-tx: calc(var(--interactive-showcase-spot) / -2);
+    --interactive-showcase-grow-from: inset(0 calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) 0 round var(--interactive-showcase-spot-radius));
   }
 
   /* opening upwards, the minus sits in the bottom corner: keep that row free of text */
   .tooltip[data-align='bottom'] {
-    --interactive-showcase-ty: calc(-100% + 25px);
+    --interactive-showcase-ty: calc(-100% + var(--interactive-showcase-spot) / 2);
+    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-spot)) 0 0 calc(100% - var(--interactive-showcase-spot)) round var(--interactive-showcase-spot-radius));
 
-    padding-bottom: 50px;
-    transform-origin: calc(100% - 25px) calc(100% - 25px);
+    padding-bottom: calc(var(--interactive-showcase-spot) - 10px);
   }
 
   .tooltip[data-side='right'][data-align='bottom'] {
-    transform-origin: 25px calc(100% - 25px);
+    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) 0 0 round var(--interactive-showcase-spot-radius));
   }
 
-  /* narrow screens: just below / above the hotspot, centred on it */
+  /* narrow screens: just below / above the hotspot (6px apart), centred on it, the hotspot
+     keeping its own box; it grows down / up from its edge by the hotspot, as wide as the
+     hotspot to start with */
   .tooltip[data-side='center'] {
     --interactive-showcase-tx: -50%;
   }
 
   .tooltip[data-align='below'] {
-    --interactive-showcase-ty: 24px;
-
-    transform-origin: 50% 0;
+    --interactive-showcase-ty: 36px;
+    --interactive-showcase-grow-from: inset(0 calc(50% - var(--interactive-showcase-spot) / 2) 100% round var(--interactive-showcase-spot-radius));
   }
 
   .tooltip[data-align='above'] {
-    --interactive-showcase-ty: calc(-100% - 24px);
-
-    transform-origin: 50% 100%;
+    --interactive-showcase-ty: calc(-100% - 36px);
+    --interactive-showcase-grow-from: inset(100% calc(50% - var(--interactive-showcase-spot) / 2) 0 round var(--interactive-showcase-spot-radius));
   }
 
   .tooltip[hidden] {
     display: none;
   }
 
-  /* the title shares its row with the minus (centred 25px in from the corner) */
+  /* the title shares its row with the minus (the 17px icon, 16px after it) */
   .tooltip-title {
-    margin-bottom: 22px;
-    padding-right: 20px;
+    margin-bottom: 20px;
+    padding-right: 33px;
     font-family: var(--interactive-showcase-font-mono);
     font-size: 14px;
-    line-height: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 
   .tooltip[data-side='right'] .tooltip-title {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 33px;
   }
 
   .tooltip[data-side='center'] .tooltip-title,
@@ -401,11 +482,10 @@ main > .section > .interactive-showcase-wrapper {
     padding: 0;
   }
 
-  /* a touch tighter than Inter's default, so the lines break as in the frame */
   .tooltip-text {
-    color: rgb(255 255 255 / 80%);
+    color: var(--interactive-showcase-white, #fff);
     font-size: 12px;
-    line-height: 1.3;
+    line-height: 1.35;
     letter-spacing: -0.02em;
   }
 
@@ -413,8 +493,8 @@ main > .section > .interactive-showcase-wrapper {
      the minus is the visible control) */
   .tooltip-close {
     position: absolute;
-    top: 7px;
-    right: 7px;
+    top: calc(var(--interactive-showcase-spot) / 2 - 18px);
+    right: calc(var(--interactive-showcase-spot) / 2 - 18px);
     width: 36px;
     height: 36px;
     margin: 0;
@@ -428,12 +508,12 @@ main > .section > .interactive-showcase-wrapper {
 
   .tooltip[data-side='right'] .tooltip-close {
     right: auto;
-    left: 7px;
+    left: calc(var(--interactive-showcase-spot) / 2 - 18px);
   }
 
   .tooltip[data-align='bottom'] .tooltip-close {
     top: auto;
-    bottom: 7px;
+    bottom: calc(var(--interactive-showcase-spot) / 2 - 18px);
   }
 
   /* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
@@ -444,21 +524,30 @@ main > .section > .interactive-showcase-wrapper {
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
     height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-svh) - 16px));
 
+    /* the heading's top 152px and the copy's bottom 68px of the 720px frame, as shares of the
+       card's height */
     .copy {
+      --card-height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-svh) - 16px));
+
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       min-height: 0;
-      padding: 0 0 calc(7 * var(--interactive-showcase-svh));
+      padding: 0 0 calc(var(--card-height) * 68 / 720);
     }
 
     .heading {
       padding: 0 24px 0 var(--interactive-showcase-edge);
-      padding-top: max(108px, calc(17 * var(--interactive-showcase-svh)));
+      padding-top: calc(var(--card-height) * 152 / 720);
     }
 
     .detail {
       padding: 0 24px 0 var(--interactive-showcase-edge);
+    }
+
+    /* 127 x 157 of the 720px-tall frame, scaled with the card like its spacing */
+    .thumb {
+      width: clamp(72px, calc(var(--card-height) * 127 / 720), 160px);
     }
 
     /* the stage covers the whole card, so each image can sit where its frame has it: partly
@@ -482,6 +571,10 @@ main > .section > .interactive-showcase-wrapper {
        any added after it share that placement; the first two have their own frames below */
     .figure {
       --u: min(calc(100cqh / 720), calc(100cqw / 1280));
+
+      /* where the "NEV / Tech 3" engine shows in the frame. Not the Figma image layers' boxes
+         (image 1560 is 849 x 700 at 605, 52): those hold background-removed copies with empty
+         space around each engine, while the DAM photos are cut tight to it */
       --fx: 670;
       --fy: 110;
       --fh: 592;
@@ -518,8 +611,10 @@ main > .section > .interactive-showcase-wrapper {
       width: clamp(72px, calc(15 * var(--interactive-showcase-svh)), 120px);
     }
 
+    /* short screens: the copy's 24px gap tightens, so the thumbnails stay inside the card
+       (e.g. a phone held sideways, 812 x 375) */
     .thumbs {
-      margin-top: 18px;
+      margin-top: 12px;
     }
   }
 
@@ -532,12 +627,13 @@ main > .section > .interactive-showcase-wrapper {
       padding: min(78px, calc(9.6 * var(--interactive-showcase-svh))) 24px 0;
     }
 
+    /* New Science Medium Extended 24px / 135%, -1% (narrower phones scale it down); the card's
+       width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
     .title {
       max-width: none;
-
-      /* the card's width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
       font-size: min(24px, 6.4vw);
-      line-height: 1.3;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
     }
 
     /* the counter and the powertrain's name share the first row */
@@ -555,16 +651,21 @@ main > .section > .interactive-showcase-wrapper {
       display: contents;
     }
 
+    /* Roboto Mono Medium 16px / 140% */
     .counter {
       grid-column: 1;
       margin: 0;
-      font-size: 13px;
+      font-size: 16px;
+      line-height: 1.4;
     }
 
+    /* New Science Regular 16px / 150% */
     .item-title {
       grid-column: 2;
       margin: 0 0 10px;
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.5;
     }
 
     /* the description (its own cell, title and description being separate fields) spans the
@@ -573,19 +674,60 @@ main > .section > .interactive-showcase-wrapper {
       grid-column: 1 / -1;
     }
 
+    /* New Science Regular 14px / 135%, -2% */
     .description p {
       max-width: none;
-      font-size: 12.5px;
+      font-size: 14px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
     }
 
+    /* the tray 200 x 79: three 64 x 79 thumbnails, 4px apart */
     .thumbs {
       grid-column: 1 / -1;
-      gap: 6px;
+      gap: 4px;
       margin-top: 18px;
     }
 
     .thumb {
-      width: 63px;
+      width: 64px;
+    }
+
+    /* the + : 36 x 36, radius 8, 40% black with the same glass */
+    --interactive-showcase-spot: 36px;
+    --interactive-showcase-spot-radius: 8px;
+
+    .hotspot::before,
+    .hotspot::after {
+      width: 14px;
+      height: 1.5px;
+    }
+
+    /* the minus's row: the 10px title's centre on the minus */
+    .tooltip[data-align='top'] {
+      padding-top: calc(var(--interactive-showcase-spot) / 2 - 7px);
+    }
+
+    /* a tooltip just below / above its + : half of it (18px) and 6px apart */
+    .tooltip[data-align='below'] {
+      --interactive-showcase-ty: 24px;
+    }
+
+    .tooltip[data-align='above'] {
+      --interactive-showcase-ty: calc(-100% - 24px);
+    }
+
+    /* the open module: title Roboto Mono Medium 10px / 140%, text New Science Regular
+       10px / 140%, -1% */
+    .tooltip-title {
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .tooltip-text {
+      font-size: 10px;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
     }
 
     /* the image sits in what is left of the screen: as on the 375x815 frame, 87% of the card's
@@ -673,11 +815,16 @@ main > .section > .interactive-showcase-wrapper {
     .thumb img,
     .hotspot,
     .hotspot::before,
-    .hotspot::after {
+    .hotspot::after,
+    .hotspot[aria-expanded='true']::before,
+    .hotspot[aria-expanded='true']::after,
+    .hotspot.is-closing::before,
+    .hotspot.is-closing::after {
       transition: none;
     }
 
-    .tooltip.is-opening {
+    .tooltip.is-opening,
+    .tooltip.is-closing {
       animation: none;
     }
   }
@@ -746,15 +893,28 @@ main > .section > .interactive-showcase-wrapper {
   }
 }
 
-/* the tooltip opening (.tooltip.is-opening): keyframes cannot be nested in the block rule */
+/* the tooltip growing out of its hotspot's box and back into it (.tooltip.is-opening /
+   .is-closing): only its shape changes (a tooltip nudged off its hotspot's corner also starts
+   moved back onto it). "out" is "in" backwards (its own name, so that switching from one to the
+   other always starts it afresh). Keyframes cannot be nested in the block rule */
 @keyframes interactive-showcase-tooltip-in {
-  from {
-    opacity: 0;
-    scale: 0.96;
+  0% {
+    clip-path: var(--interactive-showcase-grow-from);
+    translate: calc(0px - var(--interactive-showcase-sx, 0px)) calc(0px - var(--interactive-showcase-sy, 0px));
   }
 
-  to {
-    opacity: 1;
-    scale: 1;
+  100% {
+    clip-path: inset(0 round 12px);
+  }
+}
+
+@keyframes interactive-showcase-tooltip-out {
+  0% {
+    clip-path: inset(0 round 12px);
+  }
+
+  100% {
+    clip-path: var(--interactive-showcase-grow-from);
+    translate: calc(0px - var(--interactive-showcase-sx, 0px)) calc(0px - var(--interactive-showcase-sy, 0px));
   }
 }

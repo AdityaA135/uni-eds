@@ -288,16 +288,52 @@ export default function decorate(block) {
     openSpot.classList.toggle('hotspot-apart', apart || Boolean(sy));
   };
 
-  const closeTooltip = (refocus = false) => {
+  // the hotspot whose tooltip is shrinking back into it (closeTooltip with animate)
+  let closingSpot = null;
+  const finishClosing = () => {
+    if (!closingSpot) return;
+    const spot = closingSpot;
+    closingSpot = null;
+    // the hotspot takes over the box the tooltip has shrunk into, in the colour it ended in
+    // (its own, unless hovered: then it eases on to the hover colour)
+    const { backgroundColor } = getComputedStyle(spot.classList.contains('hotspot-apart') ? spot : tooltip);
+    spot.style.transition = 'none';
+    spot.style.backgroundColor = backgroundColor;
+    spot.classList.remove('is-closing', 'hotspot-apart');
+    tooltip.classList.remove('is-closing');
+    tooltip.hidden = true;
+    spot.getBoundingClientRect();
+    spot.style.removeProperty('transition');
+    spot.style.removeProperty('background-color');
+  };
+  tooltip.addEventListener('animationend', (e) => {
+    if (e.target === tooltip && tooltip.classList.contains('is-closing')) finishClosing();
+  });
+
+  /**
+   * closes the open tooltip: at once, or (animate: closed by the user) shrinking back into its
+   * hotspot, the reverse of its opening (interactive-showcase.css)
+   */
+  const closeTooltip = ({ refocus = false, animate = false } = {}) => {
     if (!openSpot) return;
     const spot = openSpot;
     openSpot = null;
     spot.setAttribute('aria-expanded', 'false');
-    spot.classList.remove('hotspot-apart');
-    tooltip.hidden = true;
     if (refocus) spot.focus();
+    tooltip.classList.remove('is-opening');
+    if (!animate) {
+      spot.classList.remove('hotspot-apart');
+      tooltip.hidden = true;
+      return;
+    }
+    closingSpot = spot;
+    spot.classList.add('is-closing');
+    tooltip.classList.add('is-closing');
+    // no animation (reduced motion): nothing to wait for
+    if (getComputedStyle(tooltip).animationName === 'none') finishClosing();
   };
   const openTooltip = (spot, data) => {
+    finishClosing();
     closeTooltip();
     openSpot = spot;
     spot.setAttribute('aria-expanded', 'true');
@@ -306,8 +342,8 @@ export default function decorate(block) {
     spot.closest('.figure').append(tooltip);
     tooltip.style.setProperty('--interactive-showcase-x', `${data.x}%`);
     tooltip.style.setProperty('--interactive-showcase-y', `${data.y}%`);
-    // placed at its full size, then opened with a slight fade and grow (restarted each time,
-    // also when going straight from one hotspot to another)
+    // placed at its full size, then grown out of its hotspot (restarted each time, also when
+    // going straight from one hotspot to another)
     tooltip.classList.remove('is-opening');
     tooltip.hidden = false;
     placeTooltip();
@@ -356,7 +392,7 @@ export default function decorate(block) {
       btn.style.setProperty('--interactive-showcase-y', `${spot.y}%`);
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (openSpot === btn) closeTooltip();
+        if (openSpot === btn) closeTooltip({ animate: true });
         else openTooltip(btn, spot);
       });
       figure.append(btn);
@@ -458,15 +494,15 @@ export default function decorate(block) {
     });
   });
 
-  tipClose.addEventListener('click', () => closeTooltip(true));
+  tipClose.addEventListener('click', () => closeTooltip({ refocus: true, animate: true }));
   window.addEventListener('resize', () => {
     if (openSpot) placeTooltip();
   });
   document.addEventListener('click', (e) => {
-    if (openSpot && !tooltip.contains(e.target)) closeTooltip();
+    if (openSpot && !tooltip.contains(e.target)) closeTooltip({ animate: true });
   });
   block.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && openSpot) closeTooltip(true);
+    if (e.key === 'Escape' && openSpot) closeTooltip({ refocus: true, animate: true });
   });
 
   block.replaceChildren(copy, stage);
