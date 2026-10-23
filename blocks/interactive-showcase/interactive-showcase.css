@@ -353,6 +353,15 @@ main > .section > .interactive-showcase-wrapper {
     --interactive-showcase-tx: calc(-100% + 24.5px);
     --interactive-showcase-ty: -26px;
 
+    /* the box it opens out of and closes back into: its hotspot's, in the corner the hotspot
+       sits in (the + is 60px, centred 24.5px / 26px in from that corner) */
+    --interactive-showcase-spot: 60px;
+    --interactive-showcase-grow-w: calc(24.5px + var(--interactive-showcase-spot) / 2);
+    --interactive-showcase-grow-h: calc(26px + var(--interactive-showcase-spot) / 2);
+    --interactive-showcase-grow-from: inset(0 0 calc(100% - var(--interactive-showcase-grow-h)) calc(100% - var(--interactive-showcase-grow-w)) round 12px);
+    --interactive-showcase-grow-time: 0.5s;
+    --interactive-showcase-grow-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
     position: absolute;
     top: var(--interactive-showcase-y);
     left: var(--interactive-showcase-x);
@@ -374,48 +383,65 @@ main > .section > .interactive-showcase-wrapper {
         calc(var(--interactive-showcase-tx) + var(--interactive-showcase-sx, 0px)),
         calc(var(--interactive-showcase-ty) + var(--interactive-showcase-sy, 0px))
       );
-    transform-origin: calc(100% - 24.5px) 26px;
   }
 
-  /* opening (interactive-showcase.js adds .is-opening): a slight fade and grow out of its
-     hotspot's corner (transform-origin, by data-side / data-align) */
+  /* opening (interactive-showcase.js adds .is-opening) it grows out of its hotspot: the two
+     edges at the hotspot's corner stay put while the other two move out (opening down and to
+     the left: top and right stay, bottom and left move). Closing (.is-closing) it shrinks back
+     the same way into the hotspot. The text fades in once there is room for it, and out first */
   .tooltip.is-opening {
-    animation: interactive-showcase-tooltip-in 0.2s var(--interactive-showcase-ease);
+    animation: interactive-showcase-tooltip-in var(--interactive-showcase-grow-time) var(--interactive-showcase-grow-ease);
+  }
+
+  .tooltip.is-closing {
+    pointer-events: none;
+    animation: interactive-showcase-tooltip-out var(--interactive-showcase-grow-time) var(--interactive-showcase-grow-ease) forwards;
+  }
+
+  .tooltip.is-opening > p {
+    animation: interactive-showcase-tooltip-text-in var(--interactive-showcase-grow-time) linear;
+  }
+
+  .tooltip.is-closing > p {
+    animation: interactive-showcase-tooltip-text-out var(--interactive-showcase-grow-time) linear forwards;
+  }
+
+  /* while its tooltip shrinks into it, the + is back on top */
+  .hotspot.is-closing {
+    z-index: 4;
   }
 
   .tooltip[data-side='right'] {
     --interactive-showcase-tx: -24.5px;
-
-    transform-origin: 24.5px 26px;
+    --interactive-showcase-grow-from: inset(0 calc(100% - var(--interactive-showcase-grow-w)) calc(100% - var(--interactive-showcase-grow-h)) 0 round 12px);
   }
 
   /* opening upwards, the minus sits in the bottom corner: keep that row free of text */
   .tooltip[data-align='bottom'] {
     --interactive-showcase-ty: calc(-100% + 26px);
+    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-grow-h)) 0 0 calc(100% - var(--interactive-showcase-grow-w)) round 12px);
 
     padding-bottom: 50px;
-    transform-origin: calc(100% - 24.5px) calc(100% - 26px);
   }
 
   .tooltip[data-side='right'][data-align='bottom'] {
-    transform-origin: 24.5px calc(100% - 26px);
+    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-grow-h)) calc(100% - var(--interactive-showcase-grow-w)) 0 0 round 12px);
   }
 
-  /* narrow screens: just below / above the hotspot, centred on it */
+  /* narrow screens: just below / above the hotspot, centred on it; it grows down / up from
+     the edge next to the hotspot, as wide as the hotspot to start with */
   .tooltip[data-side='center'] {
     --interactive-showcase-tx: -50%;
   }
 
   .tooltip[data-align='below'] {
     --interactive-showcase-ty: 36px;
-
-    transform-origin: 50% 0;
+    --interactive-showcase-grow-from: inset(0 calc(50% - var(--interactive-showcase-spot) / 2) 100% round 12px);
   }
 
   .tooltip[data-align='above'] {
     --interactive-showcase-ty: calc(-100% - 36px);
-
-    transform-origin: 50% 100%;
+    --interactive-showcase-grow-from: inset(100% calc(50% - var(--interactive-showcase-spot) / 2) 0 round 12px);
   }
 
   .tooltip[hidden] {
@@ -669,6 +695,10 @@ main > .section > .interactive-showcase-wrapper {
       height: 1.5px;
     }
 
+    .tooltip {
+      --interactive-showcase-spot: 36px;
+    }
+
     /* a tooltip just below / above its + : half of it (18px) and 6px apart */
     .tooltip[data-align='below'] {
       --interactive-showcase-ty: 24px;
@@ -780,7 +810,10 @@ main > .section > .interactive-showcase-wrapper {
       transition: none;
     }
 
-    .tooltip.is-opening {
+    .tooltip.is-opening,
+    .tooltip.is-opening > p,
+    .tooltip.is-closing,
+    .tooltip.is-closing > p {
       animation: none;
     }
   }
@@ -849,15 +882,51 @@ main > .section > .interactive-showcase-wrapper {
   }
 }
 
-/* the tooltip opening (.tooltip.is-opening): keyframes cannot be nested in the block rule */
+/* the tooltip growing out of its hotspot and back (.tooltip.is-opening / .is-closing):
+   keyframes cannot be nested in the block rule */
 @keyframes interactive-showcase-tooltip-in {
   from {
-    opacity: 0;
-    scale: 0.96;
+    clip-path: var(--interactive-showcase-grow-from);
   }
 
   to {
+    clip-path: inset(0 round 12px);
+  }
+}
+
+@keyframes interactive-showcase-tooltip-out {
+  0% {
+    clip-path: inset(0 round 12px);
+  }
+
+  85% {
     opacity: 1;
-    scale: 1;
+  }
+
+  100% {
+    clip-path: var(--interactive-showcase-grow-from);
+    opacity: 0;
+  }
+}
+
+@keyframes interactive-showcase-tooltip-text-in {
+  0%,
+  40% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes interactive-showcase-tooltip-text-out {
+  0% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
   }
 }
