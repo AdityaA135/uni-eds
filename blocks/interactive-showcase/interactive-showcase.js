@@ -286,16 +286,26 @@ export default function decorate(block) {
     if (sy) tooltip.style.setProperty('--interactive-showcase-sy', `${sy}px`);
     // a tooltip moved off its hotspot's corner leaves the hotspot its own box
     openSpot.classList.toggle('hotspot-apart', apart || Boolean(sy));
+    tooltip.classList.toggle('is-apart', apart || Boolean(sy));
   };
 
   // the hotspot whose tooltip is shrinking back into it (closeTooltip with animate)
   let closingSpot = null;
   const finishClosing = () => {
     if (!closingSpot) return;
-    closingSpot.classList.remove('is-closing');
+    const spot = closingSpot;
     closingSpot = null;
+    // the hotspot takes over the box the tooltip has shrunk into, in the colour it ended in
+    // (its own, unless hovered: then it eases on to the hover colour)
+    const { backgroundColor } = getComputedStyle(spot.classList.contains('hotspot-apart') ? spot : tooltip);
+    spot.style.transition = 'none';
+    spot.style.backgroundColor = backgroundColor;
+    spot.classList.remove('is-closing', 'hotspot-apart');
     tooltip.classList.remove('is-closing');
     tooltip.hidden = true;
+    spot.getBoundingClientRect();
+    spot.style.removeProperty('transition');
+    spot.style.removeProperty('background-color');
   };
   tooltip.addEventListener('animationend', (e) => {
     if (e.target === tooltip && tooltip.classList.contains('is-closing')) finishClosing();
@@ -310,10 +320,10 @@ export default function decorate(block) {
     const spot = openSpot;
     openSpot = null;
     spot.setAttribute('aria-expanded', 'false');
-    spot.classList.remove('hotspot-apart');
     if (refocus) spot.focus();
     tooltip.classList.remove('is-opening');
     if (!animate) {
+      spot.classList.remove('hotspot-apart');
       tooltip.hidden = true;
       return;
     }

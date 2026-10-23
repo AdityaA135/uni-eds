@@ -43,6 +43,11 @@ main > .section > .interactive-showcase-wrapper {
      (slow - fast - slow) both ways, so closing is opening played backwards */
   --interactive-showcase-grow-time: 0.75s;
   --interactive-showcase-grow-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
+  --interactive-showcase-spot: 60px;
+  --interactive-showcase-spot-radius: 12px;
+  --interactive-showcase-spot-bg: rgb(0 0 0 / 20%);
   --interactive-showcase-edge: 20px;
 
   /* one hundredth of the screen's height (vh / svh, svh falling back to vh): every size taken
@@ -287,15 +292,15 @@ main > .section > .interactive-showcase-wrapper {
     top: var(--interactive-showcase-y);
     left: var(--interactive-showcase-x);
     z-index: 2;
-    width: 60px;
-    height: 60px;
+    width: var(--interactive-showcase-spot);
+    height: var(--interactive-showcase-spot);
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: 12px;
+    border-radius: var(--interactive-showcase-spot-radius);
     cursor: pointer;
     color: var(--interactive-showcase-white, #fff);
-    background-color: rgb(0 0 0 / 20%);
+    background-color: var(--interactive-showcase-spot-bg);
 
     /* the same glass as the open module */
     backdrop-filter: blur(3px);
@@ -324,11 +329,15 @@ main > .section > .interactive-showcase-wrapper {
     background-color: rgb(0 0 0 / 35%);
   }
 
-  /* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip */
-  .hotspot[aria-expanded='true'] {
+  /* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip. Its
+     box is then the tooltip's, which grows out of exactly this box and, closing (.is-closing),
+     shrinks back into it: the hotspot's own glass goes at once, so there is only ever one box */
+  .hotspot[aria-expanded='true'],
+  .hotspot.is-closing {
     z-index: 4;
     background-color: transparent;
     backdrop-filter: none;
+    transition: none;
   }
 
   /* the frame's minus: 12 x 1px */
@@ -339,13 +348,24 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   /* ...except beside a tooltip opened below / above it: then it keeps its own box */
-  .hotspot.hotspot-apart[aria-expanded='true'] {
+  .hotspot.hotspot-apart[aria-expanded='true'],
+  .hotspot.hotspot-apart.is-closing {
     background-color: rgb(0 0 0 / 40%);
     backdrop-filter: blur(3px);
   }
 
   .hotspot[aria-expanded='true']::after {
     transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  /* the plus turns into the minus as its tooltip grows, and back as it shrinks */
+  .hotspot[aria-expanded='true']::before,
+  .hotspot[aria-expanded='true']::after,
+  .hotspot.is-closing::before,
+  .hotspot.is-closing::after {
+    transition-property: transform, width, height;
+    transition-duration: var(--interactive-showcase-grow-time);
+    transition-timing-function: var(--interactive-showcase-grow-ease);
   }
 
   /* tooltip ("Additional info" in NEV / Tech 1, 272 x 120): its hotspot's minus is the 17px icon in its
@@ -358,12 +378,13 @@ main > .section > .interactive-showcase-wrapper {
     --interactive-showcase-tx: calc(-100% + 24.5px);
     --interactive-showcase-ty: -26px;
 
-    /* the box it opens out of and closes back into: its hotspot's, in the corner the hotspot
-       sits in (the + is 60px, centred 24.5px / 26px in from that corner) */
-    --interactive-showcase-spot: 60px;
-    --interactive-showcase-grow-w: calc(24.5px + var(--interactive-showcase-spot) / 2);
-    --interactive-showcase-grow-h: calc(26px + var(--interactive-showcase-spot) / 2);
-    --interactive-showcase-grow-from: inset(0 0 calc(100% - var(--interactive-showcase-grow-h)) calc(100% - var(--interactive-showcase-grow-w)) round 12px);
+    /* where it grows from and shrinks back to: exactly its hotspot's box (size, corners, colour).
+       The + is centred 24.5px / 26px in from the tooltip's corner, so the tooltip starts moved
+       by the difference (and back by any nudge) to put its corner on the hotspot's */
+    --interactive-showcase-grow-x: calc(var(--interactive-showcase-spot) / 2 - 24.5px - var(--interactive-showcase-sx, 0px));
+    --interactive-showcase-grow-y: calc(26px - var(--interactive-showcase-spot) / 2 - var(--interactive-showcase-sy, 0px));
+    --interactive-showcase-grow-from: inset(0 0 calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) round var(--interactive-showcase-spot-radius));
+    --interactive-showcase-grow-bg: var(--interactive-showcase-spot-bg);
 
     position: absolute;
     top: var(--interactive-showcase-y);
@@ -409,49 +430,48 @@ main > .section > .interactive-showcase-wrapper {
     animation: interactive-showcase-tooltip-text-out var(--interactive-showcase-grow-time) var(--interactive-showcase-grow-ease) forwards;
   }
 
-  /* while its tooltip shrinks into it, the + is back on top */
-  .hotspot.is-closing {
-    z-index: 4;
-  }
-
-  /* the hotspot's own glass fades out as its tooltip grows and back in as it shrinks */
-  .hotspot[aria-expanded='true'],
-  .hotspot.is-closing {
-    transition-duration: var(--interactive-showcase-grow-time);
-    transition-timing-function: var(--interactive-showcase-grow-ease);
+  /* a tooltip off its hotspot's corner (.is-apart: below / above it, or nudged up or down) leaves
+     the hotspot its own box: it comes out from under that box, clear to start with */
+  .tooltip.is-apart {
+    --interactive-showcase-grow-bg: rgb(0 0 0 / 0%);
   }
 
   .tooltip[data-side='right'] {
     --interactive-showcase-tx: -24.5px;
-    --interactive-showcase-grow-from: inset(0 calc(100% - var(--interactive-showcase-grow-w)) calc(100% - var(--interactive-showcase-grow-h)) 0 round 12px);
+    --interactive-showcase-grow-x: calc(24.5px - var(--interactive-showcase-spot) / 2 - var(--interactive-showcase-sx, 0px));
+    --interactive-showcase-grow-from: inset(0 calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) 0 round var(--interactive-showcase-spot-radius));
   }
 
   /* opening upwards, the minus sits in the bottom corner: keep that row free of text */
   .tooltip[data-align='bottom'] {
     --interactive-showcase-ty: calc(-100% + 26px);
-    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-grow-h)) 0 0 calc(100% - var(--interactive-showcase-grow-w)) round 12px);
+    --interactive-showcase-grow-y: calc(var(--interactive-showcase-spot) / 2 - 26px - var(--interactive-showcase-sy, 0px));
+    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-spot)) 0 0 calc(100% - var(--interactive-showcase-spot)) round var(--interactive-showcase-spot-radius));
 
     padding-bottom: 50px;
   }
 
   .tooltip[data-side='right'][data-align='bottom'] {
-    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-grow-h)) calc(100% - var(--interactive-showcase-grow-w)) 0 0 round 12px);
+    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) 0 0 round var(--interactive-showcase-spot-radius));
   }
 
-  /* narrow screens: just below / above the hotspot, centred on it; it grows down / up from
-     the edge next to the hotspot, as wide as the hotspot to start with */
+  /* narrow screens: just below / above the hotspot (6px apart), centred on it; it starts on the
+     hotspot's box, moved up / down by the hotspot's height and the gap */
   .tooltip[data-side='center'] {
     --interactive-showcase-tx: -50%;
+    --interactive-showcase-grow-x: calc(0px - var(--interactive-showcase-sx, 0px));
   }
 
   .tooltip[data-align='below'] {
     --interactive-showcase-ty: 36px;
-    --interactive-showcase-grow-from: inset(0 calc(50% - var(--interactive-showcase-spot) / 2) 100% round 12px);
+    --interactive-showcase-grow-y: calc(-6px - var(--interactive-showcase-spot) - var(--interactive-showcase-sy, 0px));
+    --interactive-showcase-grow-from: inset(0 calc(50% - var(--interactive-showcase-spot) / 2) calc(100% - var(--interactive-showcase-spot)) round var(--interactive-showcase-spot-radius));
   }
 
   .tooltip[data-align='above'] {
     --interactive-showcase-ty: calc(-100% - 36px);
-    --interactive-showcase-grow-from: inset(100% calc(50% - var(--interactive-showcase-spot) / 2) 0 round 12px);
+    --interactive-showcase-grow-y: calc(6px + var(--interactive-showcase-spot) - var(--interactive-showcase-sy, 0px));
+    --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-spot)) calc(50% - var(--interactive-showcase-spot) / 2) 0 round var(--interactive-showcase-spot-radius));
   }
 
   .tooltip[hidden] {
@@ -692,21 +712,14 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     /* the + : 36 x 36, radius 8, 40% black with the same glass */
-    .hotspot {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background-color: rgb(0 0 0 / 40%);
-    }
+    --interactive-showcase-spot: 36px;
+    --interactive-showcase-spot-radius: 8px;
+    --interactive-showcase-spot-bg: rgb(0 0 0 / 40%);
 
     .hotspot::before,
     .hotspot::after {
       width: 14px;
       height: 1.5px;
-    }
-
-    .tooltip {
-      --interactive-showcase-spot: 36px;
     }
 
     /* a tooltip just below / above its + : half of it (18px) and 6px apart */
@@ -816,7 +829,11 @@ main > .section > .interactive-showcase-wrapper {
     .thumb img,
     .hotspot,
     .hotspot::before,
-    .hotspot::after {
+    .hotspot::after,
+    .hotspot[aria-expanded='true']::before,
+    .hotspot[aria-expanded='true']::after,
+    .hotspot.is-closing::before,
+    .hotspot.is-closing::after {
       transition: none;
     }
 
@@ -892,30 +909,31 @@ main > .section > .interactive-showcase-wrapper {
   }
 }
 
-/* the tooltip growing out of its hotspot and back (.tooltip.is-opening / .is-closing): each
-   "out" is its "in" backwards (its own name, so that switching from one to the other always
-   starts it afresh). Keyframes cannot be nested in the block rule */
+/* the tooltip growing out of its hotspot's box and back into it (.tooltip.is-opening /
+   .is-closing): from the hotspot's box, place, corners and colour to its own. Each "out" is its
+   "in" backwards (its own name, so that switching from one to the other always starts it
+   afresh). Keyframes cannot be nested in the block rule */
 @keyframes interactive-showcase-tooltip-in {
   0% {
     clip-path: var(--interactive-showcase-grow-from);
-    opacity: 0.6;
+    translate: var(--interactive-showcase-grow-x) var(--interactive-showcase-grow-y);
+    background-color: var(--interactive-showcase-grow-bg);
   }
 
   100% {
     clip-path: inset(0 round 12px);
-    opacity: 1;
   }
 }
 
 @keyframes interactive-showcase-tooltip-out {
   0% {
     clip-path: inset(0 round 12px);
-    opacity: 1;
   }
 
   100% {
     clip-path: var(--interactive-showcase-grow-from);
-    opacity: 0.6;
+    translate: var(--interactive-showcase-grow-x) var(--interactive-showcase-grow-y);
+    background-color: var(--interactive-showcase-grow-bg);
   }
 }
 
