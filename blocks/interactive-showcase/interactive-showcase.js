@@ -19,6 +19,16 @@
 const MAX_HOTSPOTS = 4;
 // at most this many items (thumbnails): further items are not shown
 const MAX_ITEMS = 3;
+// the most characters each text may have, so it fits its place in the card on every screen
+// (_interactive-showcase.json limits the fields to the same); longer text, saved before the
+// limits or in the hotspots' bullets, is shortened on the page
+const MAX_CHARS = {
+  title: 40,
+  itemTitle: 40,
+  description: 160,
+  hotspotTitle: 24,
+  hotspotText: 120,
+};
 let instance = 0;
 
 function el(tag, className, attrs = {}) {
@@ -59,6 +69,33 @@ function parseHotspots(cell) {
       text: text.join(' | '),
     };
   });
+}
+
+/**
+ * the text cut to at most `max` characters, at the last whole word, with an ellipsis; as it is
+ * if it fits
+ */
+function clip(text, max) {
+  const full = text.trim();
+  if (full.length <= max) return full;
+  const cut = full.slice(0, max - 1);
+  const atWord = cut.replace(/\s+\S*$/, '');
+  return `${(atWord.length >= max / 2 ? atWord : cut).replace(/[\s.,;:–-]+$/, '')}…`;
+}
+
+/**
+ * a plain-text field's element with its text cut to `max` characters (clip); its paragraph,
+ * where it has one, is kept. Returns the text's length if it was cut, else 0
+ */
+function clipField(node, max) {
+  const { length } = node.textContent.trim();
+  if (length <= max) return 0;
+  const holder = node.querySelector('p') || node;
+  holder.textContent = clip(node.textContent, max);
+  [...node.children].forEach((child) => {
+    if (child !== holder && !child.contains(holder)) child.remove();
+  });
+  return length;
 }
 
 /**
@@ -207,12 +244,21 @@ export default function decorate(block) {
     cell.matches(`[data-aue-prop="${name}"]`) || cell.querySelector(`[data-aue-prop="${name}"]`)
   )) || null;
   const copy = el('div', 'copy');
+  // texts over their limit (MAX_CHARS), listed for the author in the editor
+  const tooLong = [];
   if (headRow) {
     headRow.className = 'heading';
     const mainTitle = fieldCell(headRow, 'title');
     // published, the plain-text title is the row's only cell (no heading element, no field name)
-    (mainTitle || headRow.querySelector('h1, h2, h3') || headRow.firstElementChild)
-      ?.classList.add('title');
+    const titleNode = mainTitle || headRow.querySelector('h1, h2, h3') || headRow.firstElementChild;
+    titleNode?.classList.add('title');
+    // in the editor the title is the field itself, edited in place: it is left whole (the
+    // stylesheet keeps it to its lines) and the author is told it is too long
+    const titleLength = titleNode?.textContent.trim().length || 0;
+    if (titleNode && titleLength > MAX_CHARS.title) {
+      if (editing) tooLong.push(`the title (${titleLength} of ${MAX_CHARS.title} characters)`);
+      else clipField(titleNode, MAX_CHARS.title);
+    }
     copy.append(headRow);
   }
   const detail = el('div', 'detail');
@@ -369,8 +415,8 @@ export default function decorate(block) {
     closeTooltip();
     openSpot = spot;
     spot.setAttribute('aria-expanded', 'true');
-    tipTitle.textContent = data.title;
-    tipText.textContent = data.text;
+    tipTitle.textContent = clip(data.title, MAX_CHARS.hotspotTitle);
+    tipText.textContent = clip(data.text, MAX_CHARS.hotspotText);
     spot.closest('.figure').append(tooltip);
     // where the hotspot is drawn (in the editor, one in the cut-off part of the image is drawn
     // at the nearest visible point, not at its own x, y)
@@ -405,7 +451,7 @@ export default function decorate(block) {
     const thumbPicture = fieldPicture('media_thumbnail') || pictures[0];
     const imagePicture = fieldPicture('media_image')
       || pictures.find((p) => p !== thumbPicture) || thumbPicture?.cloneNode(true);
-    const title = titleCell?.textContent.trim() || `Showcase item ${i + 1}`;
+    const title = clip(titleCell?.textContent || '', MAX_CHARS.itemTitle) || `Showcase item ${i + 1}`;
 
     // the item row becomes its panel (keeps the editor's item instrumentation)
     row.className = 'panel';
@@ -416,10 +462,17 @@ export default function decorate(block) {
     if (imagePicture) figure.append(imagePicture);
     const img = imagePicture?.querySelector('img');
     if (img) trackRatio(figure, img);
-    const spots = parseHotspots(hotCell).map((spot) => {
+    // each spot keeps its whole title and text (the editor writes them back when a + is moved);
+    // they are shortened where they are shown
+    const spots = parseHotspots(hotCell).map((spot, n) => {
+      [['title', MAX_CHARS.hotspotTitle], ['text', MAX_CHARS.hotspotText]].forEach(([key, max]) => {
+        if (spot[key].length > max) {
+          tooLong.push(`item ${i + 1}, + point ${n + 1}: its ${key === 'title' ? 'title' : 'description'} (${spot[key].length} of ${max} characters)`);
+        }
+      });
       const btn = el('button', 'hotspot', {
         type: 'button',
-        'aria-label': spot.title ? `Show details: ${spot.title}` : 'Show details',
+        'aria-label': spot.title ? `Show details: ${clip(spot.title, MAX_CHARS.hotspotTitle)}` : 'Show details',
         'aria-expanded': 'false',
         'aria-controls': tooltip.id,
       });
@@ -450,11 +503,15 @@ export default function decorate(block) {
     if (titleCell) {
       const shownTitle = show(titleCell);
       shownTitle.classList.add('item-title');
+      const length = clipField(shownTitle, MAX_CHARS.itemTitle);
+      if (length) tooLong.push(`item ${i + 1}: its title (${length} of ${MAX_CHARS.itemTitle} characters)`);
       textCell.append(shownTitle);
     }
     if (descriptionCell) {
       const shownDescription = show(descriptionCell);
       shownDescription.classList.add('description');
+      const length = clipField(shownDescription, MAX_CHARS.description);
+      if (length) tooLong.push(`item ${i + 1}: its description (${length} of ${MAX_CHARS.description} characters)`);
       textCell.append(shownDescription);
     }
     if (textCell.children.length) texts.append(textCell);
@@ -479,6 +536,13 @@ export default function decorate(block) {
       row, textCell, tab, figure, hotCell, spots,
     };
   });
+
+  if (editing && tooLong.length) {
+    const note = el('p', 'limit-note');
+    note.textContent = `Too long for the card, so shortened on the page: ${tooLong.join('; ')}. `
+      + 'Shorten them in the properties.';
+    detail.prepend(note);
+  }
 
   let current = 0;
   /**

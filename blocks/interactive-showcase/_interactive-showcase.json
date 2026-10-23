@@ -41,7 +41,12 @@
           "valueType": "string",
           "name": "title",
           "label": "Title",
-          "value": ""
+          "value": "",
+          "description": "Up to 40 characters, so the title fits the card on every screen.",
+          "validation": {
+            "maxLength": 40,
+            "customErrorMsg": "Keep the title to 40 characters at most."
+          }
         }
       ]
     },
@@ -53,7 +58,9 @@
           "valueType": "string",
           "name": "media_thumbnail",
           "label": "Thumbnail",
-          "multi": false
+          "multi": false,
+          "required": true,
+          "description": "Required: the item needs its thumbnail."
         },
         {
           "component": "text",
@@ -67,7 +74,9 @@
           "valueType": "string",
           "name": "media_image",
           "label": "Showcase image",
-          "multi": false
+          "multi": false,
+          "required": true,
+          "description": "Required: the item needs its showcase image."
         },
         {
           "component": "text",
@@ -81,14 +90,24 @@
           "valueType": "string",
           "name": "title",
           "label": "Title",
-          "value": ""
+          "value": "",
+          "description": "Up to 40 characters, so the title fits the card on every screen.",
+          "validation": {
+            "maxLength": 40,
+            "customErrorMsg": "Keep the title to 40 characters at most."
+          }
         },
         {
           "component": "textarea",
           "valueType": "string",
           "name": "description",
           "label": "Description",
-          "value": ""
+          "value": "",
+          "description": "Up to 160 characters, so the description fits the card on every screen.",
+          "validation": {
+            "maxLength": 160,
+            "customErrorMsg": "Keep the description to 160 characters at most."
+          }
         },
         {
           "component": "richtext",
@@ -96,7 +115,7 @@
           "name": "hotspots",
           "label": "Hotspots (+ points)",
           "value": "",
-          "description": "Up to 4 bullets, one per + point, written as: x, y | TITLE | description. x and y are percentages of the showcase image from its bottom-left corner (0, 0); x to the right and y upwards; \"40\" and \"40%\" mean the same, and a missing value counts as 0. Bullets after the 4th are not shown."
+          "description": "Up to 4 bullets, one per + point, written as: x, y | TITLE | description. The title may have up to 24 characters and the description up to 120; longer ones are shortened on the page. x and y are percentages of the showcase image from its bottom-left corner (0, 0); x to the right and y upwards; \"40\" and \"40%\" mean the same, and a missing value counts as 0. Bullets after the 4th are not shown."
         }
       ]
     }
