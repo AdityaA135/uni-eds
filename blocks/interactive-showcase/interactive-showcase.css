@@ -90,7 +90,8 @@ main > .section > .interactive-showcase-wrapper {
 
   /* Universal Editor sizes its frame to the page's height, so a card sized from the screen's
      height would make the page taller, the frame taller and the card taller again, without end.
-     In the editor the card is laid out for a fixed 800px-tall screen instead. */
+     In the editor the card is laid out for a screen of the Figma frame's shape at the editor's
+     width (interactive-showcase.js sets these from the width); 800px tall until then. */
   &.editing {
     --interactive-showcase-vh: 8px;
     --interactive-showcase-svh: 8px;
