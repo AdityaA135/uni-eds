@@ -38,6 +38,11 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
   --interactive-showcase-radius-card: 24px;
   --interactive-showcase-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* a tooltip growing out of its hotspot and shrinking back: the same time and an even curve
+     (slow - fast - slow) both ways, so closing is opening played backwards */
+  --interactive-showcase-grow-time: 0.75s;
+  --interactive-showcase-grow-ease: cubic-bezier(0.65, 0, 0.35, 1);
   --interactive-showcase-edge: 20px;
 
   /* one hundredth of the screen's height (vh / svh, svh falling back to vh): every size taken
@@ -359,8 +364,6 @@ main > .section > .interactive-showcase-wrapper {
     --interactive-showcase-grow-w: calc(24.5px + var(--interactive-showcase-spot) / 2);
     --interactive-showcase-grow-h: calc(26px + var(--interactive-showcase-spot) / 2);
     --interactive-showcase-grow-from: inset(0 0 calc(100% - var(--interactive-showcase-grow-h)) calc(100% - var(--interactive-showcase-grow-w)) round 12px);
-    --interactive-showcase-grow-time: 0.5s;
-    --interactive-showcase-grow-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
     position: absolute;
     top: var(--interactive-showcase-y);
@@ -399,16 +402,23 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   .tooltip.is-opening > p {
-    animation: interactive-showcase-tooltip-text-in var(--interactive-showcase-grow-time) linear;
+    animation: interactive-showcase-tooltip-text-in var(--interactive-showcase-grow-time) var(--interactive-showcase-grow-ease);
   }
 
   .tooltip.is-closing > p {
-    animation: interactive-showcase-tooltip-text-out var(--interactive-showcase-grow-time) linear forwards;
+    animation: interactive-showcase-tooltip-text-out var(--interactive-showcase-grow-time) var(--interactive-showcase-grow-ease) forwards;
   }
 
   /* while its tooltip shrinks into it, the + is back on top */
   .hotspot.is-closing {
     z-index: 4;
+  }
+
+  /* the hotspot's own glass fades out as its tooltip grows and back in as it shrinks */
+  .hotspot[aria-expanded='true'],
+  .hotspot.is-closing {
+    transition-duration: var(--interactive-showcase-grow-time);
+    transition-timing-function: var(--interactive-showcase-grow-ease);
   }
 
   .tooltip[data-side='right'] {
@@ -882,36 +892,36 @@ main > .section > .interactive-showcase-wrapper {
   }
 }
 
-/* the tooltip growing out of its hotspot and back (.tooltip.is-opening / .is-closing):
-   keyframes cannot be nested in the block rule */
+/* the tooltip growing out of its hotspot and back (.tooltip.is-opening / .is-closing): each
+   "out" is its "in" backwards (its own name, so that switching from one to the other always
+   starts it afresh). Keyframes cannot be nested in the block rule */
 @keyframes interactive-showcase-tooltip-in {
-  from {
+  0% {
     clip-path: var(--interactive-showcase-grow-from);
+    opacity: 0.6;
   }
 
-  to {
+  100% {
     clip-path: inset(0 round 12px);
+    opacity: 1;
   }
 }
 
 @keyframes interactive-showcase-tooltip-out {
   0% {
     clip-path: inset(0 round 12px);
-  }
-
-  85% {
     opacity: 1;
   }
 
   100% {
     clip-path: var(--interactive-showcase-grow-from);
-    opacity: 0;
+    opacity: 0.6;
   }
 }
 
 @keyframes interactive-showcase-tooltip-text-in {
   0%,
-  40% {
+  45% {
     opacity: 0;
   }
 
@@ -925,7 +935,7 @@ main > .section > .interactive-showcase-wrapper {
     opacity: 1;
   }
 
-  50%,
+  55%,
   100% {
     opacity: 0;
   }
