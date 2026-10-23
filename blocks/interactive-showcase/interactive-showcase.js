@@ -122,6 +122,31 @@ function containerUnits(container) {
   else window.addEventListener('resize', measure);
 }
 
+// the card side by side with its copy (as in interactive-showcase.css)
+const SIDE_BY_SIDE = '(width >= 900px), (orientation: landscape) and (width >= 600px)';
+
+/**
+ * Universal Editor sizes its frame to the page's height, so in the editor the card cannot take
+ * the screen's height (interactive-showcase.css). It is laid out for a screen of the Figma
+ * frame's shape at the editor's width instead: the card 1280 x 720 side by side, the screen
+ * 375 x 815 for the phone layout. From the width only, so it cannot feed back into the height
+ */
+function editorScreen(block) {
+  const sideBySide = window.matchMedia(SIDE_BY_SIDE);
+  const measure = () => {
+    const width = block.offsetWidth;
+    if (!width) return;
+    // the card is 8px in from the screen's edges (interactive-showcase-wrapper)
+    const screen = sideBySide.matches ? width * (720 / 1280) + 16 : (width + 16) * (815 / 375);
+    ['--interactive-showcase-vh', '--interactive-showcase-svh'].forEach((prop) => {
+      block.style.setProperty(prop, `${screen / 100}px`);
+    });
+  };
+  measure();
+  if (window.ResizeObserver) new ResizeObserver(measure).observe(block);
+  sideBySide.addEventListener('change', measure);
+}
+
 // Universal Editor model of one showcase item (block/item). Published rows carry no model, so
 // identify items by their image/hotspot content and leave the separate title/description
 // heading row out.
@@ -253,6 +278,13 @@ export default function decorate(block) {
     if (!openSpot) return;
     const spot = openSpot.getBoundingClientRect();
     const area = freeArea(spot);
+    // a hotspot at the very edge of the card reaches past the free area: its tooltip may go as
+    // far as the hotspot itself does, so it stays on the hotspot's corner (one box with it)
+    // rather than being nudged off it
+    area.left = Math.min(area.left, spot.left - 0.5);
+    area.right = Math.max(area.right, spot.right + 0.5);
+    area.top = Math.min(area.top, spot.top - 0.5);
+    area.bottom = Math.max(area.bottom, spot.bottom + 0.5);
     const set = (side, align) => {
       tooltip.dataset.side = side;
       tooltip.dataset.align = align;
@@ -340,8 +372,11 @@ export default function decorate(block) {
     tipTitle.textContent = data.title;
     tipText.textContent = data.text;
     spot.closest('.figure').append(tooltip);
-    tooltip.style.setProperty('--interactive-showcase-x', `${data.x}%`);
-    tooltip.style.setProperty('--interactive-showcase-y', `${data.y}%`);
+    // where the hotspot is drawn (in the editor, one in the cut-off part of the image is drawn
+    // at the nearest visible point, not at its own x, y)
+    ['--interactive-showcase-x', '--interactive-showcase-y'].forEach((prop) => {
+      tooltip.style.setProperty(prop, spot.style.getPropertyValue(prop));
+    });
     // placed at its full size, then grown out of its hotspot (restarted each time, also when
     // going straight from one hotspot to another)
     tooltip.classList.remove('is-opening');
@@ -506,8 +541,10 @@ export default function decorate(block) {
   });
 
   block.replaceChildren(copy, stage);
-  if (editing) block.classList.add('editing');
-  else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  if (editing) {
+    block.classList.add('editing');
+    editorScreen(block);
+  } else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     curtain(section, block);
   }
   if (items.length) select(0);
