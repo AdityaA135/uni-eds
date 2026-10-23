@@ -809,15 +809,15 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
-  /* "white curtain" entrance (interactive-showcase.js): the card slides up empty (with the
-     scroll), then its content slides up from 80px lower once it fills the screen; it fades in
-     sooner than it slides, so the slide, longer and gentler, is seen almost all the way.
-     Scrolling back up to the section before, the content fades and drops away again, a little
-     quicker than it came. */
+  /* "white curtain" entrance (interactive-showcase.js): the card glides up empty over the
+     section before (1.8s, curtainGlide), then its content slides up from 80px lower once it
+     fills the screen; it fades in sooner than it slides, so the slide, longer and gentler, is
+     seen almost all the way. Gliding back up to the section before, the content fades and
+     drops away. The times are the JSW NEV page's. */
   &.curtain {
-    --interactive-showcase-reveal-time: 1.8s;
-    --interactive-showcase-reveal-fade: 0.8s;
-    --interactive-showcase-veil-time: 0.6s;
+    --interactive-showcase-reveal-time: 1.2s;
+    --interactive-showcase-reveal-fade: 0.45s;
+    --interactive-showcase-veil-time: 0.3s;
   }
 
   &.curtain :is(.heading, .detail, .stage) {
@@ -832,8 +832,8 @@ main > .section > .interactive-showcase-wrapper {
     opacity: 1;
     transform: none;
     transition:
-      opacity var(--interactive-showcase-reveal-fade) ease-out 0.15s,
-      transform var(--interactive-showcase-reveal-time) cubic-bezier(0.33, 1, 0.68, 1) 0.15s;
+      opacity var(--interactive-showcase-reveal-fade) ease-out 0.1s,
+      transform var(--interactive-showcase-reveal-time) cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
   }
 
   @media (prefers-reduced-motion: reduce) {
