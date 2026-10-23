@@ -253,6 +253,13 @@ export default function decorate(block) {
     if (!openSpot) return;
     const spot = openSpot.getBoundingClientRect();
     const area = freeArea(spot);
+    // a hotspot at the very edge of the card reaches past the free area: its tooltip may go as
+    // far as the hotspot itself does, so it stays on the hotspot's corner (one box with it)
+    // rather than being nudged off it
+    area.left = Math.min(area.left, spot.left - 0.5);
+    area.right = Math.max(area.right, spot.right + 0.5);
+    area.top = Math.min(area.top, spot.top - 0.5);
+    area.bottom = Math.max(area.bottom, spot.bottom + 0.5);
     const set = (side, align) => {
       tooltip.dataset.side = side;
       tooltip.dataset.align = align;
@@ -340,8 +347,11 @@ export default function decorate(block) {
     tipTitle.textContent = data.title;
     tipText.textContent = data.text;
     spot.closest('.figure').append(tooltip);
-    tooltip.style.setProperty('--interactive-showcase-x', `${data.x}%`);
-    tooltip.style.setProperty('--interactive-showcase-y', `${data.y}%`);
+    // where the hotspot is drawn (in the editor, one in the cut-off part of the image is drawn
+    // at the nearest visible point, not at its own x, y)
+    ['--interactive-showcase-x', '--interactive-showcase-y'].forEach((prop) => {
+      tooltip.style.setProperty(prop, spot.style.getPropertyValue(prop));
+    });
     // placed at its full size, then grown out of its hotspot (restarted each time, also when
     // going straight from one hotspot to another)
     tooltip.classList.remove('is-opening');
