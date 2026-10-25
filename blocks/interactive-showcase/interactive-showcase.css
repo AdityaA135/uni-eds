@@ -36,7 +36,7 @@ main > .section > .interactive-showcase-wrapper {
   /* the motor images sliding from one item to the next when a thumbnail is picked (.panel):
      how long it takes (change this one value to make it slower or faster) and its curve, a
      gentle ease-out, so the image glides in rather than shooting in and stopping */
-  --interactive-showcase-slide-time: 1.6s;
+  --interactive-showcase-slide-time: 1s;
   --interactive-showcase-slide-ease: cubic-bezier(0.33, 1, 0.68, 1);
 
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
