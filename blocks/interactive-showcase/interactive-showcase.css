@@ -33,6 +33,13 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-grow-time: 0.75s;
   --interactive-showcase-grow-ease: cubic-bezier(0.65, 0, 0.35, 1);
 
+  /* the motor images sliding from one item to the next when a thumbnail is picked (.panel):
+     how long it takes (change this one value to make it slower or faster) and its curve:
+     linear, the images move at one steady speed from start to end (the outgoing one fading
+     at the same steady pace) */
+  --interactive-showcase-slide-time: 1.6s;
+  --interactive-showcase-slide-ease: linear;
+
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
   --interactive-showcase-spot: 60px;
   --interactive-showcase-spot-radius: 12px;
@@ -150,7 +157,9 @@ main > .section > .interactive-showcase-wrapper {
     padding: 24px var(--interactive-showcase-edge, 20px) 32px;
   }
 
+  /* Figma: a 416 x 15 text box, Medium 14px / 110%, uppercase, #666 */
   .counter {
+    max-width: 416px;
     margin-bottom: 11px;
     color: var(--interactive-showcase-text-counter, #666);
     font-family: var(--interactive-showcase-font-body);
@@ -285,14 +294,16 @@ main > .section > .interactive-showcase-wrapper {
     justify-content: center;
     opacity: 0;
     transform: translateY(100%);
-    transition: transform 0.9s var(--interactive-showcase-ease), opacity 0.9s var(--interactive-showcase-ease);
+    transition:
+      transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease),
+      opacity var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
   }
 
   .panel.is-active {
     z-index: 1;
     opacity: 1;
     transform: none;
-    transition: transform 0.9s var(--interactive-showcase-ease);
+    transition: transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
   }
 
   /* the figure has the image's own ratio, so hotspot percentages stay on the artwork */
@@ -499,8 +510,10 @@ main > .section > .interactive-showcase-wrapper {
     padding: 0;
   }
 
+  /* the open module's description: white at 80% */
   .tooltip-text {
     color: var(--interactive-showcase-white, #fff);
+    opacity: 0.8;
     font-size: 12px;
     line-height: 1.35;
     letter-spacing: -0.02em;
