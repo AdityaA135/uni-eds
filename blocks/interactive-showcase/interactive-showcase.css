@@ -33,9 +33,10 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-grow-time: 0.75s;
   --interactive-showcase-grow-ease: cubic-bezier(0.65, 0, 0.35, 1);
 
-  /* the motor images sliding from one item to the next (.panel): a gentle ease-out, so the
-     image glides in rather than shooting in and stopping */
-  --interactive-showcase-slide-time: 1.3s;
+  /* the motor images sliding from one item to the next when a thumbnail is picked (.panel):
+     how long it takes (change this one value to make it slower or faster) and its curve, a
+     gentle ease-out, so the image glides in rather than shooting in and stopping */
+  --interactive-showcase-slide-time: 1.6s;
   --interactive-showcase-slide-ease: cubic-bezier(0.33, 1, 0.68, 1);
 
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
@@ -155,7 +156,9 @@ main > .section > .interactive-showcase-wrapper {
     padding: 24px var(--interactive-showcase-edge, 20px) 32px;
   }
 
+  /* Figma: a 416 x 15 text box, Medium 14px / 110%, uppercase, #666 */
   .counter {
+    max-width: 416px;
     margin-bottom: 11px;
     color: var(--interactive-showcase-text-counter, #666);
     font-family: var(--interactive-showcase-font-body);
@@ -506,8 +509,10 @@ main > .section > .interactive-showcase-wrapper {
     padding: 0;
   }
 
+  /* the open module's description: white at 80% */
   .tooltip-text {
     color: var(--interactive-showcase-white, #fff);
+    opacity: 0.8;
     font-size: 12px;
     line-height: 1.35;
     letter-spacing: -0.02em;
