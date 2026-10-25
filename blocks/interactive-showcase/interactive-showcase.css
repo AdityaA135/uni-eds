@@ -651,13 +651,22 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
-  /* phones ("M / What is NEV 375x815"): one screen, top to bottom: heading; "1/3" beside the
-     powertrain's name, its copy and the thumbnails; then the showcase image filling the rest
-     of the card, running off its right edge (tablets keep the layout above) */
+  /* phones ("M / What is NEV 375x815", the frame being the card): one screen, top to bottom:
+     heading; "1/3" beside the powertrain's name, its copy and the thumbnails; then the
+     showcase image filling the rest of the card, running off its right edge (tablets keep the
+     layout above). The copy (20px in) starts 80px down: title; 36px; "1/3" and the item title
+     in a row, 12px apart; 12px; description; 44px; thumbnails. Vertical gaps follow the screen
+     height (frame values at 815px tall) */
   @media (width <= 599.98px) {
-    /* vertical gaps follow the screen height (frame values at 815px tall) */
+    /* the mobile frame's fill: a radial gradient (the linter does not know its two-size form) */
+    /* stylelint-disable declaration-property-value-no-unknown */
+    background:
+      radial-gradient(184.52% 73.28% at 100% 95.71%, rgb(0 0 0 / 18.24%) 0%, rgb(246 246 246 / 38%) 76.69%, rgb(255 255 255 / 38%) 100%),
+      #fff;
+    /* stylelint-enable declaration-property-value-no-unknown */
+
     .heading {
-      padding: min(78px, calc(9.6 * var(--interactive-showcase-svh))) 24px 0;
+      padding: min(80px, calc(9.82 * var(--interactive-showcase-svh))) 20px 0;
     }
 
     /* New Science Medium Extended 24px / 135%, -1% (narrower phones scale it down); the card's
@@ -674,9 +683,9 @@ main > .section > .interactive-showcase-wrapper {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: baseline;
-      column-gap: 10px;
+      column-gap: 12px;
       order: 2;
-      padding: min(30px, calc(3.7 * var(--interactive-showcase-svh))) 24px 0;
+      padding: min(36px, calc(4.42 * var(--interactive-showcase-svh))) 20px 0;
     }
 
     .texts,
@@ -695,7 +704,7 @@ main > .section > .interactive-showcase-wrapper {
     /* New Science Regular 16px / 150% */
     .item-title {
       grid-column: 2;
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       font-size: 16px;
       font-weight: 400;
       line-height: 1.5;
@@ -719,7 +728,7 @@ main > .section > .interactive-showcase-wrapper {
     .thumbs {
       grid-column: 1 / -1;
       gap: 4px;
-      margin-top: 18px;
+      margin-top: min(44px, calc(5.4 * var(--interactive-showcase-svh)));
     }
 
     .thumb {
