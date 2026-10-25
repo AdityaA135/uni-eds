@@ -34,11 +34,10 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-grow-ease: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* the motor images sliding from one item to the next when a thumbnail is picked (.panel):
-     how long it takes (change this one value to make it slower or faster) and its curve:
-     linear, the images move at one steady speed from start to end (the outgoing one fading
-     at the same steady pace) */
-  --interactive-showcase-slide-time: 1.6s;
-  --interactive-showcase-slide-ease: linear;
+     how long it takes (change this one value to make it slower or faster) and its curve, a
+     gentle ease-out, so the image glides in rather than shooting in and stopping */
+  --interactive-showcase-slide-time: 1s;
+  --interactive-showcase-slide-ease: cubic-bezier(0.33, 1, 0.68, 1);
 
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
   --interactive-showcase-spot: 60px;
