@@ -546,21 +546,19 @@ export default function decorate(block) {
 
   let current = 0;
   /**
-   * the images change places vertically (interactive-showcase.css): picking a thumbnail to the
-   * right, the current image rises and fades out while the new one rises into place from a
-   * little lower, fading in; one to the left, the same downwards
+   * the images move like a vertical carousel (interactive-showcase.css): picking a thumbnail to
+   * the right pushes the current image up and out while the new one rises from the bottom;
+   * one to the left pushes it down while the new one comes in from the top
    */
   const slideImages = (from, to) => {
     if (from === to) return;
     const dir = to > from ? 1 : -1;
     const incoming = items[to].row;
     incoming.style.transition = 'none';
-    // the distance the images travel: --interactive-showcase-slide-distance (stylesheet)
-    const shift = (sign) => `translateY(calc(${sign} * var(--interactive-showcase-slide-distance, 30%)))`;
-    incoming.style.transform = shift(dir);
+    incoming.style.transform = `translateY(${dir * 100}%)`;
     incoming.getBoundingClientRect();
     ['transition', 'transform'].forEach((p) => incoming.style.removeProperty(p));
-    items[from].row.style.transform = shift(-dir);
+    items[from].row.style.transform = `translateY(${-dir * 100}%)`;
   };
 
   const select = (index, focus = false) => {

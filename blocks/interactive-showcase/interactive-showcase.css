@@ -40,11 +40,6 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-slide-time: 1.6s;
   --interactive-showcase-slide-ease: linear;
 
-  /* how far the images travel, as a share of the image area's height: short enough that the
-     new image is in view (fading in) from the first moment, so the change runs evenly from
-     start to end (a full height, 100%, kept it out of sight for the first third or so) */
-  --interactive-showcase-slide-distance: 30%;
-
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
   --interactive-showcase-spot: 60px;
   --interactive-showcase-spot-radius: 12px;
@@ -287,10 +282,10 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
-  /* picking a thumbnail (interactive-showcase.js): the images change places vertically. To the
-     right, the current image rises and fades out while the new one rises into its place from
-     a little lower, fading in; to the left, the same downwards. Both move the same distance
-     (--interactive-showcase-slide-distance) over the same time, so it is one even movement. */
+  /* picking a thumbnail (interactive-showcase.js): a vertical carousel inside the card. To the
+     right, the current image slides up and out while the new one rises from the bottom edge;
+     to the left, the current one slides down while the new one comes in from the top. The
+     outgoing image fades out as it slides, in step with its movement. */
   .panel {
     position: absolute;
     inset: 0;
@@ -298,7 +293,7 @@ main > .section > .interactive-showcase-wrapper {
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transform: translateY(var(--interactive-showcase-slide-distance));
+    transform: translateY(100%);
     transition:
       transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease),
       opacity var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
@@ -308,9 +303,7 @@ main > .section > .interactive-showcase-wrapper {
     z-index: 1;
     opacity: 1;
     transform: none;
-    transition:
-      transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease),
-      opacity var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
+    transition: transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
   }
 
   /* the figure has the image's own ratio, so hotspot percentages stay on the artwork */
