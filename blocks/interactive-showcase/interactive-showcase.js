@@ -145,6 +145,47 @@ function trackRatio(figure, img) {
 }
 
 /**
+ * a + whose point is near the edge of the part of the image the card shows (the image's own
+ * edge, or the card's where the image runs off it) would be cut off there: it is drawn moved
+ * in, just enough to be whole (4px clear of the edge), on every screen and as sizes change.
+ * Its x, y stays as authored; its tooltip opens from where it is drawn. In the editor
+ * hotspot-editor.js draws (and marks) such points itself.
+ */
+function keepSpotsInView(stage, items) {
+  const AIR = 4;
+  const between = (n, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, n)));
+  const fit = () => {
+    items.forEach(({ figure, spots }) => {
+      const w = figure.offsetWidth;
+      const h = figure.offsetHeight;
+      if (!w || !h || !spots.length) return;
+      // the figure's place in the stage, from offsets (the slide's transforms left out)
+      let left = 0;
+      let top = 0;
+      for (let n = figure; n && n !== stage; n = n.offsetParent) {
+        left += n.offsetLeft;
+        top += n.offsetTop;
+      }
+      spots.forEach(({ btn, spot }) => {
+        const half = btn.offsetWidth / 2 + AIR;
+        // in % of the figure: `half` in from the stage's near edge to `half` in from its far one
+        const pct = (px, size) => (px / size) * 100;
+        const x = between(spot.x, pct(half - left, w), pct(stage.clientWidth - half - left, w));
+        const y = between(spot.y, pct(half - top, h), pct(stage.clientHeight - half - top, h));
+        btn.style.setProperty('--interactive-showcase-x', `${x}%`);
+        btn.style.setProperty('--interactive-showcase-y', `${y}%`);
+      });
+    });
+  };
+  fit();
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(fit);
+    ro.observe(stage);
+    items.forEach(({ figure }) => ro.observe(figure));
+  } else window.addEventListener('resize', fit);
+}
+
+/**
  * browsers without CSS container units (cqw / cqh): the stage's own width and height as
  * --interactive-showcase-cq-w / --interactive-showcase-cq-h, which the CSS uses in their place
  * (@supports not container-type)
@@ -612,6 +653,7 @@ export default function decorate(block) {
     curtain(section, block);
   }
   if (items.length) select(0);
+  if (!editing) keepSpotsInView(stage, items);
 
   // Universal Editor only: drag / nudge the + points and save their x, y (hotspot-editor.js)
   if (block.classList.contains('editing') && items.length) {

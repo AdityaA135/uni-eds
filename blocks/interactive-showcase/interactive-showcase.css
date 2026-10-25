@@ -786,14 +786,10 @@ main > .section > .interactive-showcase-wrapper {
   }
 
   /* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
-     the screen, and the + buttons stay inside the image, clear of the card's bottom edge */
+     the screen (the + buttons are kept whole inside it by interactive-showcase.js) */
   @media (width <= 599.98px) and (height <= 600px) {
     .stage {
       flex-basis: 140px;
-    }
-
-    .hotspot {
-      top: min(var(--interactive-showcase-y), 100% - 36px);
     }
   }
 
