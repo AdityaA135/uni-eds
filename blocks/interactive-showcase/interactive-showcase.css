@@ -69,8 +69,9 @@ main > .section > .interactive-showcase-wrapper {
   line-height: 1.35;
 
   @media (width >= 900px) {
-    /* 48px of the 1280px frame */
-    --interactive-showcase-edge: 3.75vw;
+    /* 48px of the 1280px frame: 3.75% of the card's width (the screen's, less the card's 8px
+       inset on each side) */
+    --interactive-showcase-edge: calc((100vw - 16px) * 0.0375);
   }
 
   /* the site's default heading and paragraph margins do not apply in the card: every gap in it
@@ -568,6 +569,13 @@ main > .section > .interactive-showcase-wrapper {
     .heading {
       padding: 0 24px 0 var(--interactive-showcase-edge);
       padding-top: calc(var(--card-height) * 152 / 720);
+    }
+
+    /* Figma sets the title as two 36px lines (30px at 120%) 2px apart, at 152 and 190: 38px
+       from line to line, nudged up 1px so each line sits where Figma's does */
+    .title {
+      margin-top: calc(-1em / 30);
+      line-height: calc(38 / 30);
     }
 
     .detail {
