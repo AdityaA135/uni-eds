@@ -33,6 +33,11 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-grow-time: 0.75s;
   --interactive-showcase-grow-ease: cubic-bezier(0.65, 0, 0.35, 1);
 
+  /* the motor images sliding from one item to the next (.panel): a gentle ease-out, so the
+     image glides in rather than shooting in and stopping */
+  --interactive-showcase-slide-time: 1.3s;
+  --interactive-showcase-slide-ease: cubic-bezier(0.33, 1, 0.68, 1);
+
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
   --interactive-showcase-spot: 60px;
   --interactive-showcase-spot-radius: 12px;
@@ -285,14 +290,16 @@ main > .section > .interactive-showcase-wrapper {
     justify-content: center;
     opacity: 0;
     transform: translateY(100%);
-    transition: transform 0.9s var(--interactive-showcase-ease), opacity 0.9s var(--interactive-showcase-ease);
+    transition:
+      transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease),
+      opacity var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
   }
 
   .panel.is-active {
     z-index: 1;
     opacity: 1;
     transform: none;
-    transition: transform 0.9s var(--interactive-showcase-ease);
+    transition: transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
   }
 
   /* the figure has the image's own ratio, so hotspot percentages stay on the artwork */
