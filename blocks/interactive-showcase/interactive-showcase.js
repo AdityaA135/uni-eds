@@ -98,6 +98,75 @@ function clipField(node, max) {
   return length;
 }
 
+// the glide between the section before and the card (curtainGlide): the time and curve one
+// panel glides to the next with on the JSW NEV page (1.8s, ease in and out)
+const GLIDE_TIME = 1800;
+const glideEase = (t) => (t < 0.5 ? 2 * t * t : 1 - ((2 - 2 * t) ** 2) / 2);
+
+/**
+ * between the section before and the card, one wheel gesture glides the whole way, as one panel
+ * to the next on the JSW NEV page: down, the card rises over the held section into place; up,
+ * the page goes back to the section before (its top, or for a tall one its last screen). Only
+ * there: anywhere else the wheel scrolls as usual, and so do touch, keys and the scrollbar.
+ * The rest of the gesture (a trackpad's inertia) is swallowed, so it is one glide per gesture
+ */
+function curtainGlide(section, prev) {
+  const root = document.documentElement;
+  let gliding = 0;
+  let lastWheel = 0;
+  let swallowing = false;
+  const ends = () => {
+    const card = Math.round(section.getBoundingClientRect().top + window.scrollY);
+    const r = prev.getBoundingClientRect();
+    const above = r.height > window.innerHeight * 1.25
+      ? card - window.innerHeight
+      : Math.round(r.top + window.scrollY);
+    return { above: Math.max(0, above), card };
+  };
+  const glide = (to) => {
+    const from = window.scrollY;
+    const start = performance.now();
+    let expected = from;
+    const step = (now) => {
+      // the page was moved some other way (scrollbar, keys, a link): that wins
+      if (Math.abs(window.scrollY - expected) > 3) {
+        gliding = 0;
+        return;
+      }
+      const k = Math.min(1, (now - start) / GLIDE_TIME);
+      expected = Math.round(from + (to - from) * glideEase(k));
+      window.scrollTo({ top: expected, behavior: 'instant' });
+      gliding = k < 1 ? requestAnimationFrame(step) : 0;
+    };
+    gliding = requestAnimationFrame(step);
+  };
+  window.addEventListener('wheel', (e) => {
+    const sideways = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+    if (e.defaultPrevented || e.ctrlKey || !e.deltaY || sideways) return;
+    // a page that glides its panels itself (as the JSW NEV page does) is left to it
+    if (root.classList.contains('gsap-scrolling')) return;
+    const now = performance.now();
+    const burst = now - lastWheel < 150;
+    lastWheel = now;
+    if (gliding || (swallowing && burst)) {
+      e.preventDefault();
+      return;
+    }
+    swallowing = false;
+    const y = window.scrollY;
+    const { above, card } = ends();
+    let to = null;
+    // down: the card is coming (at most a screen and a quarter below the top of the screen);
+    // up: the card is at the top, or on its way there
+    if (e.deltaY > 0 && y < card - 2 && card - y <= window.innerHeight * 1.25) to = card;
+    else if (e.deltaY < 0 && y > above + 2 && y <= card + 2) to = above;
+    if (to === null) return;
+    e.preventDefault();
+    swallowing = true;
+    glide(to);
+  }, { passive: false });
+}
+
 /**
  * "white curtain" entrance: while this section slides up, the previous section's content is
  * moved down by the distance scrolled, so it stays put and the white card covers it (only the
@@ -127,6 +196,7 @@ function curtain(section, block) {
     if (!frame) frame = requestAnimationFrame(update);
   };
   block.classList.add('curtain');
+  if (prev) curtainGlide(section, prev);
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
   new ResizeObserver(schedule).observe(section);
