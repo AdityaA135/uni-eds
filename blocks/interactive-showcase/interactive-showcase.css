@@ -101,6 +101,10 @@ main > .section > .interactive-showcase-wrapper {
   .heading {
     order: 1;
     padding: 92px var(--interactive-showcase-edge, 20px) 24px;
+
+    /* never under the site's header where it stays over the page: 16px clear of it
+       (--interactive-showcase-header-cover, measured by interactive-showcase.js) */
+    padding-top: max(92px, var(--interactive-showcase-header-cover, 0px) + 16px);
   }
 
   .title {
@@ -568,7 +572,7 @@ main > .section > .interactive-showcase-wrapper {
 
     .heading {
       padding: 0 24px 0 var(--interactive-showcase-edge);
-      padding-top: calc(var(--card-height) * 152 / 720);
+      padding-top: max(calc(var(--card-height) * 152 / 720), var(--interactive-showcase-header-cover, 0px) + 16px);
     }
 
     /* Figma sets the title as two 36px lines (30px at 120%) 2px apart, at 152 and 190: 38px
@@ -674,7 +678,7 @@ main > .section > .interactive-showcase-wrapper {
     /* stylelint-enable declaration-property-value-no-unknown */
 
     .heading {
-      padding: min(80px, calc(9.82 * var(--interactive-showcase-svh))) 20px 0;
+      padding: max(min(80px, calc(9.82 * var(--interactive-showcase-svh))), var(--interactive-showcase-header-cover, 0px) + 16px) 20px 0;
     }
 
     /* New Science Medium Extended 24px / 135%, -1% (narrower phones scale it down); the card's

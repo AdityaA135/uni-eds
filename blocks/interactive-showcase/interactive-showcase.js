@@ -215,16 +215,62 @@ function trackRatio(figure, img) {
 }
 
 /**
+ * the site's header where it stays over the page (fixed or sticky, as the boilerplate's
+ * navigation bar is): how far down the screen it reaches, from its layout (so a header that
+ * slides away on scroll still counts), and again whenever it changes; 0 where it scrolls away
+ * with the page. An open menu (taller than a bar) is left out: the last bar's value is kept
+ */
+function watchHeader(onChange) {
+  let last = -1;
+  const measure = () => {
+    const header = document.querySelector('header');
+    const bar = header && [header, ...header.querySelectorAll('*')]
+      .find((node) => ['fixed', 'sticky'].includes(getComputedStyle(node).position));
+    let bottom = 0;
+    if (bar) {
+      const height = bar.offsetHeight;
+      if (height > window.innerHeight * 0.4) return;
+      const { position, top } = getComputedStyle(bar);
+      bottom = position === 'sticky' ? (parseFloat(top) || 0) + height : bar.offsetTop + height;
+    }
+    bottom = Math.max(0, Math.round(bottom));
+    if (bottom !== last) {
+      last = bottom;
+      onChange(bottom);
+    }
+  };
+  measure();
+  window.addEventListener('resize', measure);
+  const header = document.querySelector('header');
+  // the header block is decorated after this one may be
+  if (header && window.MutationObserver) {
+    new MutationObserver(measure).observe(header, {
+      childList: true, subtree: true, attributes: true,
+    });
+  }
+}
+
+/**
  * a + whose point is near the edge of the part of the image the card shows (the image's own
  * edge, or the card's where the image runs off it) would be cut off there: it is drawn moved
- * in, just enough to be whole (4px clear of the edge), on every screen and as sizes change.
- * Its x, y stays as authored; its tooltip opens from where it is drawn. In the editor
- * hotspot-editor.js draws (and marks) such points itself.
+ * in, just enough to be whole (4px clear of the edge), on every screen and as sizes change, and
+ * out from under the site's header where it covers the card's top (header.cover, px from the
+ * card's top). Its x, y stays as authored; its tooltip opens from where it is drawn. In the
+ * editor hotspot-editor.js draws (and marks) such points itself. Returns its fitting, to run
+ * again when the header changes.
  */
-function keepSpotsInView(stage, items) {
+function keepSpotsInView(block, stage, items, header) {
   const AIR = 4;
   const between = (n, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, n)));
+  // an element's place in the page from offsets (the slide's and entrance's transforms left out)
+  const pageTop = (node) => {
+    let top = 0;
+    for (let n = node; n; n = n.offsetParent) top += n.offsetTop;
+    return top;
+  };
   const fit = () => {
+    // the header's reach over the stage
+    const covered = header.cover - (pageTop(stage) - pageTop(block));
     items.forEach(({ figure, spots }) => {
       const w = figure.offsetWidth;
       const h = figure.offsetHeight;
@@ -241,7 +287,8 @@ function keepSpotsInView(stage, items) {
         // in % of the figure: `half` in from the stage's near edge to `half` in from its far one
         const pct = (px, size) => (px / size) * 100;
         const x = between(spot.x, pct(half - left, w), pct(stage.clientWidth - half - left, w));
-        const y = between(spot.y, pct(half - top, h), pct(stage.clientHeight - half - top, h));
+        const lo = Math.max(half, covered + half);
+        const y = between(spot.y, pct(lo - top, h), pct(stage.clientHeight - half - top, h));
         btn.style.setProperty('--interactive-showcase-x', `${x}%`);
         btn.style.setProperty('--interactive-showcase-y', `${y}%`);
       });
@@ -253,6 +300,7 @@ function keepSpotsInView(stage, items) {
     ro.observe(stage);
     items.forEach(({ figure }) => ro.observe(figure));
   } else window.addEventListener('resize', fit);
+  return fit;
 }
 
 /**
@@ -389,6 +437,12 @@ export default function decorate(block) {
   }
   copy.append(detail);
 
+  // the site's header, where it stays over the page: how far down the screen it reaches
+  // (header.bottom) and over the card once the card fills the screen, 8px down from the top
+  // (header.cover). The heading starts clear of it (--interactive-showcase-header-cover, the
+  // stylesheet); tooltips and + points keep out from under it
+  const header = { bottom: 0, cover: 0 };
+  let refitSpots = null;
   const stage = el('div', 'stage');
   containerUnits(stage);
   const tooltip = el('div', 'tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
@@ -410,7 +464,8 @@ export default function decorate(block) {
     const area = {
       left: Math.max(card.left, 0) + gap,
       right: Math.min(card.right, document.documentElement.clientWidth) - gap,
-      top: Math.max(card.top, 0) + gap,
+      // clear of the site's header where it stays over the page
+      top: Math.max(card.top, 0, header.bottom) + gap,
       bottom: Math.min(card.bottom, window.innerHeight) - gap,
     };
     copy.querySelectorAll('.title, .counter, .text:not([hidden]), .thumbs, .limit-note')
@@ -723,7 +778,14 @@ export default function decorate(block) {
     curtain(section, block);
   }
   if (items.length) select(0);
-  if (!editing) keepSpotsInView(stage, items);
+  if (!editing) refitSpots = keepSpotsInView(block, stage, items, header);
+  watchHeader((bottom) => {
+    header.bottom = bottom;
+    header.cover = Math.max(0, bottom - 8);
+    block.style.setProperty('--interactive-showcase-header-cover', `${header.cover}px`);
+    refitSpots?.();
+    if (openSpot) placeTooltip();
+  });
 
   // Universal Editor only: drag / nudge the + points and save their x, y (hotspot-editor.js)
   if (block.classList.contains('editing') && items.length) {
