@@ -68,7 +68,7 @@ main > .section > .interactive-showcase-wrapper {
   letter-spacing: 0;
   line-height: 1.35;
 
-  @media (width >= 900px) and (not ((hover: none) and (pointer: coarse))) {
+  @media (width >= 900px) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))) {
     /* 48px of the 1280px frame: 3.75% of the card's width (the screen's, less the card's 8px
        inset on each side) */
     --interactive-showcase-edge: calc((100vw - 16px) * 0.0375);
@@ -276,7 +276,7 @@ main > .section > .interactive-showcase-wrapper {
   /* upright tablets (600-899px wide; wider ones and landscape use the two columns below): the
      card is exactly one screen and the image takes the room the heading and copy leave, so the
      thumbnails stay on the screen (and can be tapped) instead of running past its bottom */
-  @media (width >= 600px) and (width <= 899.98px) and (orientation: portrait) and (not ((hover: none) and (pointer: coarse))) {
+  @media (width >= 600px) and (width <= 899.98px) and (orientation: portrait) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))) {
     height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-vh) - 16px));
 
     .stage {
@@ -565,10 +565,10 @@ main > .section > .interactive-showcase-wrapper {
     bottom: 8px;
   }
 
-  /* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
-     in), where the stacked layout would push the copy off screen; not on touch screens (phones
-     and tablets, any way up), which have the mobile design (below) */
-  @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse))) {
+  /* side by side from 900px, and on any landscape screen from 600px (a desktop zoomed far in,
+     a phone or tablet held sideways), where the stacked layout would push the copy off screen;
+     not on touch screens held upright (phones and tablets), which have the mobile design */
+  @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))) {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
@@ -671,7 +671,7 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
-  @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (height <= 679.98px) and (not ((hover: none) and (pointer: coarse))) {
+  @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (height <= 679.98px) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))) {
     .thumb {
       width: clamp(72px, calc(15 * var(--interactive-showcase-svh)), 120px);
     }
@@ -689,7 +689,7 @@ main > .section > .interactive-showcase-wrapper {
      layout above). The copy (20px in) starts 80px down: title; 36px; "1/3" and the item title
      in a row, 12px apart; 12px; description; 44px; thumbnails. Vertical gaps follow the screen
      height (frame values at 815px tall) */
-  @media (width <= 599.98px), (hover: none) and (pointer: coarse) {
+  @media (width <= 599.98px), (hover: none) and (pointer: coarse) and (orientation: portrait) {
     /* the mobile frame's fill: a radial gradient (the linter does not know its two-size form) */
     /* stylelint-disable declaration-property-value-no-unknown */
     background:
@@ -834,7 +834,7 @@ main > .section > .interactive-showcase-wrapper {
 
   /* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
      the screen (the + buttons are kept whole inside it by interactive-showcase.js) */
-  @media ((width <= 599.98px) or ((hover: none) and (pointer: coarse))) and (height <= 600px) {
+  @media ((width <= 599.98px) or ((hover: none) and (pointer: coarse) and (orientation: portrait))) and (height <= 600px) {
     .stage {
       flex-basis: 140px;
     }
@@ -851,7 +851,7 @@ main > .section > .interactive-showcase-wrapper {
       width: min(270px, calc(var(--interactive-showcase-cq-w) - 16px));
     }
 
-    @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse))) {
+    @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))) {
       .figure {
         --u: min(calc(var(--interactive-showcase-cq-h) / 720), calc(var(--interactive-showcase-cq-w) / 1280));
 
@@ -861,7 +861,7 @@ main > .section > .interactive-showcase-wrapper {
       }
     }
 
-    @media (width <= 599.98px), (hover: none) and (pointer: coarse) {
+    @media (width <= 599.98px), (hover: none) and (pointer: coarse) and (orientation: portrait) {
       .figure {
         width: min(var(--interactive-showcase-cq-w) * 0.904, (var(--interactive-showcase-cq-h) - clamp(16px, var(--interactive-showcase-cq-h) - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
       }
