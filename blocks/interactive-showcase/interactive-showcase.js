@@ -318,8 +318,9 @@ function containerUnits(container) {
   else window.addEventListener('resize', measure);
 }
 
-// the card side by side with its copy (as in interactive-showcase.css)
-const SIDE_BY_SIDE = '(width >= 900px), (orientation: landscape) and (width >= 600px)';
+// the card side by side with its copy (as in interactive-showcase.css): not on touch screens
+// held upright (phones and tablets), which have the mobile design
+const SIDE_BY_SIDE = '((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait)))';
 
 /**
  * Universal Editor sizes its frame to the page's height, so in the editor the card cannot take
