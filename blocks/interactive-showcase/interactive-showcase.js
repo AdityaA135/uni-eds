@@ -19,6 +19,9 @@
 const MAX_HOTSPOTS = 4;
 // at most this many items (thumbnails): further items are not shown
 const MAX_ITEMS = 3;
+// a module beside its + is the design's 272px wide where it fits; where it does not (a + in
+// the middle of a phone's card) it narrows to the room there is, down to this
+const MIN_TOOLTIP_WIDTH = 180;
 // the most characters each text may have, so it fits its place in the card on every screen
 // (_interactive-showcase.json limits the fields to the same); longer text, saved before the
 // limits or in the hotspots' bullets, is shortened on the page
@@ -483,7 +486,8 @@ export default function decorate(block) {
    * opens to the left, from one in the left half to the right, and downwards wherever it fits
    * (the hotspot in its top corner, its title beside the minus, as in the design), upwards only
    * where it does not. Where that side does not fit it takes the other one; where neither does
-   * (narrow screens) it opens just below or above the hotspot, centred on it and nudged in, the
+   * (a phone's card) it narrows to fit on the side with more room; only where even that is too
+   * narrow does it open just below or above the hotspot, centred on it and nudged in, the
    * hotspot keeping its own box. Up or down: the one that fits, else the one with more room.
    */
   const placeTooltip = () => {
@@ -508,9 +512,21 @@ export default function decorate(block) {
     const spotY = (spot.top + spot.bottom) / 2;
     tooltip.style.removeProperty('--interactive-showcase-sx');
     tooltip.style.removeProperty('--interactive-showcase-sy');
+    tooltip.style.removeProperty('width');
 
     const sides = spotX > (area.left + area.right) / 2 ? ['left', 'right'] : ['right', 'left'];
-    const side = sides.find((s) => fitsAcross(set(s, 'top'))) || 'center';
+    let side = sides.find((s) => fitsAcross(set(s, 'top')));
+    if (!side) {
+      // too wide for either side: narrower, on the side with more room, still growing out of the
+      // + 's corner as everywhere else (only below MIN_TOOLTIP_WIDTH does it go below / above)
+      const room = { left: spot.right - area.left, right: area.right - spot.left };
+      const wider = room.left >= room.right ? 'left' : 'right';
+      if (room[wider] >= MIN_TOOLTIP_WIDTH) {
+        tooltip.style.width = `${Math.floor(room[wider])}px`;
+        side = wider;
+      }
+    }
+    side = side || 'center';
     const apart = side === 'center';
     // beside its +, the module opens downwards wherever it fits (its title and the minus then
     // share its top row, as in the design), upwards only where it does not; below / above its +
