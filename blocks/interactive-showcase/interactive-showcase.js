@@ -522,14 +522,29 @@ export default function decorate(block) {
     // nudged in where it still does not fit (across, and up or down); taller than the free
     // area (the shortest phones) it keeps to its top. It may then cover some of the image, never
     // the copy or the edges; its hotspot stays above it, so it can still be closed
-    if (box.right > area.right) tooltip.style.setProperty('--interactive-showcase-sx', `${area.right - box.right}px`);
-    else if (box.left < area.left) tooltip.style.setProperty('--interactive-showcase-sx', `${area.left - box.left}px`);
+    let sx = 0;
+    if (box.right > area.right) sx = area.right - box.right;
+    else if (box.left < area.left) sx = area.left - box.left;
+    if (sx) tooltip.style.setProperty('--interactive-showcase-sx', `${sx}px`);
     const sy = box.top < area.top || box.height > area.bottom - area.top
       ? area.top - box.top
       : Math.min(0, area.bottom - box.bottom);
     if (sy) tooltip.style.setProperty('--interactive-showcase-sy', `${sy}px`);
     // a tooltip moved off its hotspot's corner leaves the hotspot its own box
-    openSpot.classList.toggle('hotspot-apart', apart || Boolean(sy));
+    const offCorner = apart || Boolean(sy);
+    openSpot.classList.toggle('hotspot-apart', offCorner);
+    // the minus where the open module has it: centred 24.5px in from the module's side and 26px
+    // down from its top (up from its bottom, opening up), moved there from the + 's centre
+    // (interactive-showcase.css); a module apart from its + leaves it in the middle
+    const half = openSpot.offsetWidth / 2;
+    const iconX = { left: half - 24.5, right: 24.5 - half }[side];
+    const iconY = { top: 26 - half, bottom: half - 26 }[align[0]];
+    if (offCorner || iconX === undefined || iconY === undefined) {
+      ['x', 'y'].forEach((k) => openSpot.style.removeProperty(`--interactive-showcase-icon-${k}`));
+    } else {
+      openSpot.style.setProperty('--interactive-showcase-icon-x', `${iconX + sx}px`);
+      openSpot.style.setProperty('--interactive-showcase-icon-y', `${iconY}px`);
+    }
   };
 
   // the hotspot whose tooltip is shrinking back into it (closeTooltip with animate)
@@ -563,6 +578,8 @@ export default function decorate(block) {
     const spot = openSpot;
     openSpot = null;
     spot.setAttribute('aria-expanded', 'false');
+    // the minus goes back to the + 's centre (as the module shrinks, closing animated)
+    ['x', 'y'].forEach((k) => spot.style.removeProperty(`--interactive-showcase-icon-${k}`));
     if (refocus) spot.focus();
     tooltip.classList.remove('is-opening');
     if (!animate) {
