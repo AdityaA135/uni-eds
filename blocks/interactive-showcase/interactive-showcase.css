@@ -213,6 +213,11 @@ main > .section > .interactive-showcase-wrapper {
     border-radius: 6px;
     cursor: pointer;
     background-color: var(--interactive-showcase-ink, #0d0d0d);
+
+    /* the image is wider than the frame (cropped, below): Safari (iOS / iPadOS) stops clipping
+       it to the rounded frame while its filter animates, so it spread over the gaps for that
+       moment on a tap; a clip-path is applied to it all the same */
+    clip-path: inset(0 round 6px);
   }
 
   .thumb picture,
