@@ -468,12 +468,14 @@ main > .section > .interactive-showcase-wrapper {
     --interactive-showcase-grow-from: inset(0 calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) 0 round var(--interactive-showcase-spot-radius));
   }
 
-  /* opening upwards, the minus sits in the bottom corner: the title's row is the bottom one */
+  /* opening upwards (only where there is no room below), the minus sits in the bottom corner:
+     the title stays on top, and the minus has the bottom row to itself (20px, 20px below the
+     description) */
   .tooltip[data-align='bottom'] {
     --interactive-showcase-ty: calc(-100% + var(--interactive-showcase-spot) / 2);
     --interactive-showcase-grow-from: inset(calc(100% - var(--interactive-showcase-spot)) 0 0 calc(100% - var(--interactive-showcase-spot)) round var(--interactive-showcase-spot-radius));
 
-    flex-direction: column-reverse;
+    padding-bottom: 56px;
   }
 
   .tooltip[data-side='right'][data-align='bottom'] {
@@ -518,9 +520,10 @@ main > .section > .interactive-showcase-wrapper {
     padding: 0 0 0 33px;
   }
 
+  /* opening upwards the title has its row to itself, the whole width */
   .tooltip[data-align='bottom'] .tooltip-title {
-    margin-top: 0;
-    margin-bottom: calc(10px - 0.7em);
+    margin: 0;
+    padding: 0;
   }
 
   /* no minus beside the title: the module is apart from its + (centred below / above it) */

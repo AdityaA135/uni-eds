@@ -479,13 +479,12 @@ export default function decorate(block) {
   };
 
   /**
-   * the tooltip opens away from the edges, by the quadrant of the free area its hotspot is in:
-   * from a hotspot in the right half it opens to the left, from one in the left half to the
-   * right; from the lower half it opens up, from the upper half down (the hotspot in its
-   * corner, as in the design). Where that side does not fit it takes the other one; where
-   * neither does (narrow screens) it opens just below or above the hotspot, centred on it and
-   * nudged in, the hotspot keeping its own box. Up or down: the one that fits, else the one
-   * with more room.
+   * the tooltip opens away from the edges: from a hotspot in the right half of the free area it
+   * opens to the left, from one in the left half to the right, and downwards wherever it fits
+   * (the hotspot in its top corner, its title beside the minus, as in the design), upwards only
+   * where it does not. Where that side does not fit it takes the other one; where neither does
+   * (narrow screens) it opens just below or above the hotspot, centred on it and nudged in, the
+   * hotspot keeping its own box. Up or down: the one that fits, else the one with more room.
    */
   const placeTooltip = () => {
     if (!openSpot) return;
@@ -513,8 +512,11 @@ export default function decorate(block) {
     const sides = spotX > (area.left + area.right) / 2 ? ['left', 'right'] : ['right', 'left'];
     const side = sides.find((s) => fitsAcross(set(s, 'top'))) || 'center';
     const apart = side === 'center';
+    // beside its +, the module opens downwards wherever it fits (its title and the minus then
+    // share its top row, as in the design), upwards only where it does not; below / above its +
+    // (narrow screens), whichever side of the free area the + is not in
     const aligns = apart ? ['below', 'above'] : ['top', 'bottom'];
-    if (spotY > (area.top + area.bottom) / 2) aligns.reverse();
+    if (apart && spotY > (area.top + area.bottom) / 2) aligns.reverse();
     const [align] = aligns
       .map((a) => [a, overflowY(set(side, a))])
       .sort((a, b) => a[1] - b[1]);
