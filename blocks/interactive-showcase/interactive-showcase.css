@@ -678,7 +678,7 @@ main > .section > .interactive-showcase-wrapper {
     /* stylelint-enable declaration-property-value-no-unknown */
 
     .heading {
-      padding: max(min(80px, calc(9.82 * var(--interactive-showcase-svh))), var(--interactive-showcase-header-cover, 0px) + 16px) 20px 0;
+      /* padding: max(min(80px, calc(9.82 * var(--interactive-showcase-svh))), var(--interactive-showcase-header-cover, 0px) + 16px) 20px 0; */
     }
 
     /* New Science Medium Extended 24px / 135%, -1% (narrower phones scale it down); the card's
