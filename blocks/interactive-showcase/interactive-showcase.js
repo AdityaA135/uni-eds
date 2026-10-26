@@ -321,6 +321,9 @@ function containerUnits(container) {
 // the card side by side with its copy (as in interactive-showcase.css): not on touch screens
 // held upright (phones and tablets), which have the mobile design
 const SIDE_BY_SIDE = '((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait)))';
+// the mobile design (as in interactive-showcase.css): phones, narrow windows, touch screens held
+// upright; a + 's details open there as a panel across the image area
+const MOBILE_DESIGN = '(width <= 599.98px), (hover: none) and (pointer: coarse) and (orientation: portrait)';
 
 /**
  * Universal Editor sizes its frame to the page's height, so in the editor the card cannot take
@@ -486,8 +489,55 @@ export default function decorate(block) {
    * (narrow screens) it opens just below or above the hotspot, centred on it and nudged in, the
    * hotspot keeping its own box. Up or down: the one that fits, else the one with more room.
    */
+  /**
+   * the mobile design: the details open as one panel across the card, 20px in from its edges
+   * (interactive-showcase.css), on the part of the card on the screen: at the image area's
+   * bottom for a + in its upper half, at its top for one in its lower half; where that would
+   * still cover the + (a short image area), just below the + or else just above it. It never
+   * covers the + it belongs to, which keeps its own box and turns into a minus; it grows from
+   * its edge nearest the +
+   */
+  const placePanel = () => {
+    if (tooltip.parentNode !== block) block.append(tooltip);
+    tooltip.dataset.side = 'panel';
+    const card = block.getBoundingClientRect();
+    const st = stage.getBoundingClientRect();
+    const spot = openSpot.getBoundingClientRect();
+    const gap = 8;
+    const shownTop = Math.max(card.top, 0, header.bottom) + gap;
+    const shownBottom = Math.min(card.bottom, window.innerHeight) - gap;
+    const { height } = tooltip.getBoundingClientRect();
+    const covers = (top) => top < spot.bottom && top + height > spot.top;
+    const upperHalf = (spot.top + spot.bottom) / 2
+      < (Math.max(st.top, shownTop) + Math.min(st.bottom, shownBottom)) / 2;
+    // screen y of the panel's top: at the image area's edge away from the +, else next to it
+    let top = upperHalf
+      ? Math.min(st.bottom, shownBottom + gap) - 20 - height
+      : Math.max(st.top, shownTop - gap) + 12;
+    if (covers(top)) {
+      const under = spot.bottom + gap;
+      const over = spot.top - gap - height;
+      if (under + height <= shownBottom) top = under;
+      else if (over >= shownTop) top = over;
+      else top = shownBottom - under > over - shownTop ? under : over;
+    }
+    tooltip.dataset.align = top >= spot.bottom ? 'under' : 'over';
+    tooltip.style.top = `${top - card.top}px`;
+    openSpot.classList.add('hotspot-apart');
+    ['x', 'y'].forEach((k) => openSpot.style.removeProperty(`--interactive-showcase-icon-${k}`));
+  };
+
   const placeTooltip = () => {
     if (!openSpot) return;
+    ['--interactive-showcase-sx', '--interactive-showcase-sy'].forEach((prop) => tooltip.style.removeProperty(prop));
+    if (window.matchMedia(MOBILE_DESIGN).matches) {
+      placePanel();
+      return;
+    }
+    // beside its + : in the + 's figure, at its x, y
+    const figure = openSpot.closest('.figure');
+    if (tooltip.parentNode !== figure) figure.append(tooltip);
+    ['top', 'bottom'].forEach((edge) => tooltip.style.removeProperty(edge));
     const spot = openSpot.getBoundingClientRect();
     const area = freeArea(spot);
     // a hotspot at the very edge of the card reaches past the free area: its tooltip may go as
@@ -506,8 +556,6 @@ export default function decorate(block) {
     const overflowY = (b) => Math.max(0, area.top - b.top) + Math.max(0, b.bottom - area.bottom);
     const spotX = (spot.left + spot.right) / 2;
     const spotY = (spot.top + spot.bottom) / 2;
-    tooltip.style.removeProperty('--interactive-showcase-sx');
-    tooltip.style.removeProperty('--interactive-showcase-sy');
 
     const sides = spotX > (area.left + area.right) / 2 ? ['left', 'right'] : ['right', 'left'];
     const side = sides.find((s) => fitsAcross(set(s, 'top'))) || 'center';

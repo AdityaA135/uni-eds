@@ -53,6 +53,8 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-vh: 1vh;
   --interactive-showcase-svh: 1vh;
 
+  /* the mobile design's details panel is placed in the card (interactive-showcase.js) */
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -497,6 +499,35 @@ main > .section > .interactive-showcase-wrapper {
   .tooltip[data-align='above'] {
     --interactive-showcase-ty: calc(-100% - 36px);
     --interactive-showcase-grow-from: inset(100% calc(50% - var(--interactive-showcase-spot) / 2) 0 round var(--interactive-showcase-spot-radius));
+  }
+
+  /* the mobile design (interactive-showcase.js): one panel across the card, 20px in from its
+     edges, below its + (under) or above it (over), never covering it; it grows from its edge
+     nearest the + and shrinks back to it. Its title shares the top row with a minus (the close
+     button's), as in the module */
+  .tooltip[data-side='panel'] {
+    --interactive-showcase-grow-from: inset(0 0 100% round 12px);
+
+    /* its top is set by interactive-showcase.js */
+    inset: auto 20px;
+    z-index: 5;
+    width: auto;
+    transform: none;
+  }
+
+  .tooltip[data-side='panel'][data-align='over'] {
+    --interactive-showcase-grow-from: inset(100% 0 0 round 12px);
+  }
+
+  .tooltip[data-side='panel'] .tooltip-close::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(17px * 0.7032);
+    height: calc(17px * 0.0742);
+    background-color: currentcolor;
+    transform: translate(-50%, -50%);
   }
 
   .tooltip[hidden] {
