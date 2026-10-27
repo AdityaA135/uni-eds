@@ -976,6 +976,61 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
+  /* touch tablets held upright (600px wide and up: iPad, Surface): the phones' layout, but its
+     copy, sized for a 375px screen, would be lost beside an image three times the width. The
+     copy grows with the screen (title "A NEW WAY TO MOVE" / "POWERED BY TECH" as on desktop,
+     the description at a readable measure, larger thumbnails) and the image stays within 80%
+     of the card's width, so the two balance */
+  @media (hover: none) and (pointer: coarse) and (orientation: portrait) and (width >= 600px) {
+    .heading {
+      padding: max(clamp(92px, 10vw, 112px), var(--interactive-showcase-header-cover, 0px) + 16px) clamp(32px, 4.7vw, 48px) 32px;
+    }
+
+    .title {
+      max-width: 16.5em;
+      font-size: clamp(34px, 4.3vw, 44px);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    .detail {
+      column-gap: 16px;
+      padding: 0 clamp(32px, 4.7vw, 48px);
+    }
+
+    .counter {
+      font-size: clamp(20px, 2.2vw, 22px);
+    }
+
+    .item-title {
+      margin-bottom: 16px;
+      font-size: clamp(20px, 2.2vw, 22px);
+    }
+
+    .description p {
+      max-width: 600px;
+      font-size: clamp(17px, 1.9vw, 19px);
+      line-height: 1.45;
+    }
+
+    .thumbs {
+      gap: 8px;
+      margin-top: 40px;
+    }
+
+    .thumb {
+      width: clamp(96px, 11vw, 120px);
+    }
+
+    .stage {
+      margin-top: 24px;
+    }
+
+    .figure {
+      width: min(80cqw, (100cqh - clamp(16px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
+    }
+  }
+
   /* browsers without container units: the same sizes, from the stage's size as measured by
      interactive-showcase.js (--interactive-showcase-cq-w / --interactive-showcase-cq-h in place of 100cqw / 100cqh) */
   @supports not (container-type: size) {
