@@ -418,6 +418,11 @@ main > .section > .interactive-showcase-wrapper {
     --interactive-showcase-tx: calc(-100% + var(--interactive-showcase-spot) / 2);
     --interactive-showcase-ty: calc(var(--interactive-showcase-spot) / -2);
 
+    /* where the minus sits: its centre this far in from the module's side and down from its top
+       (interactive-showcase.js moves the + 's icon there) */
+    --interactive-showcase-minus-x: 24.5px;
+    --interactive-showcase-minus-y: 26px;
+
     /* what it grows out of and shrinks back into: exactly its hotspot's box, in its corner (only
        a tooltip nudged off that corner starts moved back onto it) */
     --interactive-showcase-grow-from: inset(0 0 calc(100% - var(--interactive-showcase-spot)) calc(100% - var(--interactive-showcase-spot)) round var(--interactive-showcase-spot-radius));
@@ -696,7 +701,6 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .tooltip[data-align='bottom'] .tooltip-text {
-      display: block;
       height: 48px;
       overflow: hidden;
     }
@@ -835,17 +839,77 @@ main > .section > .interactive-showcase-wrapper {
       --interactive-showcase-ty: calc(-100% - 24px);
     }
 
-    /* the open module: title New Science Medium 10px / 140%, text New Science Regular
-       10px / 140%, -1% */
+    /* the open module: always 150 x 92 (12px padding, the 14px title row with the minus, 12px,
+       three 14px lines of description; one line of title and three of description, longer text
+       ending with an ellipsis). Title New Science Medium 10px / 140%, text New Science Regular
+       10px / 140%, -1%. Its corner is its + 's, the minus in the + 's middle, level with the
+       title (18px in from the side, 19px down) */
+    .tooltip {
+      --interactive-showcase-minus-x: 18px;
+      --interactive-showcase-minus-y: 19px;
+
+      width: 150px;
+      height: 92px;
+      gap: 12px;
+      padding: 12px;
+    }
+
     .tooltip-title {
+      --interactive-showcase-lines: 1;
+
+      margin-top: 0;
+      padding-right: 18px;
       font-size: 10px;
-      line-height: 1.4;
+      line-height: 14px;
+    }
+
+    .tooltip[data-side='right'] .tooltip-title {
+      padding: 0 0 0 18px;
     }
 
     .tooltip-text {
+      --interactive-showcase-lines: 3;
+
       font-size: 10px;
-      line-height: 1.4;
+      line-height: 14px;
       letter-spacing: -0.01em;
+    }
+
+    /* the close button under the minus */
+    .tooltip-close {
+      top: 1px;
+      right: 0;
+    }
+
+    .tooltip[data-side='right'] .tooltip-close {
+      left: 0;
+    }
+
+    .tooltip[data-align='bottom'] .tooltip-close {
+      bottom: 1px;
+    }
+
+    /* opening upwards, 92 too: the minus beside the description's last line, which stops short
+       of it */
+    .tooltip[data-align='bottom'] {
+      padding-bottom: 12px;
+    }
+
+    .tooltip[data-align='bottom'] .tooltip-text {
+      height: 42px;
+      overflow: hidden;
+    }
+
+    .tooltip[data-align='bottom'] .tooltip-text::before {
+      content: '';
+      float: right;
+      width: 18px;
+      height: 42px;
+      shape-outside: inset(28px 0 0);
+    }
+
+    .tooltip[data-side='right'][data-align='bottom'] .tooltip-text::before {
+      float: left;
     }
 
     /* the image sits in what is left of the screen: as on the 375x815 frame (339 x 330 at 36,

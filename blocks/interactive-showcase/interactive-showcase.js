@@ -111,13 +111,19 @@ const glideEase = (t) => (t < 0.5 ? 2 * t * t : 1 - ((2 - 2 * t) ** 2) / 2);
  * to the next on the JSW NEV page: down, the card rises over the held section into place; up,
  * the page goes back to the section before (its top, or for a tall one its last screen). Only
  * there: anywhere else the wheel scrolls as usual, and so do touch, keys and the scrollbar.
- * The rest of the gesture (a trackpad's inertia) is swallowed, so it is one glide per gesture
+ * The rest of the gesture (a trackpad's inertia) is swallowed, so it is one glide per gesture.
+ * Only a gesture that starts there glides: one already scrolling when it gets there (coming up
+ * from the section after the card, say) scrolls on as usual, as far as it goes, rather than
+ * being carried on by a glide to the section before
  */
 function curtainGlide(section, prev) {
   const root = document.documentElement;
   let gliding = 0;
   let lastWheel = 0;
   let swallowing = false;
+  // where the current gesture started, and its direction
+  let gestureY = 0;
+  let gestureDir = 0;
   const ends = () => {
     const card = Math.round(section.getBoundingClientRect().top + window.scrollY);
     const r = prev.getBoundingClientRect();
@@ -149,8 +155,13 @@ function curtainGlide(section, prev) {
     // a page that glides its panels itself (as the JSW NEV page does) is left to it
     if (root.classList.contains('gsap-scrolling')) return;
     const now = performance.now();
-    const burst = now - lastWheel < 150;
+    const dir = Math.sign(e.deltaY);
+    const burst = now - lastWheel < 150 && dir === gestureDir;
     lastWheel = now;
+    if (!burst) {
+      gestureY = window.scrollY;
+      gestureDir = dir;
+    }
     if (gliding || (swallowing && burst)) {
       e.preventDefault();
       return;
@@ -158,11 +169,14 @@ function curtainGlide(section, prev) {
     swallowing = false;
     const y = window.scrollY;
     const { above, card } = ends();
-    let to = null;
     // down: the card is coming (at most a screen and a quarter below the top of the screen);
     // up: the card is at the top, or on its way there
-    if (e.deltaY > 0 && y < card - 2 && card - y <= window.innerHeight * 1.25) to = card;
-    else if (e.deltaY < 0 && y > above + 2 && y <= card + 2) to = above;
+    const comingDown = (at) => at < card - 2 && card - at <= window.innerHeight * 1.25;
+    const goingUp = (at) => at > above + 2 && at <= card + 2;
+    let to = null;
+    // both where the page is and where the gesture started
+    if (dir > 0 && comingDown(y) && comingDown(gestureY)) to = card;
+    else if (dir < 0 && goingUp(y) && goingUp(gestureY)) to = above;
     if (to === null) return;
     e.preventDefault();
     swallowing = true;
@@ -556,8 +570,12 @@ export default function decorate(block) {
     // down from its top (up from its bottom, opening up), moved there from the + 's centre
     // (interactive-showcase.css); a module apart from its + leaves it in the middle
     const half = openSpot.offsetWidth / 2;
-    const iconX = { left: half - 24.5, right: 24.5 - half }[side];
-    const iconY = { top: 26 - half, bottom: half - 26 }[align[0]];
+    // (24.5 / 26 in the desktop module; the stylesheet's --interactive-showcase-minus-x / -y)
+    const tipStyle = getComputedStyle(tooltip);
+    const minusX = parseFloat(tipStyle.getPropertyValue('--interactive-showcase-minus-x')) || 24.5;
+    const minusY = parseFloat(tipStyle.getPropertyValue('--interactive-showcase-minus-y')) || 26;
+    const iconX = { left: half - minusX, right: minusX - half }[side];
+    const iconY = { top: minusY - half, bottom: half - minusY }[align[0]];
     if (offCorner || iconX === undefined || iconY === undefined) {
       ['x', 'y'].forEach((k) => openSpot.style.removeProperty(`--interactive-showcase-icon-${k}`));
     } else {
