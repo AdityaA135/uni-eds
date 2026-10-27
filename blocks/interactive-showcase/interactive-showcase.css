@@ -761,10 +761,6 @@ main > .section > .interactive-showcase-wrapper {
       min-height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-vh) - 16px));
     }
 
-    .heading {
-      /* padding: max(min(80px, calc(9.82 * var(--interactive-showcase-svh))), var(--interactive-showcase-header-cover, 0px) + 16px) 20px 0; */
-    }
-
     /* New Science Medium Extended 24px / 135%, -1% (narrower phones scale it down); the card's
        width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
     .title {
@@ -1046,7 +1042,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .tooltip {
-      width: min(270px, calc(var(--interactive-showcase-cq-w) - 16px));
+      width: min(272px, calc(var(--interactive-showcase-cq-w) - 16px));
     }
 
     @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))) {
