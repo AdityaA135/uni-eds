@@ -673,6 +673,15 @@ main > .section > .interactive-showcase-wrapper {
       --fh: 650;
     }
 
+    .hotspot,
+    .tooltip {
+      pointer-events: auto;
+    }
+  }
+
+  /* the desktop + and its open module, on desktop and on touch tablets held upright (600px
+     wide and up: iPad, Surface), whose screens are as large; phones have their own below */
+  @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))), (hover: none) and (pointer: coarse) and (orientation: portrait) and (width >= 600px) {
     /* the open module beside its + : always the design's 272 x 120 (16px padding, a 20px row for
        the title and the minus, 20px, the description's 48px: three 16px lines), a shorter
        description leaving room below it; one line of title and three of description fit it, as
@@ -715,11 +724,6 @@ main > .section > .interactive-showcase-wrapper {
 
     .tooltip[data-side='right'][data-align='bottom'] .tooltip-text::before {
       float: left;
-    }
-
-    .hotspot,
-    .tooltip {
-      pointer-events: auto;
     }
   }
 
@@ -829,87 +833,90 @@ main > .section > .interactive-showcase-wrapper {
       width: 64px;
     }
 
-    /* the + : 36 x 36, radius 8, 40% black (the mobile frame's) with the same glass */
-    --interactive-showcase-spot: 36px;
-    --interactive-showcase-spot-radius: 8px;
-    --interactive-showcase-spot-bg: rgb(0 0 0 / 40%);
+    /* phones (under 600px; touch tablets have the desktop ones, above) */
+    @media (width <= 599.98px) {
+      /* the + : 36 x 36, radius 8, 40% black (the mobile frame's) with the same glass */
+      --interactive-showcase-spot: 36px;
+      --interactive-showcase-spot-radius: 8px;
+      --interactive-showcase-spot-bg: rgb(0 0 0 / 40%);
 
-    .hotspot {
-      --interactive-showcase-icon: 16px;
-    }
+      .hotspot {
+        --interactive-showcase-icon: 16px;
+      }
 
-    /* a tooltip just below / above its + : half of it (18px) and 6px apart */
-    .tooltip[data-align='below'] {
-      --interactive-showcase-ty: 24px;
-    }
+      /* a tooltip just below / above its + : half of it (18px) and 6px apart */
+      .tooltip[data-align='below'] {
+        --interactive-showcase-ty: 24px;
+      }
 
-    .tooltip[data-align='above'] {
-      --interactive-showcase-ty: calc(-100% - 24px);
-    }
+      .tooltip[data-align='above'] {
+        --interactive-showcase-ty: calc(-100% - 24px);
+      }
 
-    /* the open module: 150 x 92 at the least (12px padding, the 14px title row with the minus,
-       12px, three 14px lines of description); a longer title or description makes it taller
-       (150 wide still, so it stays beside its + ), never cut. Title New Science Medium
-       10px / 140%, text New Science Regular 10px / 140%, -1%. Its corner is its + 's, the minus in
-       the + 's middle, level with the title's first line (18px in from the side, 19px down) */
-    .tooltip {
-      --interactive-showcase-minus-x: 18px;
-      --interactive-showcase-minus-y: 19px;
+      /* the open module: 150 x 92 at the least (12px padding, the 14px title row with the minus,
+         12px, three 14px lines of description); a longer title or description makes it taller
+         (150 wide still, so it stays beside its + ), never cut. Title New Science Medium
+         10px / 140%, text New Science Regular 10px / 140%, -1%. Its corner is its + 's, the minus in
+         the + 's middle, level with the title's first line (18px in from the side, 19px down) */
+      .tooltip {
+        --interactive-showcase-minus-x: 18px;
+        --interactive-showcase-minus-y: 19px;
 
-      width: 150px;
-      min-height: 92px;
-      gap: 12px;
-      padding: 12px;
-    }
+        width: 150px;
+        min-height: 92px;
+        gap: 12px;
+        padding: 12px;
+      }
 
-    .tooltip-title {
-      --interactive-showcase-lines: 2;
+      .tooltip-title {
+        --interactive-showcase-lines: 2;
 
-      margin-top: 0;
-      padding-right: 18px;
-      font-size: 10px;
-      line-height: 14px;
-    }
+        margin-top: 0;
+        padding-right: 18px;
+        font-size: 10px;
+        line-height: 14px;
+      }
 
-    .tooltip[data-side='right'] .tooltip-title {
-      padding: 0 0 0 18px;
-    }
+      .tooltip[data-side='right'] .tooltip-title {
+        padding: 0 0 0 18px;
+      }
 
-    .tooltip-text {
-      --interactive-showcase-lines: 8;
+      .tooltip-text {
+        --interactive-showcase-lines: 8;
 
-      font-size: 10px;
-      line-height: 14px;
-      letter-spacing: -0.01em;
-    }
+        font-size: 10px;
+        line-height: 14px;
+        letter-spacing: -0.01em;
+      }
 
-    /* the close button under the minus */
-    .tooltip-close {
-      top: 1px;
-      right: 0;
-    }
+      /* the close button under the minus */
+      .tooltip-close {
+        top: 1px;
+        right: 0;
+      }
 
-    .tooltip[data-side='right'] .tooltip-close {
-      left: 0;
-    }
+      .tooltip[data-side='right'] .tooltip-close {
+        left: 0;
+      }
 
-    .tooltip[data-align='bottom'] .tooltip-close {
-      bottom: 1px;
-    }
+      .tooltip[data-align='bottom'] .tooltip-close {
+        bottom: 1px;
+      }
 
-    /* opening upwards: the minus in the bottom corner, beside the description's last line; the
-       description keeps clear of it all down that side, however long it is */
-    .tooltip[data-align='bottom'] {
-      padding-bottom: 12px;
-    }
+      /* opening upwards: the minus in the bottom corner, beside the description's last line; the
+         description keeps clear of it all down that side, however long it is */
+      .tooltip[data-align='bottom'] {
+        padding-bottom: 12px;
+      }
 
-    .tooltip[data-align='bottom'] .tooltip-text {
-      padding-right: 18px;
-    }
+      .tooltip[data-align='bottom'] .tooltip-text {
+        padding-right: 18px;
+      }
 
-    .tooltip[data-side='right'][data-align='bottom'] .tooltip-text {
-      padding-right: 0;
-      padding-left: 18px;
+      .tooltip[data-side='right'][data-align='bottom'] .tooltip-text {
+        padding-right: 0;
+        padding-left: 18px;
+      }
     }
 
     /* the image sits in what is left of the screen: as on the 375x815 frame (339 x 330 at 36,
