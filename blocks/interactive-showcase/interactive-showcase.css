@@ -749,6 +749,14 @@ main > .section > .interactive-showcase-wrapper {
       #fff;
     /* stylelint-enable declaration-property-value-no-unknown */
 
+    /* phones: the card is one screen tall, the screen with the browser's bars tucked away (vh;
+       as they are once the page is scrolled), not with them showing (svh), which on a phone
+       leaves the image a fraction of its size; never taller, so a page that snaps one card per
+       screen shows all of it */
+    @media (width <= 599.98px) {
+      min-height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-vh) - 16px));
+    }
+
     .heading {
       /* padding: max(min(80px, calc(9.82 * var(--interactive-showcase-svh))), var(--interactive-showcase-header-cover, 0px) + 16px) 20px 0; */
     }
@@ -906,22 +914,13 @@ main > .section > .interactive-showcase-wrapper {
 
     /* the image sits in what is left of the screen: as on the 375x815 frame (339 x 330 at 36,
        440), 90.4% of the card's width, its right edge on the card's right edge, 12px below the
-       thumbnails and 45px clear of the card's bottom */
+       thumbnails and 45px clear of the card's bottom; on shorter phones that bottom gap narrows
+       first, then the image shrinks */
     .stage {
       flex: 1 0 170px;
       order: 3;
       height: auto;
       margin: 12px 0 0;
-    }
-
-    /* phones: never smaller than that. A phone's browser bars take a good part of its screen
-       (an iPhone 16 shows about 660 of its 852px), which would leave the image a fraction of
-       its size: there the card runs on below the screen instead (the card being the screen's
-       width less its 8px inset each side) */
-    @media (width <= 599.98px) {
-      .stage {
-        min-height: calc((100vw - 16px) * 0.904 * 330 / 339 + 45px);
-      }
     }
 
     .panel {
@@ -944,6 +943,36 @@ main > .section > .interactive-showcase-wrapper {
 
     .panel:nth-child(1) .figure img {
       object-fit: cover;
+    }
+  }
+
+  /* short phones (under 700px tall, e.g. the iPhone SE's 667): the gaps around the copy
+     tighten, so the image keeps more of the card (taller phones keep the frame's gaps): 64px
+     above the title (still clear of a site header over the page), 24px above the thumbnails,
+     8px between them and the image, at least 8px below it */
+  @media (width <= 599.98px) and (height <= 699.98px) {
+    .heading {
+      padding-top: max(64px, var(--interactive-showcase-header-cover, 0px) + 16px);
+    }
+
+    .thumbs {
+      margin-top: 24px;
+    }
+
+    .stage {
+      margin-top: 8px;
+    }
+
+    .figure {
+      width: min(90.4cqw, (100cqh - clamp(8px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
+    }
+  }
+
+  /* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
+     the screen (the + buttons are kept whole inside it by interactive-showcase.js) */
+  @media ((width <= 599.98px) or ((hover: none) and (pointer: coarse) and (orientation: portrait))) and (height <= 600px) {
+    .stage {
+      flex-basis: 140px;
     }
   }
 
