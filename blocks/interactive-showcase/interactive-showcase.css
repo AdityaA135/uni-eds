@@ -668,6 +668,51 @@ main > .section > .interactive-showcase-wrapper {
       --fh: 650;
     }
 
+    /* the open module beside its + : always the design's 272 x 120 (16px padding, a 20px row for
+       the title and the minus, 20px, the description's 48px: three 16px lines), a shorter
+       description leaving room below it; one line of title and three of description fit it, as
+       their character limits keep them (interactive-showcase.js) */
+    .tooltip {
+      min-height: 120px;
+    }
+
+    .tooltip-title {
+      --interactive-showcase-lines: 1;
+
+      margin-top: 0;
+      line-height: 20px;
+    }
+
+    .tooltip-text {
+      --interactive-showcase-lines: 3;
+
+      line-height: 16px;
+    }
+
+    /* opening upwards (no room below), 120 too: the minus sits in the bottom corner, beside the
+       description's last line, which stops short of it (a float shaped to that line alone) */
+    .tooltip[data-align='bottom'] {
+      padding-bottom: 16px;
+    }
+
+    .tooltip[data-align='bottom'] .tooltip-text {
+      display: block;
+      height: 48px;
+      overflow: hidden;
+    }
+
+    .tooltip[data-align='bottom'] .tooltip-text::before {
+      content: '';
+      float: right;
+      width: 24px;
+      height: 48px;
+      shape-outside: inset(32px 0 0);
+    }
+
+    .tooltip[data-side='right'][data-align='bottom'] .tooltip-text::before {
+      float: left;
+    }
+
     .hotspot,
     .tooltip {
       pointer-events: auto;
@@ -720,7 +765,9 @@ main > .section > .interactive-showcase-wrapper {
       align-items: baseline;
       column-gap: 12px;
       order: 2;
-      padding: 36px 20px 0;
+
+      /* 24px below the main title: the heading's own bottom padding (base heading rule) */
+      padding: 0 20px;
     }
 
     .texts,
