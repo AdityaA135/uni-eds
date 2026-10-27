@@ -111,19 +111,13 @@ const glideEase = (t) => (t < 0.5 ? 2 * t * t : 1 - ((2 - 2 * t) ** 2) / 2);
  * to the next on the JSW NEV page: down, the card rises over the held section into place; up,
  * the page goes back to the section before (its top, or for a tall one its last screen). Only
  * there: anywhere else the wheel scrolls as usual, and so do touch, keys and the scrollbar.
- * The rest of the gesture (a trackpad's inertia) is swallowed, so it is one glide per gesture.
- * Only a gesture that starts there glides: one already scrolling when it gets there (coming up
- * from the section after the card, say) scrolls on as usual, as far as it goes, rather than
- * being carried on by a glide to the section before
+ * The rest of the gesture (a trackpad's inertia) is swallowed, so it is one glide per gesture
  */
 function curtainGlide(section, prev) {
   const root = document.documentElement;
   let gliding = 0;
   let lastWheel = 0;
   let swallowing = false;
-  // where the current gesture started, and its direction
-  let gestureY = 0;
-  let gestureDir = 0;
   const ends = () => {
     const card = Math.round(section.getBoundingClientRect().top + window.scrollY);
     const r = prev.getBoundingClientRect();
@@ -153,15 +147,10 @@ function curtainGlide(section, prev) {
     const sideways = Math.abs(e.deltaX) > Math.abs(e.deltaY);
     if (e.defaultPrevented || e.ctrlKey || !e.deltaY || sideways) return;
     // a page that glides its panels itself (as the JSW NEV page does) is left to it
-    if (root.classList.contains('gsap-scrolling')) return;
+    if (root.classList.contains('snap-active')) return;
     const now = performance.now();
-    const dir = Math.sign(e.deltaY);
-    const burst = now - lastWheel < 150 && dir === gestureDir;
+    const burst = now - lastWheel < 150;
     lastWheel = now;
-    if (!burst) {
-      gestureY = window.scrollY;
-      gestureDir = dir;
-    }
     if (gliding || (swallowing && burst)) {
       e.preventDefault();
       return;
@@ -169,14 +158,11 @@ function curtainGlide(section, prev) {
     swallowing = false;
     const y = window.scrollY;
     const { above, card } = ends();
+    let to = null;
     // down: the card is coming (at most a screen and a quarter below the top of the screen);
     // up: the card is at the top, or on its way there
-    const comingDown = (at) => at < card - 2 && card - at <= window.innerHeight * 1.25;
-    const goingUp = (at) => at > above + 2 && at <= card + 2;
-    let to = null;
-    // both where the page is and where the gesture started
-    if (dir > 0 && comingDown(y) && comingDown(gestureY)) to = card;
-    else if (dir < 0 && goingUp(y) && goingUp(gestureY)) to = above;
+    if (e.deltaY > 0 && y < card - 2 && card - y <= window.innerHeight * 1.25) to = card;
+    else if (e.deltaY < 0 && y > above + 2 && y <= card + 2) to = above;
     if (to === null) return;
     e.preventDefault();
     swallowing = true;
