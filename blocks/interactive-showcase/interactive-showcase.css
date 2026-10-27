@@ -839,23 +839,23 @@ main > .section > .interactive-showcase-wrapper {
       --interactive-showcase-ty: calc(-100% - 24px);
     }
 
-    /* the open module: always 150 x 92 (12px padding, the 14px title row with the minus, 12px,
-       three 14px lines of description; one line of title and three of description, longer text
-       ending with an ellipsis). Title New Science Medium 10px / 140%, text New Science Regular
-       10px / 140%, -1%. Its corner is its + 's, the minus in the + 's middle, level with the
-       title (18px in from the side, 19px down) */
+    /* the open module: 150 x 92 at the least (12px padding, the 14px title row with the minus,
+       12px, three 14px lines of description); a longer title or description makes it taller
+       (150 wide still, so it stays beside its + ), never cut. Title New Science Medium
+       10px / 140%, text New Science Regular 10px / 140%, -1%. Its corner is its + 's, the minus in
+       the + 's middle, level with the title's first line (18px in from the side, 19px down) */
     .tooltip {
       --interactive-showcase-minus-x: 18px;
       --interactive-showcase-minus-y: 19px;
 
       width: 150px;
-      height: 92px;
+      min-height: 92px;
       gap: 12px;
       padding: 12px;
     }
 
     .tooltip-title {
-      --interactive-showcase-lines: 1;
+      --interactive-showcase-lines: 2;
 
       margin-top: 0;
       padding-right: 18px;
@@ -868,7 +868,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .tooltip-text {
-      --interactive-showcase-lines: 3;
+      --interactive-showcase-lines: 8;
 
       font-size: 10px;
       line-height: 14px;
@@ -889,27 +889,19 @@ main > .section > .interactive-showcase-wrapper {
       bottom: 1px;
     }
 
-    /* opening upwards, 92 too: the minus beside the description's last line, which stops short
-       of it */
+    /* opening upwards: the minus in the bottom corner, beside the description's last line; the
+       description keeps clear of it all down that side, however long it is */
     .tooltip[data-align='bottom'] {
       padding-bottom: 12px;
     }
 
     .tooltip[data-align='bottom'] .tooltip-text {
-      height: 42px;
-      overflow: hidden;
+      padding-right: 18px;
     }
 
-    .tooltip[data-align='bottom'] .tooltip-text::before {
-      content: '';
-      float: right;
-      width: 18px;
-      height: 42px;
-      shape-outside: inset(28px 0 0);
-    }
-
-    .tooltip[data-side='right'][data-align='bottom'] .tooltip-text::before {
-      float: left;
+    .tooltip[data-side='right'][data-align='bottom'] .tooltip-text {
+      padding-right: 0;
+      padding-left: 18px;
     }
 
     /* the image sits in what is left of the screen: as on the 375x815 frame (339 x 330 at 36,
