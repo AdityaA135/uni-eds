@@ -946,6 +946,28 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
+  /* short phones (under 700px tall, e.g. the iPhone SE's 667): the gaps around the copy
+     tighten, so the image keeps more of the card (taller phones keep the frame's gaps): 64px
+     above the title (still clear of a site header over the page), 24px above the thumbnails,
+     8px between them and the image, at least 8px below it */
+  @media (width <= 599.98px) and (height <= 699.98px) {
+    .heading {
+      padding-top: max(64px, var(--interactive-showcase-header-cover, 0px) + 16px);
+    }
+
+    .thumbs {
+      margin-top: 24px;
+    }
+
+    .stage {
+      margin-top: 8px;
+    }
+
+    .figure {
+      width: min(90.4cqw, (100cqh - clamp(8px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
+    }
+  }
+
   /* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
      the screen (the + buttons are kept whole inside it by interactive-showcase.js) */
   @media ((width <= 599.98px) or ((hover: none) and (pointer: coarse) and (orientation: portrait))) and (height <= 600px) {
