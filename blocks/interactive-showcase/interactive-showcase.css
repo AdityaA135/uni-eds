@@ -906,13 +906,22 @@ main > .section > .interactive-showcase-wrapper {
 
     /* the image sits in what is left of the screen: as on the 375x815 frame (339 x 330 at 36,
        440), 90.4% of the card's width, its right edge on the card's right edge, 12px below the
-       thumbnails and 45px clear of the card's bottom; on shorter phones that bottom gap narrows
-       first, then the image shrinks */
+       thumbnails and 45px clear of the card's bottom */
     .stage {
       flex: 1 0 170px;
       order: 3;
       height: auto;
       margin: 12px 0 0;
+    }
+
+    /* phones: never smaller than that. A phone's browser bars take a good part of its screen
+       (an iPhone 16 shows about 660 of its 852px), which would leave the image a fraction of
+       its size: there the card runs on below the screen instead (the card being the screen's
+       width less its 8px inset each side) */
+    @media (width <= 599.98px) {
+      .stage {
+        min-height: calc((100vw - 16px) * 0.904 * 330 / 339 + 45px);
+      }
     }
 
     .panel {
@@ -935,14 +944,6 @@ main > .section > .interactive-showcase-wrapper {
 
     .panel:nth-child(1) .figure img {
       object-fit: cover;
-    }
-  }
-
-  /* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
-     the screen (the + buttons are kept whole inside it by interactive-showcase.js) */
-  @media ((width <= 599.98px) or ((hover: none) and (pointer: coarse) and (orientation: portrait))) and (height <= 600px) {
-    .stage {
-      flex-basis: 140px;
     }
   }
 
