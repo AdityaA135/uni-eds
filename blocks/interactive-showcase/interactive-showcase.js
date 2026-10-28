@@ -206,6 +206,31 @@ function curtain(section, block) {
   update();
 }
 
+/**
+ * pages that move one panel per swipe or wheel turn (the JSW pages' scripts/delayed.js) stop at
+ * each section's top, and at its bottom only for a section much taller than the screen. A card
+ * a little taller than the part of the screen the browser leaves (Chrome on an iPhone, whose
+ * bottom toolbar covers the page's last few dozen px) would then never show its bottom: its
+ * section gets a stop where its bottom edge meets the screen's (data-scroll-stops, read by that
+ * script), so one more swipe shows all of it. Where the card fits (Safari, desktop) there is none
+ */
+function bottomStop(section) {
+  // stops the section was given some other way are left as they are
+  if (section.dataset.scrollStops) return;
+  const update = () => {
+    const vv = window.visualViewport;
+    // the part of the screen the page has (pinch zoom left out)
+    const visible = Math.min(window.innerHeight, vv ? vv.height * vv.scale : Infinity);
+    const over = Math.round(section.offsetHeight - visible);
+    if (over > 16) section.dataset.scrollStops = String(over);
+    else delete section.dataset.scrollStops;
+  };
+  update();
+  window.addEventListener('resize', update);
+  window.visualViewport?.addEventListener('resize', update);
+  if (window.ResizeObserver) new ResizeObserver(update).observe(section);
+}
+
 /** the figure takes the image's own ratio so hotspot percentages stay on the artwork */
 function trackRatio(figure, img) {
   const apply = () => {
@@ -819,6 +844,7 @@ export default function decorate(block) {
   }
   if (items.length) select(0);
   if (!editing) refitSpots = keepSpotsInView(block, stage, items, header);
+  if (!editing && section) bottomStop(section);
   watchHeader((bottom) => {
     header.bottom = bottom;
     header.cover = Math.max(0, bottom - 8);
