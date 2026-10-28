@@ -206,6 +206,60 @@ function curtain(section, block) {
   update();
 }
 
+/**
+ * pages that move one panel per swipe or wheel turn (the JSW pages' scripts/delayed.js) stop at
+ * each section's top, and at its bottom only for a section much taller than the screen. A card
+ * a little taller than the part of the screen the browser leaves (Chrome on an iPhone, whose
+ * bottom toolbar covers the page's last few dozen px) would then never show its bottom: its
+ * section gets a stop where its bottom edge meets the screen's (data-scroll-stops, read by that
+ * script), so one more swipe shows all of it. Where the card fits (Safari, desktop) there is none
+ */
+function bottomStop(section) {
+  // stops the section was given some other way are left as they are
+  if (section.dataset.scrollStops) return;
+  const update = () => {
+    const vv = window.visualViewport;
+    // the part of the screen the page has (pinch zoom left out)
+    const visible = Math.min(window.innerHeight, vv ? vv.height * vv.scale : Infinity);
+    const over = Math.round(section.offsetHeight - visible);
+    if (over > 16) section.dataset.scrollStops = String(over);
+    else delete section.dataset.scrollStops;
+  };
+  update();
+  window.addEventListener('resize', update);
+  window.visualViewport?.addEventListener('resize', update);
+  if (window.ResizeObserver) new ResizeObserver(update).observe(section);
+}
+
+/**
+ * phones: the card is the part of the screen the page really has. CSS's svh is that in Safari,
+ * but Chrome on an iPhone counts the strip behind its bottom toolbar too, which put the card's
+ * bottom (and the motor image's) under the toolbar: the height measured here takes svh's place
+ * (--interactive-showcase-svh) wherever it is the smaller. Measured on load and when the width
+ * changes (the phone turned), not as the browser's bars come and go or the keyboard opens, so
+ * the card does not jump about
+ */
+function visibleScreen(block) {
+  const phone = window.matchMedia('(width <= 599.98px)');
+  const unit = window.CSS?.supports?.('height', '1svh') ? '1svh' : '1vh';
+  let width = 0;
+  const measure = () => {
+    if (!phone.matches) {
+      width = 0;
+      block.style.removeProperty('--interactive-showcase-svh');
+      return;
+    }
+    if (window.innerWidth === width) return;
+    width = window.innerWidth;
+    const vv = window.visualViewport;
+    const visible = Math.min(window.innerHeight, vv ? vv.height * vv.scale : Infinity);
+    block.style.setProperty('--interactive-showcase-svh', `min(${unit}, ${(visible / 100).toFixed(2)}px)`);
+  };
+  measure();
+  window.addEventListener('resize', measure);
+  phone.addEventListener('change', measure);
+}
+
 /** the figure takes the image's own ratio so hotspot percentages stay on the artwork */
 function trackRatio(figure, img) {
   const apply = () => {
@@ -819,6 +873,8 @@ export default function decorate(block) {
   }
   if (items.length) select(0);
   if (!editing) refitSpots = keepSpotsInView(block, stage, items, header);
+  if (!editing) visibleScreen(block);
+  if (!editing && section) bottomStop(section);
   watchHeader((bottom) => {
     header.bottom = bottom;
     header.cover = Math.max(0, bottom - 8);

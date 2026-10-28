@@ -753,14 +753,6 @@ main > .section > .interactive-showcase-wrapper {
       #fff;
     /* stylelint-enable declaration-property-value-no-unknown */
 
-    /* phones: the card is one screen tall, the screen with the browser's bars tucked away (vh;
-       as they are once the page is scrolled), not with them showing (svh), which on a phone
-       leaves the image a fraction of its size; never taller, so a page that snaps one card per
-       screen shows all of it */
-    @media (width <= 599.98px) {
-      min-height: var(--interactive-showcase-panel-height, calc(100 * var(--interactive-showcase-vh) - 16px));
-    }
-
     /* New Science Medium Extended 24px / 135%, -1% (narrower phones scale it down); the card's
        width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
     .title {
@@ -949,25 +941,34 @@ main > .section > .interactive-showcase-wrapper {
     }
   }
 
-  /* short phones (under 700px tall, e.g. the iPhone SE's 667): the gaps around the copy
-     tighten, so the image keeps more of the card (taller phones keep the frame's gaps): 64px
-     above the title (still clear of a site header over the page), 24px above the thumbnails,
-     8px between them and the image, at least 8px below it */
-  @media (width <= 599.98px) and (height <= 699.98px) {
+  /* phones: the card is the part of the screen the browser leaves (svh: on a real phone its
+     bars take a good part of the screen, which an emulator does not show), so a page that snaps
+     one card per screen shows all of it. Where that is short (under about 700px: the iPhone
+     SE, or most phones with the browser's bars showing) the gaps around the copy tighten so the
+     image keeps more of the card, down to 64px above the title (still clear of a site header
+     over the page), 24px above the thumbnails, 8px between them and the image and at least 8px
+     below it; taller screens keep the frame's gaps. The motor image is never smaller than on
+     the iPhone SE, 60% of the card's width: on a screen too short even for that the card runs
+     on below it, and a page that steps one panel per swipe stops once more at the card's
+     bottom (bottomStop, interactive-showcase.js) */
+  @media (width <= 599.98px) {
+    --interactive-showcase-short: clamp(0px, 700px - 100 * var(--interactive-showcase-svh), 33px);
+
     .heading {
-      padding-top: max(64px, var(--interactive-showcase-header-cover, 0px) + 16px);
+      padding-top: max(92px - var(--interactive-showcase-short) * 28 / 33, var(--interactive-showcase-header-cover, 0px) + 16px);
     }
 
     .thumbs {
-      margin-top: 24px;
+      margin-top: calc(44px - var(--interactive-showcase-short) * 20 / 33);
     }
 
     .stage {
-      margin-top: 8px;
+      min-height: calc((100vw - 16px) * 0.6 * 330 / 339 + 16px - var(--interactive-showcase-short) * 8 / 33);
+      margin-top: calc(12px - var(--interactive-showcase-short) * 4 / 33);
     }
 
     .figure {
-      width: min(90.4cqw, (100cqh - clamp(8px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
+      width: min(90.4cqw, (100cqh - clamp(16px - var(--interactive-showcase-short) * 8 / 33, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
     }
   }
 
