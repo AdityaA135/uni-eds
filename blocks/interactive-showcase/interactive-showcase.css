@@ -947,7 +947,10 @@ main > .section > .interactive-showcase-wrapper {
      SE, or most phones with the browser's bars showing) the gaps around the copy tighten so the
      image keeps more of the card, down to 64px above the title (still clear of a site header
      over the page), 24px above the thumbnails, 8px between them and the image and at least 8px
-     below it; taller screens keep the frame's gaps */
+     below it; taller screens keep the frame's gaps. The motor image is never smaller than on
+     the iPhone SE, 60% of the card's width: on a screen too short even for that the card runs
+     on below it, and a page that steps one panel per swipe stops once more at the card's
+     bottom (bottomStop, interactive-showcase.js) */
   @media (width <= 599.98px) {
     --interactive-showcase-short: clamp(0px, 700px - 100 * var(--interactive-showcase-svh), 33px);
 
@@ -960,6 +963,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .stage {
+      min-height: calc((100vw - 16px) * 0.6 * 330 / 339 + 16px - var(--interactive-showcase-short) * 8 / 33);
       margin-top: calc(12px - var(--interactive-showcase-short) * 4 / 33);
     }
 

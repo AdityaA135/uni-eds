@@ -231,6 +231,35 @@ function bottomStop(section) {
   if (window.ResizeObserver) new ResizeObserver(update).observe(section);
 }
 
+/**
+ * phones: the card is the part of the screen the page really has. CSS's svh is that in Safari,
+ * but Chrome on an iPhone counts the strip behind its bottom toolbar too, which put the card's
+ * bottom (and the motor image's) under the toolbar: the height measured here takes svh's place
+ * (--interactive-showcase-svh) wherever it is the smaller. Measured on load and when the width
+ * changes (the phone turned), not as the browser's bars come and go or the keyboard opens, so
+ * the card does not jump about
+ */
+function visibleScreen(block) {
+  const phone = window.matchMedia('(width <= 599.98px)');
+  const unit = window.CSS?.supports?.('height', '1svh') ? '1svh' : '1vh';
+  let width = 0;
+  const measure = () => {
+    if (!phone.matches) {
+      width = 0;
+      block.style.removeProperty('--interactive-showcase-svh');
+      return;
+    }
+    if (window.innerWidth === width) return;
+    width = window.innerWidth;
+    const vv = window.visualViewport;
+    const visible = Math.min(window.innerHeight, vv ? vv.height * vv.scale : Infinity);
+    block.style.setProperty('--interactive-showcase-svh', `min(${unit}, ${(visible / 100).toFixed(2)}px)`);
+  };
+  measure();
+  window.addEventListener('resize', measure);
+  phone.addEventListener('change', measure);
+}
+
 /** the figure takes the image's own ratio so hotspot percentages stay on the artwork */
 function trackRatio(figure, img) {
   const apply = () => {
@@ -844,6 +873,7 @@ export default function decorate(block) {
   }
   if (items.length) select(0);
   if (!editing) refitSpots = keepSpotsInView(block, stage, items, header);
+  if (!editing) visibleScreen(block);
   if (!editing && section) bottomStop(section);
   watchHeader((bottom) => {
     header.bottom = bottom;
