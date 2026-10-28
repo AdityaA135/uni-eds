@@ -847,3 +847,38 @@ export default function decorate(block) {
     }, true);
   }
 }
+
+// TEMPORARY (debug branch only, not for main): with ?viewport-debug in the address, a box
+// shows how this browser sizes the screen, to compare Chrome and Safari on a real iPhone
+if (new URLSearchParams(window.location.search).has('viewport-debug')) {
+  const probe = (unit) => {
+    const p = document.createElement('div');
+    p.style.cssText = `position:fixed;top:0;left:-9px;width:1px;height:100${unit};visibility:hidden`;
+    document.body.append(p);
+    const h = p.offsetHeight;
+    p.remove();
+    return h;
+  };
+  const box = document.createElement('pre');
+  box.style.cssText = 'position:fixed;z-index:99999;top:40%;left:8px;right:8px;margin:0;padding:8px;'
+    + 'font:12px/1.4 monospace;color:#0f0;background:rgb(0 0 0 / 85%);border-radius:8px;white-space:pre-wrap';
+  const show = () => {
+    const card = document.querySelector('.interactive-showcase');
+    const r = card?.getBoundingClientRect();
+    const vv = window.visualViewport;
+    box.textContent = [
+      `browser: ${/CriOS/.test(navigator.userAgent) ? 'Chrome iOS' : 'not Chrome iOS'}`,
+      `innerHeight ${window.innerHeight} | clientHeight ${document.documentElement.clientHeight}`,
+      `visualViewport ${vv ? `${Math.round(vv.height)} (offsetTop ${Math.round(vv.offsetTop)})` : 'n/a'}`,
+      `100svh ${probe('svh')} | 100dvh ${probe('dvh')} | 100lvh ${probe('lvh')} | 100vh ${probe('vh')}`,
+      `screen ${window.screen.width}x${window.screen.height}`,
+      r ? `card top ${Math.round(r.top)} height ${Math.round(r.height)} bottom ${Math.round(r.bottom)}` : 'card: not found',
+    ].join('\n');
+  };
+  document.addEventListener('DOMContentLoaded', () => document.body.append(box));
+  if (document.body) document.body.append(box);
+  ['resize', 'scroll'].forEach((ev) => window.addEventListener(ev, show, { passive: true }));
+  window.visualViewport?.addEventListener('resize', show);
+  setInterval(show, 1000);
+  show();
+}
