@@ -948,11 +948,24 @@ main > .section > .interactive-showcase-wrapper {
      image keeps more of the card, down to 64px above the title (still clear of a site header
      over the page), 24px above the thumbnails, 8px between them and the image and at least 8px
      below it; taller screens keep the frame's gaps. The motor image is never smaller than on
-     the iPhone SE, 60% of the card's width: on a screen too short even for that the card runs
-     on below it, and a page that steps one panel per swipe stops once more at the card's
-     bottom (bottomStop, interactive-showcase.js) */
+     the iPhone SE, 60% of the card's width: on a screen too short even for that the card stays
+     the screen's height and what does not fit scrolls inside it. A page that steps one panel
+     per swipe (the JSW pages' scripts/delayed.js) leaves a swipe over a scrolling area to it,
+     so the card scrolls to its end first and the swipe after that brings the next section */
   @media (width <= 599.98px) {
     --interactive-showcase-short: clamp(0px, 700px - 100 * var(--interactive-showcase-svh), 33px);
+
+    &:not(.editing) {
+      max-height: calc(100 * var(--interactive-showcase-svh) - 16px);
+    }
+
+    /* only where its content really is taller (.is-scrolling, interactive-showcase.js): where it
+       fits, nothing scrolls, not even while the entrance slides the content up from below */
+    &.is-scrolling:not(.editing) {
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      scrollbar-width: none;
+    }
 
     .heading {
       padding-top: max(92px - var(--interactive-showcase-short) * 28 / 33, var(--interactive-showcase-header-cover, 0px) + 16px);

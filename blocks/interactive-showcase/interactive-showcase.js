@@ -207,31 +207,6 @@ function curtain(section, block) {
 }
 
 /**
- * pages that move one panel per swipe or wheel turn (the JSW pages' scripts/delayed.js) stop at
- * each section's top, and at its bottom only for a section much taller than the screen. A card
- * a little taller than the part of the screen the browser leaves (Chrome on an iPhone, whose
- * bottom toolbar covers the page's last few dozen px) would then never show its bottom: its
- * section gets a stop where its bottom edge meets the screen's (data-scroll-stops, read by that
- * script), so one more swipe shows all of it. Where the card fits (Safari, desktop) there is none
- */
-function bottomStop(section) {
-  // stops the section was given some other way are left as they are
-  if (section.dataset.scrollStops) return;
-  const update = () => {
-    const vv = window.visualViewport;
-    // the part of the screen the page has (pinch zoom left out)
-    const visible = Math.min(window.innerHeight, vv ? vv.height * vv.scale : Infinity);
-    const over = Math.round(section.offsetHeight - visible);
-    if (over > 16) section.dataset.scrollStops = String(over);
-    else delete section.dataset.scrollStops;
-  };
-  update();
-  window.addEventListener('resize', update);
-  window.visualViewport?.addEventListener('resize', update);
-  if (window.ResizeObserver) new ResizeObserver(update).observe(section);
-}
-
-/**
  * phones: the card is the part of the screen the page really has. CSS's svh is that in Safari,
  * but Chrome on an iPhone counts the strip behind its bottom toolbar too, which put the card's
  * bottom (and the motor image's) under the toolbar: the height measured here takes svh's place
@@ -258,6 +233,28 @@ function visibleScreen(block) {
   measure();
   window.addEventListener('resize', measure);
   phone.addEventListener('change', measure);
+}
+
+/**
+ * phones: where the card's content is taller than the card (a short screen, the motor image
+ * keeping its size), the card scrolls inside (.is-scrolling, interactive-showcase.css). Measured
+ * from the layout, the entrance's slide left out, so a card whose content fits never scrolls
+ */
+function innerScroll(block) {
+  const parts = () => block.querySelectorAll(':scope > .copy > *, :scope > .stage');
+  const update = () => {
+    // offsets from the card's top (its parts are placed from the card where it is positioned,
+    // else from the same element the card is)
+    const bottom = Math.max(0, ...[...parts()].map((n) => n.offsetTop + n.offsetHeight
+      - (n.offsetParent === block ? 0 : block.offsetTop)));
+    block.classList.toggle('is-scrolling', bottom > block.clientHeight + 1);
+  };
+  update();
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(update);
+    ro.observe(block);
+    parts().forEach((n) => ro.observe(n));
+  } else window.addEventListener('resize', update);
 }
 
 /** the figure takes the image's own ratio so hotspot percentages stay on the artwork */
@@ -873,8 +870,10 @@ export default function decorate(block) {
   }
   if (items.length) select(0);
   if (!editing) refitSpots = keepSpotsInView(block, stage, items, header);
-  if (!editing) visibleScreen(block);
-  if (!editing && section) bottomStop(section);
+  if (!editing) {
+    visibleScreen(block);
+    innerScroll(block);
+  }
   watchHeader((bottom) => {
     header.bottom = bottom;
     header.cover = Math.max(0, bottom - 8);
