@@ -206,6 +206,57 @@ function curtain(section, block) {
   update();
 }
 
+/**
+ * phones: the card is the part of the screen the page really has. CSS's svh is that in Safari,
+ * but Chrome on an iPhone counts the strip behind its bottom toolbar too, which put the card's
+ * bottom (and the motor image's) under the toolbar: the height measured here takes svh's place
+ * (--interactive-showcase-svh) wherever it is the smaller. Measured on load and when the width
+ * changes (the phone turned), not as the browser's bars come and go or the keyboard opens, so
+ * the card does not jump about
+ */
+function visibleScreen(block) {
+  const phone = window.matchMedia('(width <= 599.98px)');
+  const unit = window.CSS?.supports?.('height', '1svh') ? '1svh' : '1vh';
+  let width = 0;
+  const measure = () => {
+    if (!phone.matches) {
+      width = 0;
+      block.style.removeProperty('--interactive-showcase-svh');
+      return;
+    }
+    if (window.innerWidth === width) return;
+    width = window.innerWidth;
+    const vv = window.visualViewport;
+    const visible = Math.min(window.innerHeight, vv ? vv.height * vv.scale : Infinity);
+    block.style.setProperty('--interactive-showcase-svh', `min(${unit}, ${(visible / 100).toFixed(2)}px)`);
+  };
+  measure();
+  window.addEventListener('resize', measure);
+  phone.addEventListener('change', measure);
+}
+
+/**
+ * phones: where the card's content is taller than the card (a short screen, the motor image
+ * keeping its size), the card scrolls inside (.is-scrolling, interactive-showcase.css). Measured
+ * from the layout, the entrance's slide left out, so a card whose content fits never scrolls
+ */
+function innerScroll(block) {
+  const parts = () => block.querySelectorAll(':scope > .copy > *, :scope > .stage');
+  const update = () => {
+    // offsets from the card's top (its parts are placed from the card where it is positioned,
+    // else from the same element the card is)
+    const bottom = Math.max(0, ...[...parts()].map((n) => n.offsetTop + n.offsetHeight
+      - (n.offsetParent === block ? 0 : block.offsetTop)));
+    block.classList.toggle('is-scrolling', bottom > block.clientHeight + 1);
+  };
+  update();
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(update);
+    ro.observe(block);
+    parts().forEach((n) => ro.observe(n));
+  } else window.addEventListener('resize', update);
+}
+
 /** the figure takes the image's own ratio so hotspot percentages stay on the artwork */
 function trackRatio(figure, img) {
   const apply = () => {
@@ -819,6 +870,10 @@ export default function decorate(block) {
   }
   if (items.length) select(0);
   if (!editing) refitSpots = keepSpotsInView(block, stage, items, header);
+  if (!editing) {
+    visibleScreen(block);
+    innerScroll(block);
+  }
   watchHeader((bottom) => {
     header.bottom = bottom;
     header.cover = Math.max(0, bottom - 8);
