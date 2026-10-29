@@ -752,6 +752,26 @@ export default function decorate(block) {
 
   let current = 0;
   /**
+   * phones: the counter shares its row with the item's title ("1/3  Plug-in ..."). Its width
+   * follows its digits ("2/3" is wider than "1/3"), and with it the room the titles wrap in, so
+   * the copy kept the height of the longest item's could still change: the titles get the room
+   * left beside the widest counter (--interactive-showcase-counter-slack, interactive-showcase.css)
+   */
+  const counterSlack = () => {
+    if (!items.length) return;
+    const range = document.createRange();
+    const width = (label) => {
+      counter.textContent = label;
+      range.selectNodeContents(counter);
+      return range.getBoundingClientRect().width;
+    };
+    const shown = `${current + 1}/${items.length}`;
+    const widest = Math.max(...items.map((_, i) => width(`${i + 1}/${items.length}`)));
+    const slack = widest - width(shown);
+    block.style.setProperty('--interactive-showcase-counter-slack', `${slack.toFixed(2)}px`);
+  };
+
+  /**
    * the images move like a vertical carousel (interactive-showcase.css): picking a thumbnail to
    * the right pushes the current image up and out while the new one rises from the bottom;
    * one to the left pushes it down while the new one comes in from the top
@@ -783,8 +803,12 @@ export default function decorate(block) {
       tab.tabIndex = active ? 0 : -1;
     });
     counter.textContent = `${current + 1}/${items.length}`;
+    counterSlack();
     if (focus) items[current].tab.focus();
   };
+  // again once the fonts are in, and as the counter's size changes with the screen
+  document.fonts?.ready.then(counterSlack);
+  window.addEventListener('resize', counterSlack);
 
   items.forEach(({ tab }, i) => {
     tab.addEventListener('click', () => select(i));

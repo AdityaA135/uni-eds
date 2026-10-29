@@ -787,6 +787,40 @@ main > .section > .interactive-showcase-wrapper {
       display: contents;
     }
 
+    /* every item's title and description stay in the layout, one over the other in the same
+       place, only the selected one seen: the copy is always as tall as the longest item's, so
+       the thumbnails and the image below it stay where they are whichever item is picked (each
+       item's own title-to-description distance as before; a subgrid keeps the title beside the
+       counter and the description under both) */
+    @supports (grid-template-columns: subgrid) {
+      &:not(.editing) {
+        .text,
+        .text[hidden] {
+          display: grid;
+          grid-template-columns: subgrid;
+          grid-row: 1;
+          grid-column: 1 / -1;
+        }
+
+        .text[hidden] {
+          visibility: hidden;
+        }
+
+        /* every title wraps in the room beside the widest counter ("2/3"), whichever is shown */
+        .item-title {
+          margin-right: var(--interactive-showcase-counter-slack, 0);
+        }
+
+        .counter {
+          grid-row: 1;
+        }
+
+        .thumbs {
+          grid-row: 2;
+        }
+      }
+    }
+
     /* New Science Medium 16px / 140% */
     .counter {
       grid-column: 1;
