@@ -16,7 +16,7 @@
  */
 
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
-const MAX_HOTSPOTS = 4;
+const MAX_HOTSPOTS = 6;
 // at most this many items (thumbnails): further items are not shown
 const MAX_ITEMS = 3;
 // a module beside its + is the design's 272px wide where it fits; where it does not (a + in

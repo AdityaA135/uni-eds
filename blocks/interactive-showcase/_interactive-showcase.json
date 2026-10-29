@@ -115,7 +115,7 @@
           "name": "hotspots",
           "label": "Hotspots (+ points)",
           "value": "",
-          "description": "Up to 4 bullets, one per + point, written as: x, y | TITLE | description. The title may have up to 24 characters and the description up to 120; longer ones are shortened on the page. x and y are percentages of the showcase image from its bottom-left corner (0, 0); x to the right and y upwards; \"40\" and \"40%\" mean the same, and a missing value counts as 0. Bullets after the 4th are not shown."
+          "description": "Up to 6 bullets, one per + point, written as: x, y | TITLE | description. You can drag the + points to any position in preview mode. A maximum of 6 hotspots is allowed."
         }
       ]
     }
