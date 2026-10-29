@@ -310,11 +310,29 @@ main > .section > .interactive-showcase-wrapper {
     transition: transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
   }
 
-  /* the figure has the image's own ratio, so hotspot percentages stay on the artwork */
+  /* where each image sits in the desktop frame (1280 x 720): its left (--fx) and top (--fy)
+     edge and its height (--fh), in px of the frame (the desktop layout places it by them below;
+     the mobile layout shows the same part of it across). Every image starts from where the
+     "NEV / Tech 3" engine shows in that frame. Not the Figma image layers' boxes (image 1560 is
+     849 x 700 at 605, 52): those hold background-removed copies with empty space around each
+     engine, while the DAM photos are cut tight to it. The figure has the image's own ratio, so
+     hotspot percentages stay on the artwork */
   .figure {
+    --fx: 670;
+    --fy: 110;
+    --fh: 592;
+
     position: relative;
     width: min(100cqw, 100cqh * var(--interactive-showcase-ratio, 0.8));
     aspect-ratio: var(--interactive-showcase-ratio, 0.8);
+  }
+
+  /* "NEV / Tech 2": Rotax engine, cut off by the right and bottom edges (:where, so this sets
+     only its frame values, as weighty as the rule above) */
+  :where(.panel:nth-child(2)) .figure {
+    --fx: 660;
+    --fy: 133;
+    --fh: 650;
   }
 
   .hotspot-source {
@@ -637,13 +655,6 @@ main > .section > .interactive-showcase-wrapper {
     .figure {
       --u: min(calc(100cqh / 720), calc(100cqw / 1280));
 
-      /* where the "NEV / Tech 3" engine shows in the frame. Not the Figma image layers' boxes
-         (image 1560 is 849 x 700 at 605, 52): those hold background-removed copies with empty
-         space around each engine, while the DAM photos are cut tight to it */
-      --fx: 670;
-      --fy: 110;
-      --fh: 592;
-
       position: absolute;
       top: calc((100cqh - 720 * var(--u)) / 2 + var(--fy) * var(--u));
       left: calc(100cqw - (1280 - var(--fx)) * var(--u));
@@ -664,13 +675,6 @@ main > .section > .interactive-showcase-wrapper {
 
     .panel:nth-child(1) .figure img {
       object-fit: cover;
-    }
-
-    /* "NEV / Tech 2": Rotax engine, cut off by the right and bottom edges */
-    .panel:nth-child(2) .figure {
-      --fx: 660;
-      --fy: 133;
-      --fh: 650;
     }
 
     .hotspot,
@@ -931,10 +935,23 @@ main > .section > .interactive-showcase-wrapper {
       justify-content: flex-end;
     }
 
+    /* an image the desktop frame cuts off at the card's right edge (the Rotax engine: two thirds
+       of it seen across) is cut off at the same place here: the part seen
+       (--interactive-showcase-vx of its width) fills the image box, the rest runs off the card's
+       right edge, as there. --interactive-showcase-shown is that part's width */
     .figure {
+      --interactive-showcase-shown: min(90.4cqw, (100cqh - clamp(16px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)) * var(--interactive-showcase-vx, 1));
+
       flex: none;
-      width: min(90.4cqw, (100cqh - clamp(16px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
+      width: calc(var(--interactive-showcase-shown) / var(--interactive-showcase-vx, 1));
       height: auto;
+      margin-right: calc(var(--interactive-showcase-shown) * (1 - 1 / var(--interactive-showcase-vx, 1)));
+    }
+
+    /* the share of its width the desktop frame shows: from its left edge to the frame's right
+       edge, of its width there (its height there times its ratio); all of it for the chassis */
+    .panel:not(:nth-child(1)) .figure {
+      --interactive-showcase-vx: min(1, (1280 - var(--fx)) / (var(--fh) * var(--interactive-showcase-ratio, 0.8)));
     }
 
     /* the chassis in its Figma box, 339 x 330 (the photo fills it, cropped by under 1%) */
@@ -967,7 +984,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .figure {
-      width: min(90.4cqw, (100cqh - clamp(8px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
+      --interactive-showcase-shown: min(90.4cqw, (100cqh - clamp(8px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)) * var(--interactive-showcase-vx, 1));
     }
   }
 
@@ -1030,7 +1047,7 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     .figure {
-      width: min(80cqw, (100cqh - clamp(16px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)));
+      --interactive-showcase-shown: min(80cqw, (100cqh - clamp(16px, 100cqh - 250px, 45px)) * var(--interactive-showcase-box-ratio, var(--interactive-showcase-ratio, 0.8)) * var(--interactive-showcase-vx, 1));
     }
   }
 
