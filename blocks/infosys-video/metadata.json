@@ -1,0 +1,28 @@
+{
+  "variantName": "infosys-video",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Light-grey section (#f2f2f2), section height ~437px on desktop: padding 50px 0. Two equal columns (50/50, 30px gutter) from 992px: left the video 16:9 (540x304 at 1170 container: column width 570 with 15px padding each side), right the title h2: Tungsten 60px / line-height 54px, black, margin-bottom 20px. Below 992px one column: video full width (16:9) then the title (60px/54px). Video: iframe of the authored URL (Vidyard play URLs and YouTube watch/youtu.be URLs converted to embed URLs), allow=\"autoplay; fullscreen\", no border, lazy-loaded (iframe added when the block nears the viewport). Fonts: body 'myriad-pro' (fallback Arial) 18px weight 300 line-height 1.45; headings 'tungstenw05-medium' (fallback Oswald, then sans-serif) weight 500. The Infosys font files are commercial and must NOT be copied into this public repo: use font-family stacks 'myriad-pro, arial, sans-serif' and 'tungstenw05-medium, oswald, sans-serif' through CSS custom properties (--infosys-body-font, --infosys-heading-font) defined on the block (or body.infosys), and load Oswald from Google Fonts as the heading fallback only if the project already loads web fonts that way; otherwise rely on the stack. Content width: centred 1170px container from 1200px wide (970px from 992px, 750px from 768px), 15px side padding, full width below 768px.",
+  "contentPattern": "Simple block, no items. Fields: video (text, URL) and title (text, rendered as h2). Published rows: [video link] then [title].",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "One highlight video (Vidyard or YouTube) with its title beside it, usually in a Light grey section.",
+  "reuseGuidance": "Reuse for any single embedded video with a heading; for other layouts use the video/embed blocks.",
+  "sourceUrl": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery",
+  "xwalkModel": {
+    "id": "infosys-video",
+    "fields": [
+      {
+        "component": "text",
+        "name": "video",
+        "label": "Video URL",
+        "description": "A Vidyard (play.vidyard.com) or YouTube link"
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title"
+      }
+    ]
+  }
+}

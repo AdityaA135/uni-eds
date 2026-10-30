@@ -1,0 +1,179 @@
+{
+  "templates": [
+    {
+      "name": "infosys-photo-gallery",
+      "urls": [
+        "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery"
+      ],
+      "representativeUrl": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery",
+      "description": "Infosys Americas Confluence 2026 photo gallery: colour banner, jump links, highlights video, photo galleries per day",
+      "blocks": [
+        {
+          "name": "infosys-banner",
+          "instances": [
+            ".banner-wrapper"
+          ]
+        },
+        {
+          "name": "infosys-jumplinks",
+          "instances": [
+            ".jumplinks"
+          ]
+        },
+        {
+          "name": "infosys-video",
+          "instances": [
+            ".session"
+          ]
+        },
+        {
+          "name": "infosys-photo-gallery",
+          "instances": [
+            ".photo-gallery-wrapper"
+          ]
+        }
+      ],
+      "urlPattern": "/confluence/2026/us/*",
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Highlights banner",
+          "selector": [
+            "div.section.banner-container"
+          ],
+          "style": null,
+          "blocks": [
+            "infosys-banner"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Jump links",
+          "selector": [
+            "div.section#speaker-menu",
+            "div.section.jumplinks-container"
+          ],
+          "style": "light-grey",
+          "blocks": [
+            "infosys-jumplinks"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-3",
+          "name": "Highlights video",
+          "selector": [
+            "div.section#video",
+            "div.section.session-container"
+          ],
+          "style": "light-grey",
+          "blocks": [
+            "infosys-video"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-4",
+          "name": "Photo gallery - Partners, Analysts & Advisors Day",
+          "selector": [
+            "div.section#partner",
+            "main > div.section.photo-gallery-container:nth-of-type(4)"
+          ],
+          "style": null,
+          "blocks": [
+            "infosys-photo-gallery"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-5",
+          "name": "Photo gallery - Confluence Day 1",
+          "selector": [
+            "div.section#day2",
+            "main > div.section.photo-gallery-container:nth-of-type(5)"
+          ],
+          "style": null,
+          "blocks": [
+            "infosys-photo-gallery"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-6",
+          "name": "Photo gallery - Confluence Day 2",
+          "selector": [
+            "div.section#day3",
+            "main > div.section.photo-gallery-container:nth-of-type(6)"
+          ],
+          "style": null,
+          "blocks": [
+            "infosys-photo-gallery"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-7",
+          "name": "Photo gallery - Confluence Day 3",
+          "selector": [
+            "div.section#day4",
+            "main > div.section.photo-gallery-container:nth-of-type(7)"
+          ],
+          "style": null,
+          "blocks": [
+            "infosys-photo-gallery"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-8",
+          "name": "Photo gallery - Networking & Living Labs Walkthrough",
+          "selector": [
+            "div.section#networking",
+            "main > div.section.photo-gallery-container:nth-of-type(8)"
+          ],
+          "style": null,
+          "blocks": [
+            "infosys-photo-gallery"
+          ],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "infosys-nav",
+      "urls": [
+        "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/nav.plain.html"
+      ],
+      "description": "Infosys Confluence nav page (authored content, imported as its .plain.html): one infosys-header block",
+      "blocks": [
+        {
+          "name": "infosys-header",
+          "instances": [
+            ".header"
+          ]
+        }
+      ],
+      "sections": []
+    },
+    {
+      "name": "infosys-footer",
+      "urls": [
+        "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/footer.plain.html"
+      ],
+      "description": "Infosys Confluence footer page (authored content, imported as its .plain.html): one infosys-footer block",
+      "blocks": [
+        {
+          "name": "infosys-footer",
+          "instances": [
+            ".footer"
+          ]
+        }
+      ],
+      "sections": []
+    }
+  ],
+  "metadata": {
+    "projectType": "xwalk"
+  }
+}

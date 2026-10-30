@@ -1,4 +1,5 @@
 {
+  "type": "xwalk",
   "sites": {
     "uni-eds": {
       "previewOrg": "adityaa135",
@@ -7,7 +8,8 @@
       "aemSitePath": "/content/uni-eds",
       "aemAssetsFolderPath": "/content/dam/uni-eds",
       "aemSiteName": "uni-eds",
-      "aemSiteTitle": "adi-infy-eds"
+      "aemSiteTitle": "adi-infy-eds",
+      "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json"
     }
   }
 }

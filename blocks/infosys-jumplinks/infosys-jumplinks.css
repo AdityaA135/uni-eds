@@ -1,0 +1,51 @@
+.infosys-jumplinks {
+  --infosys-body-font: myriad-pro, arial, sans-serif;
+
+  font-family: var(--infosys-body-font);
+}
+
+.infosys-jumplinks ul {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 0;
+  padding: 15px 0 0;
+  list-style: none;
+}
+
+.infosys-jumplinks li {
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+/* each link fills its column (a third of the row from 768px) */
+.infosys-jumplinks a:any-link {
+  display: block;
+  padding: 1px 10px 4px;
+  border-left: 4px solid #000;
+  border-bottom: 2px solid transparent;
+  color: #000;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.infosys-jumplinks a:hover,
+.infosys-jumplinks a:focus-visible,
+.infosys-jumplinks a.active {
+  border-left-color: #f16c51;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+}
+
+@media (width >= 768px) {
+  .infosys-jumplinks ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* the jump links' grey section has no bottom padding (the items keep 15px) */
+main .section.light-grey:has(.infosys-jumplinks) {
+  padding-bottom: 0;
+}

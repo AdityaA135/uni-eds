@@ -1,0 +1,55 @@
+/* full-width band: the wrapper escapes the section's content width */
+main > .section > .infosys-banner-wrapper {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.infosys-banner {
+  --infosys-body-font: myriad-pro, arial, sans-serif;
+  --infosys-heading-font: tungstenw05-medium, oswald, sans-serif;
+
+  box-sizing: border-box;
+  min-height: 303px;
+  padding: 100px 0 40px;
+  background-color: var(--infosys-banner-color, #df9926);
+  font-family: var(--infosys-body-font);
+}
+
+.infosys-banner .infosys-banner-inner {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 90px auto 0;
+  padding: 0 15px;
+}
+
+.infosys-banner h1 {
+  margin: 0 0 10px;
+  color: #fff;
+  font-family: var(--infosys-heading-font);
+
+  /* 70px / 63px at every width, as the source renders it (its 40px rule for small screens
+     never takes effect) */
+  font-size: 70px;
+  font-weight: 500;
+  line-height: 63px;
+  text-align: left;
+}
+
+@media (width >= 768px) {
+  .infosys-banner .infosys-banner-inner {
+    max-width: 750px;
+  }
+}
+
+@media (width >= 992px) {
+  .infosys-banner .infosys-banner-inner {
+    max-width: 970px;
+  }
+}
+
+@media (width >= 1200px) {
+  .infosys-banner .infosys-banner-inner {
+    max-width: 1170px;
+  }
+}

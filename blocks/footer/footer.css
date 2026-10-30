@@ -18,3 +18,13 @@ footer .footer p {
     padding: 40px 32px 24px;
   }
 }
+
+/* the infosys-footer block takes over the footer (see footer.js) */
+footer.infosys {
+  background-color: #000;
+}
+
+footer.infosys .footer > .infosys-footer {
+  max-width: none;
+  padding: 45px 0;
+}

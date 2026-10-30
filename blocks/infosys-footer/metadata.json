@@ -1,0 +1,67 @@
+{
+  "variantName": "infosys-footer",
+  "baseBlock": "infosys-footer",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Black footer (#000), white text, padding 45px 0 45px; content in the 1170px container. Top row (desktop): logo 180px wide (x 80) in a 25% column, then the link columns (16.67% each, 16px myriad-pro weight 400, white, 10px between links), then \"Follow Us\" (16px weight 300) with three 20px white social icons in a row (Facebook, X, LinkedIn), 15px apart. Bottom row 50px below: legal links (14px weight 400 white) separated by tall \"|\" separators (17px weight 300, padding 0 5px 0 10px), on the left (66.67%); copyright right-aligned (14px weight 300) on the right (33.33%). Mobile: logo, then the link columns in a row of 3 (33% each), then Follow Us + icons, then the legal links (wrapping) and the copyright (left-aligned). Links: no underline, underline on hover. Social icons: SVG icons in /icons (facebook, x, linkedin), picked from the link host. Fonts: body 'myriad-pro' (fallback Arial) 18px weight 300 line-height 1.45; headings 'tungstenw05-medium' (fallback Oswald, then sans-serif) weight 500. The Infosys font files are commercial and must NOT be copied into this public repo: use font-family stacks 'myriad-pro, arial, sans-serif' and 'tungstenw05-medium, oswald, sans-serif' through CSS custom properties (--infosys-body-font, --infosys-heading-font) defined on the block (or body.infosys), and load Oswald from Google Fonts as the heading fallback only if the project already loads web fonts that way; otherwise rely on the stack. Content width: centred 1170px container from 1200px wide (970px from 992px, 750px from 768px), 15px side padding, full width below 768px.",
+  "contentPattern": "Container block. Block fields: logo (reference), logoAlt (text), logoLink (aem-content), socialTitle (text), socialLinks (richtext list of links), legalLinks (richtext list of links), copyright (text). Child items \"infosys-footer-column\" with a field links (richtext: a list of links), one per link column. The project footer block (blocks/footer/footer.js) loads the footer page as a fragment; when that fragment holds an infosys-footer block it hands over to it.",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "Only on the Infosys footer page (e.g. /infosys-poc/footer); blocks/footer hands over to it.",
+  "reuseGuidance": "Not for use in page content; scoped to the Infosys footer fragment.",
+  "sourceUrl": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery",
+  "xwalkModel": {
+    "id": "infosys-footer",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "logo",
+        "label": "Logo",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "name": "logoAlt",
+        "label": "Logo alt text"
+      },
+      {
+        "component": "aem-content",
+        "name": "logoLink",
+        "label": "Logo link"
+      },
+      {
+        "component": "text",
+        "name": "socialTitle",
+        "label": "Social title",
+        "value": "Follow Us"
+      },
+      {
+        "component": "richtext",
+        "name": "socialLinks",
+        "label": "Social links",
+        "description": "A list of links: Facebook, X, LinkedIn (the icon follows the link)"
+      },
+      {
+        "component": "richtext",
+        "name": "legalLinks",
+        "label": "Legal links"
+      },
+      {
+        "component": "text",
+        "name": "copyright",
+        "label": "Copyright"
+      }
+    ],
+    "items": {
+      "id": "infosys-footer-column",
+      "fields": [
+        {
+          "component": "richtext",
+          "name": "links",
+          "label": "Links",
+          "description": "A list of links for this column"
+        }
+      ]
+    }
+  }
+}

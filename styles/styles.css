@@ -292,3 +292,74 @@ main .section.highlight {
   margin: 0;
   padding: 40px 0;
 }
+
+main .section.light-grey {
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 50px 0;
+}
+
+/* a section with an "anchor" lands below a fixed header */
+main > .section[data-anchor] {
+  scroll-margin-top: 100px;
+}
+
+/* --- Infosys pages (page metadata template = infosys) ---
+   The Infosys fonts are commercial and not part of this repo: the stacks
+   name them first so they apply where installed, else fall back. */
+body.infosys {
+  --infosys-body-font: myriad-pro, arial, sans-serif;
+  --infosys-heading-font: tungstenw05-medium, oswald, sans-serif;
+
+  color: #000;
+  font-family: var(--infosys-body-font);
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.45;
+}
+
+body.infosys h1,
+body.infosys h2,
+body.infosys h3,
+body.infosys h4,
+body.infosys h5,
+body.infosys h6 {
+  font-family: var(--infosys-heading-font);
+  font-weight: 500;
+  scroll-margin-top: 100px;
+}
+
+/* the infosys-header bar is fixed and overlays the banner */
+header.infosys,
+body.infosys header {
+  height: 0;
+}
+
+body.infosys main > .section {
+  margin: 0;
+}
+
+body.infosys main > .section > div:not(.infosys-banner-wrapper) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  padding: 0 15px;
+}
+
+@media (width >= 768px) {
+  body.infosys main > .section > div:not(.infosys-banner-wrapper) {
+    max-width: 750px;
+  }
+}
+
+@media (width >= 992px) {
+  body.infosys main > .section > div:not(.infosys-banner-wrapper) {
+    max-width: 970px;
+  }
+}
+
+@media (width >= 1200px) {
+  body.infosys main > .section > div:not(.infosys-banner-wrapper) {
+    max-width: 1170px;
+  }
+}

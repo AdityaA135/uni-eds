@@ -21,6 +21,25 @@
           "name": "keywords",
           "multi": true,
           "label": "Keywords"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "template",
+          "label": "Template",
+          "description": "A page look, e.g. infosys for the Infosys pages (leave empty for the default)"
+        },
+        {
+          "component": "aem-content",
+          "name": "nav",
+          "label": "Navigation",
+          "description": "The nav page this page uses (default /nav)"
+        },
+        {
+          "component": "aem-content",
+          "name": "footer",
+          "label": "Footer",
+          "description": "The footer page this page uses (default /footer)"
         }
       ]
     }

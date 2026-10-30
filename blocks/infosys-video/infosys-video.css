@@ -1,0 +1,48 @@
+.infosys-video {
+  --infosys-body-font: myriad-pro, arial, sans-serif;
+  --infosys-heading-font: tungstenw05-medium, oswald, sans-serif;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding: 0 15px;
+  font-family: var(--infosys-body-font);
+}
+
+/* 30px below the video and below the title, as the source's columns have (mb-30) */
+.infosys-video .infosys-video-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.infosys-video .infosys-video-media iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* 20px, plus the column's 30px below the title on one column */
+.infosys-video h2 {
+  margin: 0 0 50px;
+  color: #000;
+  font-family: var(--infosys-heading-font);
+  font-size: 60px;
+  font-weight: 500;
+  line-height: 54px;
+}
+
+@media (width >= 992px) {
+  .infosys-video {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .infosys-video h2 {
+    margin: 0 0 20px;
+  }
+}

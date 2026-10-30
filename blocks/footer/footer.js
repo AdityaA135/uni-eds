@@ -11,6 +11,15 @@ export default async function decorate(block) {
   const footerPath = footerMeta ? new URL(footerMeta, window.location).pathname : '/footer';
   const fragment = await loadFragment(footerPath);
 
+  // a footer page holding an infosys-footer block (decorated by loadFragment)
+  // replaces the default footer
+  const infosysFooter = fragment?.querySelector('.infosys-footer');
+  if (infosysFooter) {
+    block.replaceChildren(infosysFooter);
+    block.closest('footer')?.classList.add('infosys');
+    return;
+  }
+
   // decorate footer DOM
   block.textContent = '';
   const footer = document.createElement('div');

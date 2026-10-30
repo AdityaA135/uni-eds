@@ -1,0 +1,266 @@
+.infosys-photo-gallery {
+  --infosys-body-font: myriad-pro, arial, sans-serif;
+  --infosys-heading-font: tungstenw05-medium, oswald, sans-serif;
+
+  font-family: var(--infosys-body-font);
+}
+
+/* the gallery title is the default-content h2 above the block in its section */
+.section:has(.infosys-photo-gallery) > .default-content-wrapper h2 {
+  margin: 70px 0 10px;
+  color: #000;
+  font-family: var(--infosys-heading-font, tungstenw05-medium, oswald, sans-serif);
+  font-size: 50px;
+  font-weight: 500;
+  line-height: 60px;
+  text-align: left;
+}
+
+/* reset the project's global button look for the gallery's own buttons */
+.infosys-photo-gallery button {
+  display: block;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  white-space: normal;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.infosys-photo-gallery button:hover,
+.infosys-photo-gallery button:focus {
+  background: none;
+}
+
+.infosys-photo-gallery button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+/* cards: a one-card scroll-snap carousel below 1000px */
+.infosys-photo-gallery .infosys-photo-gallery-cards {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-cards > li {
+  flex: 0 0 100%;
+  margin: 0 0 25px;
+  scroll-snap-align: start;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-card {
+  width: 100%;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-cover {
+  display: block;
+  aspect-ratio: 8 / 5;
+  overflow: hidden;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-cover picture,
+.infosys-photo-gallery .infosys-photo-gallery-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-title {
+  box-sizing: border-box;
+  display: block;
+  height: 100px;
+  padding: 15px 12px;
+  background-color: #f2f2f2;
+  color: #000;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* dots */
+.infosys-photo-gallery .infosys-photo-gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-dots .infosys-photo-gallery-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: rgb(0 0 0 / 30%);
+  box-shadow: inset 0 0 0 2px #000;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-dots .infosys-photo-gallery-dot.active {
+  background-color: #000;
+}
+
+@media (width >= 1000px) {
+  .section:has(.infosys-photo-gallery) > .default-content-wrapper h2 {
+    margin-top: 30px;
+  }
+
+  .infosys-photo-gallery .infosys-photo-gallery-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 255px);
+    gap: 0 30px;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .infosys-photo-gallery .infosys-photo-gallery-dots {
+    display: none;
+  }
+}
+
+/* modal */
+body.infosys-photo-gallery-open {
+  overflow: hidden;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-modal {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow-y: auto;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-modal::backdrop {
+  background-color: #000;
+  opacity: 1;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-modal-inner {
+  position: relative;
+  width: calc(100% - 20px);
+  margin: 75px auto 30px;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-close {
+  position: absolute;
+  top: -55px;
+  right: 0;
+  width: 45px;
+  height: 50px;
+  color: #fff;
+  font-size: 50px;
+  font-weight: 300;
+  line-height: 50px;
+  text-align: center;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-stage {
+  position: relative;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-track {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-track::-webkit-scrollbar {
+  display: none;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-slide {
+  flex: 0 0 100%;
+  aspect-ratio: 8 / 5;
+  scroll-snap-align: start;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-slide picture,
+.infosys-photo-gallery .infosys-photo-gallery-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-prev,
+.infosys-photo-gallery .infosys-photo-gallery-next {
+  position: absolute;
+  top: 50%;
+  width: 31px;
+  height: 56px;
+  transform: translateY(-50%);
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-prev { left: 10px; }
+.infosys-photo-gallery .infosys-photo-gallery-next { right: 10px; }
+
+.infosys-photo-gallery .infosys-photo-gallery-prev[hidden],
+.infosys-photo-gallery .infosys-photo-gallery-next[hidden] {
+  display: none;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-prev:disabled,
+.infosys-photo-gallery .infosys-photo-gallery-next:disabled {
+  background: none;
+  opacity: 0.5;
+  cursor: default;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-prev img,
+.infosys-photo-gallery .infosys-photo-gallery-next img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.infosys-photo-gallery .infosys-photo-gallery-caption {
+  margin: 0;
+  padding: 15px;
+  background-color: #f2f2f2;
+  color: #000;
+  font-family: var(--infosys-body-font);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.1;
+  text-align: center;
+}
+
+@media (width >= 768px) {
+  .infosys-photo-gallery .infosys-photo-gallery-modal-inner {
+    width: 800px;
+    max-width: calc(100% - 100px);
+    margin: 30px auto;
+  }
+
+  .infosys-photo-gallery .infosys-photo-gallery-close {
+    top: 0;
+    right: -45px;
+  }
+}

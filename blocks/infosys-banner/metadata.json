@@ -1,0 +1,30 @@
+{
+  "variantName": "infosys-banner",
+  "baseBlock": "hero",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Full-width coloured band (background = authored colour, default #df9926), 303px tall on desktop and mobile: padding 100px 0 40px; the heading column starts 90px further down (margin-top 90px). Heading: h1, white, Tungsten 70px / line-height 63px (40px/40px below 768px), left-aligned in the 1170px container, margin-bottom 10px. The fixed infosys-header (80px, transparent at the top of the page) sits over the top of this band. Fonts: body 'myriad-pro' (fallback Arial) 18px weight 300 line-height 1.45; headings 'tungstenw05-medium' (fallback Oswald, then sans-serif) weight 500. The Infosys font files are commercial and must NOT be copied into this public repo: use font-family stacks 'myriad-pro, arial, sans-serif' and 'tungstenw05-medium, oswald, sans-serif' through CSS custom properties (--infosys-body-font, --infosys-heading-font) defined on the block (or body.infosys), and load Oswald from Google Fonts as the heading fallback only if the project already loads web fonts that way; otherwise rely on the stack. Content width: centred 1170px container from 1200px wide (970px from 992px, 750px from 768px), 15px side padding, full width below 768px.",
+  "contentPattern": "Simple block, no items. Fields in order: color (text, background colour, e.g. #df9926), title (text, rendered as the page h1). Published rows: [color] then [title]. JS reads the colour from the row whose text starts with \"#\", builds <h1> from the title.",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "Page heading band at the top of Infosys Confluence pages; the fixed infosys-header overlays it.",
+  "reuseGuidance": "Reuse for any Infosys page heading on a coloured band; change the colour per page.",
+  "sourceUrl": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery",
+  "xwalkModel": {
+    "id": "infosys-banner",
+    "fields": [
+      {
+        "component": "text",
+        "name": "color",
+        "label": "Background colour",
+        "description": "A hex colour, e.g. #df9926",
+        "value": "#df9926"
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "description": "Shown as the page heading"
+      }
+    ]
+  }
+}

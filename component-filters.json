@@ -17,7 +17,13 @@
       "columns",
       "fragment",
       "nev-tech",
-      "interactive-showcase"
+      "interactive-showcase",
+      "infosys-banner",
+      "infosys-jumplinks",
+      "infosys-video",
+      "infosys-photo-gallery",
+      "infosys-header",
+      "infosys-footer"
     ]
   },
   {
@@ -45,6 +51,25 @@
     "id": "dell-hero-block",
     "components": [
       "dell-hero-slide"
+    ]
+  },
+  {
+    "id": "infosys-footer",
+    "components": [
+      "infosys-footer-column"
+    ]
+  },
+  {
+    "id": "infosys-jumplinks",
+    "components": [
+      "infosys-jumplink"
+    ]
+  },
+  {
+    "id": "infosys-photo-gallery",
+    "components": [
+      "infosys-gallery-topic",
+      "infosys-gallery-photo"
     ]
   },
   {

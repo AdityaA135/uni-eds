@@ -82,6 +82,11 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  // a section's "anchor" (section metadata) becomes its id, so links can target it
+  main.querySelectorAll(':scope > .section[data-anchor]').forEach((section) => {
+    const anchor = section.dataset.anchor.trim();
+    if (anchor && !section.id && !document.getElementById(anchor)) section.id = anchor;
+  });
   decorateBlocks(main);
 }
 

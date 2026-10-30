@@ -1,0 +1,186 @@
+.infosys-footer {
+  --infosys-body-font: myriad-pro, arial, sans-serif;
+  --infosys-heading-font: tungstenw05-medium, oswald, sans-serif;
+
+  padding: 45px 0;
+  background-color: #000;
+  color: #fff;
+  font-family: var(--infosys-body-font);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.45;
+}
+
+.infosys-footer .infosys-footer-container {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.infosys-footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.infosys-footer p {
+  margin: 0;
+}
+
+.infosys-footer a:any-link {
+  color: #fff;
+  text-decoration: none;
+}
+
+.infosys-footer a:hover,
+.infosys-footer a:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* top row */
+.infosys-footer .infosys-footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px 0;
+}
+
+.infosys-footer .infosys-footer-brand {
+  flex: 0 0 100%;
+}
+
+.infosys-footer .infosys-footer-logo {
+  display: block;
+  width: 180px;
+}
+
+.infosys-footer .infosys-footer-logo picture,
+.infosys-footer .infosys-footer-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.infosys-footer .infosys-footer-columns {
+  display: flex;
+  flex: 0 0 100%;
+}
+
+.infosys-footer .infosys-footer-column {
+  flex: 0 0 33.333%;
+}
+
+.infosys-footer .infosys-footer-column-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.infosys-footer .infosys-footer-social {
+  flex: 0 0 100%;
+}
+
+.infosys-footer .infosys-footer-social-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.infosys-footer .infosys-footer-social-links {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.infosys-footer .infosys-footer-social-links a {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.infosys-footer .infosys-footer-social-links img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* bottom row */
+.infosys-footer .infosys-footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 50px;
+}
+
+.infosys-footer .infosys-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.infosys-footer .infosys-footer-legal li + li::before {
+  content: '|';
+  padding: 0 5px 0 10px;
+  font-size: 17px;
+  font-weight: 300;
+}
+
+.infosys-footer .infosys-footer-copyright {
+  font-size: 14px;
+  font-weight: 300;
+  text-align: left;
+}
+
+@media (width >= 768px) {
+  .infosys-footer .infosys-footer-container {
+    max-width: 750px;
+  }
+
+  .infosys-footer .infosys-footer-top {
+    flex-wrap: nowrap;
+  }
+
+  .infosys-footer .infosys-footer-brand {
+    flex: 0 0 25%;
+  }
+
+  .infosys-footer .infosys-footer-columns {
+    flex: 0 0 50%;
+  }
+
+  .infosys-footer .infosys-footer-social {
+    flex: 0 0 25%;
+  }
+
+  .infosys-footer .infosys-footer-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .infosys-footer .infosys-footer-legal {
+    flex: 0 0 66.667%;
+  }
+
+  .infosys-footer .infosys-footer-copyright {
+    flex: 0 0 33.333%;
+    text-align: right;
+  }
+}
+
+@media (width >= 992px) {
+  .infosys-footer .infosys-footer-container {
+    max-width: 970px;
+  }
+}
+
+@media (width >= 1200px) {
+  .infosys-footer .infosys-footer-container {
+    max-width: 1170px;
+  }
+}

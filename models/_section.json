@@ -33,8 +33,18 @@
             {
               "name": "Highlight",
               "value": "highlight"
+            },
+            {
+              "name": "Light grey",
+              "value": "light-grey"
             }
           ]
+        },
+        {
+          "component": "text",
+          "name": "anchor",
+          "label": "Anchor",
+          "description": "An id other blocks can link to, e.g. day2"
         }
       ]
     }
@@ -52,7 +62,13 @@
         "columns",
         "fragment",
         "nev-tech",
-        "interactive-showcase"
+        "interactive-showcase",
+        "infosys-banner",
+        "infosys-jumplinks",
+        "infosys-video",
+        "infosys-photo-gallery",
+        "infosys-header",
+        "infosys-footer"
       ]
     }
   ]

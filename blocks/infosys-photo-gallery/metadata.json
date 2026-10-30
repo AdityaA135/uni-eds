@@ -1,0 +1,59 @@
+{
+  "variantName": "infosys-photo-gallery",
+  "baseBlock": "cards",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Gallery title (the h2 above the block in its section): Tungsten 50px / line-height 60px, black, left, margin 30px 0 10px on desktop (70px top on mobile). Desktop (>= 1000px): cards in a row, 4 per row, each 285px column with 15px side padding -> card 255px wide, margin-bottom 25px; card = cover image 255x159 (object-fit cover, ratio 8:5) + caption box: background #f2f2f2, myriad-pro 18px weight 400 line-height 1.1, black, centred, padding 15px 12px, fixed height 100px. Card is a button-like link (cursor pointer). Mobile/tablet (< 1000px): a one-card carousel: card full container width (cover 360x225 at 390px screen), swipe / drag between cards, dots below (16px circles, rgba(0,0,0,.3) with a 2px inset black ring; active dot darker), no arrows; dots only when more than one card. Clicking a card opens a modal dialog: black backdrop (#000, opacity 1), dialog 800px wide centred (margin 30px auto) on desktop, full width minus 10px each side on mobile (top margin 75px); a one-photo slider of that topic's photos (each photo full dialog width, 8:5), prev/next arrows at the vertical middle of the photo (31x56, white chevrons; prev dimmed to .5 opacity on the first photo, next on the last), and a caption bar at the bottom of the photo (topic title, myriad-pro 18px weight 500, black on #f2f2f2, centred, padding 15px). Close: a white × (50px, weight 300) above the dialog's top-right corner; Esc and clicking the backdrop also close; focus is trapped in the dialog and returned to the card. No jQuery, Owl Carousel or Bootstrap: plain JS with CSS scroll-snap (mobile card carousel) and a <dialog> element for the modal. Fonts: body 'myriad-pro' (fallback Arial) 18px weight 300 line-height 1.45; headings 'tungstenw05-medium' (fallback Oswald, then sans-serif) weight 500. The Infosys font files are commercial and must NOT be copied into this public repo: use font-family stacks 'myriad-pro, arial, sans-serif' and 'tungstenw05-medium, oswald, sans-serif' through CSS custom properties (--infosys-body-font, --infosys-heading-font) defined on the block (or body.infosys), and load Oswald from Google Fonts as the heading fallback only if the project already loads web fonts that way; otherwise rely on the stack. Content width: centred 1170px container from 1200px wide (970px from 992px, 750px from 768px), 15px side padding, full width below 768px.",
+  "contentPattern": "Container block with TWO child item types in order: \"infosys-gallery-topic\" (fields title text, image reference, imageAlt text) followed by its \"infosys-gallery-photo\" items (fields image reference, imageAlt text). Published: a topic row has a text cell + a picture cell; a photo row has only a picture cell. JS groups each topic row with the photo rows after it (photos before any topic are ignored); a topic with no photos opens a modal with just its cover. Import rows carry the component id as their first cell (infosys-gallery-topic | title | cover) and (infosys-gallery-photo | photo) so the xwalk converter picks the right model.",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "Event photo galleries: one card per topic, each opening a modal photo slider. Put the gallery title as an h2 above the block and set the section Anchor for jump links.",
+  "reuseGuidance": "Reuse for any topic-grouped photo set; add one Topic item followed by its Photo items.",
+  "sourceUrl": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery",
+  "xwalkModel": {
+    "items": [
+      {
+        "id": "infosys-gallery-topic",
+        "fields": [
+          {
+            "component": "text",
+            "name": "title",
+            "label": "Topic title"
+          },
+          {
+            "component": "reference",
+            "valueType": "string",
+            "name": "image",
+            "label": "Cover image",
+            "multi": false
+          },
+          {
+            "component": "text",
+            "name": "imageAlt",
+            "label": "Cover image alt text"
+          }
+        ]
+      },
+      {
+        "id": "infosys-gallery-photo",
+        "fields": [
+          {
+            "component": "reference",
+            "valueType": "string",
+            "name": "image",
+            "label": "Photo",
+            "multi": false
+          },
+          {
+            "component": "text",
+            "name": "imageAlt",
+            "label": "Alt text"
+          }
+        ]
+      }
+    ],
+    "filter": [
+      "infosys-gallery-topic",
+      "infosys-gallery-photo"
+    ]
+  }
+}

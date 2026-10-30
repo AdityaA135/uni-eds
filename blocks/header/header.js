@@ -113,6 +113,15 @@ export default async function decorate(block) {
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const fragment = await loadFragment(navPath);
 
+  // a nav page holding an infosys-header block (decorated by loadFragment)
+  // replaces the default nav
+  const infosysHeader = fragment?.querySelector('.infosys-header');
+  if (infosysHeader) {
+    block.replaceChildren(infosysHeader);
+    block.closest('header')?.classList.add('infosys');
+    return;
+  }
+
   // decorate nav DOM
   block.textContent = '';
   const nav = document.createElement('nav');

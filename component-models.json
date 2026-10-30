@@ -20,6 +20,25 @@
         "name": "keywords",
         "multi": true,
         "label": "Keywords"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "template",
+        "label": "Template",
+        "description": "A page look, e.g. infosys for the Infosys pages (leave empty for the default)"
+      },
+      {
+        "component": "aem-content",
+        "name": "nav",
+        "label": "Navigation",
+        "description": "The nav page this page uses (default /nav)"
+      },
+      {
+        "component": "aem-content",
+        "name": "footer",
+        "label": "Footer",
+        "description": "The footer page this page uses (default /footer)"
       }
     ]
   },
@@ -136,8 +155,18 @@
           {
             "name": "Highlight",
             "value": "highlight"
+          },
+          {
+            "name": "Light grey",
+            "value": "light-grey"
           }
         ]
+      },
+      {
+        "component": "text",
+        "name": "anchor",
+        "label": "Anchor",
+        "description": "An id other blocks can link to, e.g. day2"
       }
     ]
   },
@@ -298,6 +327,187 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "infosys-banner",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "color",
+        "label": "Background colour",
+        "description": "A hex colour, e.g. #df9926",
+        "value": "#df9926"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title",
+        "description": "Shown as the page heading"
+      }
+    ]
+  },
+  {
+    "id": "infosys-footer",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "logo",
+        "label": "Logo",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "logoAlt",
+        "label": "Logo alt text"
+      },
+      {
+        "component": "aem-content",
+        "name": "logoLink",
+        "label": "Logo link"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "legalLinks",
+        "label": "Legal links"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "copyright",
+        "label": "Copyright"
+      }
+    ]
+  },
+  {
+    "id": "infosys-footer-column",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "links",
+        "label": "Links",
+        "description": "A list of links for this column. A column whose links all go to Facebook, X or LinkedIn shows them as icons, with its other text (e.g. Follow Us) as the label"
+      }
+    ]
+  },
+  {
+    "id": "infosys-header",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "logo",
+        "label": "Logo",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "logoAlt",
+        "label": "Logo alt text"
+      },
+      {
+        "component": "aem-content",
+        "name": "logoLink",
+        "label": "Logo link"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "menu",
+        "label": "Menu links",
+        "description": "A list of links, shown in the menu"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "siteLinks",
+        "label": "Site links",
+        "description": "A list of links, shown as buttons under the menu"
+      }
+    ]
+  },
+  {
+    "id": "infosys-jumplink",
+    "fields": [
+      {
+        "component": "aem-content",
+        "name": "link",
+        "label": "Link",
+        "description": "An anchor on this page, e.g. #day2 (a section's Anchor), or any page"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "linkText",
+        "label": "Link text"
+      }
+    ]
+  },
+  {
+    "id": "infosys-gallery-topic",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Topic title"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Cover image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Cover image alt text"
+      }
+    ]
+  },
+  {
+    "id": "infosys-gallery-photo",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Photo",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt text"
+      }
+    ]
+  },
+  {
+    "id": "infosys-video",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "video",
+        "label": "Video URL",
+        "description": "A Vidyard (play.vidyard.com) or YouTube link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title"
       }
     ]
   },

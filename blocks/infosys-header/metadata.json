@@ -1,0 +1,46 @@
+{
+  "variantName": "infosys-header",
+  "baseBlock": "infosys-header",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Fixed bar at the top, 80px tall, full width, z-index above content; transparent over the banner at the top of the page, background #061838 once the page is scrolled (> 0). Logo left in the 1170px container (135px from the left at 1440 wide; 15px on mobile), 170px wide (x 57px), 15px from the top. Menu button right: a 45px white circle (border-radius 50%) at top 17px, right edge aligned to the container (1290px left at 1440; 15px from the right edge on mobile), with three navy (#061838) bars: 18px, 10px (right-aligned) and 18px wide, 2px tall, 8px apart. Clicking it opens a panel sliding in from the right (transform .4s ease-in-out): 360px wide on desktop, full screen below 768px, background #2f1113, padding 80px 20px 20px, z-index 9999: the logo (same image, ~205px wide) at the top, a close button (45px circle #efefef with a navy ×, at top 50px right 43px), then the menu links in two columns of 160px on desktop (one column on mobile): white myriad-pro 20px weight 400 line-height 29px, 14px apart, underline on hover; then the site links as white pills: black 20px text, padding 5px 20px, border-radius 20px, 15px apart. Clicking a menu link, the close button, Esc or outside the panel closes it; body scroll is locked while open. Fonts: body 'myriad-pro' (fallback Arial) 18px weight 300 line-height 1.45; headings 'tungstenw05-medium' (fallback Oswald, then sans-serif) weight 500. The Infosys font files are commercial and must NOT be copied into this public repo: use font-family stacks 'myriad-pro, arial, sans-serif' and 'tungstenw05-medium, oswald, sans-serif' through CSS custom properties (--infosys-body-font, --infosys-heading-font) defined on the block (or body.infosys), and load Oswald from Google Fonts as the heading fallback only if the project already loads web fonts that way; otherwise rely on the stack. Content width: centred 1170px container from 1200px wide (970px from 992px, 750px from 768px), 15px side padding, full width below 768px.",
+  "contentPattern": "Simple block, no items. Fields: logo (reference), logoAlt (text), logoLink (aem-content), menu (richtext: a list of links), siteLinks (richtext: a list of links). Published rows: [logo picture], [logoAlt? folded into img alt], [logo link], [menu ul], [site links ul]. The project header block (blocks/header/header.js) loads the nav page as a fragment; when that fragment holds an infosys-header block it must hand over to it: the header shows the infosys-header markup instead of the default nav, and header height is 0 (the bar overlays the banner).",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "Only on the Infosys nav page (e.g. /infosys-poc/nav); blocks/header hands over to it.",
+  "reuseGuidance": "Not for use in page content; scoped to the Infosys nav fragment.",
+  "sourceUrl": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery",
+  "xwalkModel": {
+    "id": "infosys-header",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "logo",
+        "label": "Logo",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "name": "logoAlt",
+        "label": "Logo alt text"
+      },
+      {
+        "component": "aem-content",
+        "name": "logoLink",
+        "label": "Logo link"
+      },
+      {
+        "component": "richtext",
+        "name": "menu",
+        "label": "Menu links",
+        "description": "A list of links, shown in the menu"
+      },
+      {
+        "component": "richtext",
+        "name": "siteLinks",
+        "label": "Site links",
+        "description": "A list of links, shown as buttons under the menu"
+      }
+    ]
+  }
+}
