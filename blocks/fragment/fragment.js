@@ -22,7 +22,17 @@ export async function loadFragment(path) {
   if (path && path.startsWith('/')) {
     // eslint-disable-next-line no-param-reassign
     path = path.replace(/(\.plain)?\.html/, '');
-    const resp = await fetch(`${path}.plain.html`);
+    let resp = await fetch(`${path}.plain.html`);
+    // the local preview serves the content folder's pages under /content: a page seen there
+    // finds its fragments (nav, footer) there too
+    if (!resp.ok && window.location.pathname.startsWith('/content/') && !path.startsWith('/content/')) {
+      const local = await fetch(`/content${path}.plain.html`);
+      if (local.ok) {
+        resp = local;
+        // eslint-disable-next-line no-param-reassign
+        path = `/content${path}`;
+      }
+    }
     if (resp.ok) {
       const main = document.createElement('main');
       main.innerHTML = await resp.text();

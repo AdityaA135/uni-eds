@@ -12,7 +12,9 @@ main > .section > .infosys-banner-wrapper {
   box-sizing: border-box;
   min-height: 303px;
   padding: 100px 0 40px;
-  background-color: var(--infosys-banner-color, #df9926);
+
+  /* the authored colour; Infosys dark sapphire where none is set */
+  background-color: var(--infosys-banner-color, #061838);
   font-family: var(--infosys-body-font);
 }
 

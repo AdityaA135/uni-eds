@@ -338,8 +338,7 @@
         "valueType": "string",
         "name": "color",
         "label": "Background colour",
-        "description": "A hex colour, e.g. #df9926",
-        "value": "#df9926"
+        "description": "The band’s background, as a hex colour (#rrggbb)"
       },
       {
         "component": "text",
