@@ -438,5 +438,48 @@
         "description": "Enter up to 4 modules using this format:\n\nmodule-1\n title: Module title\n description: Module description\n x: 73\n y: 42\n\nmodule-2\n title: Module title\n description: Module description\n x: 35\n y: 61\n\nmodule-3\n title: Module title\n description: Module description\n x: 52\n y: 78\n\nmodule-4\n title: Module title\n description: Module description\n x: 20\n y: 30"
       }
     ]
+  },
+  {
+    "id": "photo-gallery",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Gallery title"
+      }
+    ]
+  },
+  {
+    "id": "photo-gallery-topic",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Topic title"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "cover",
+        "label": "Cover image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "coverAlt",
+        "label": "Cover image alt text"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "photos",
+        "label": "Photos",
+        "description": "The photos shown, in this order, when the card is opened",
+        "multi": true
+      }
+    ]
   }
 ]
