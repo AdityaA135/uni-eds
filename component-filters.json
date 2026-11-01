@@ -82,11 +82,5 @@
     "components": [
       "photo-gallery-topic"
     ]
-  },
-  {
-    "id": "session",
-    "components": [
-      "session-row"
-    ]
   }
 ]

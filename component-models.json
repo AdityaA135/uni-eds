@@ -627,20 +627,20 @@
     ]
   },
   {
-    "id": "session-row",
+    "id": "session",
     "fields": [
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "media",
-        "label": "Video or image",
-        "description": "A video link (e.g. a Vidyard URL) or an image link"
+        "name": "video",
+        "label": "Video URL",
+        "description": "e.g. a Vidyard link: https://play.vidyard.com/..."
       },
       {
-        "component": "richtext",
-        "name": "text",
-        "label": "Text",
-        "valueType": "string"
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title"
       }
     ]
   }

@@ -1,8 +1,24 @@
 /* eslint-disable */
-// From the Infosys Confluence EDS site: blocks/confluence/session, used as is
+// From the Infosys Confluence EDS site: blocks/confluence/session. Change: the Universal Editor
+// block's two fields (Video URL, Title) render as two rows; they become the source's one row
+// [video] [title], the title an h2.
 import { createAemElement } from '../../scripts/scripts.js';
 
+function joinAuthoredRows(block) {
+  const [videoRow, titleRow] = block.children;
+  if (!videoRow || !titleRow || videoRow.children.length !== 1 || titleRow.children.length !== 1) return;
+  const titleCell = titleRow.firstElementChild;
+  if (!titleCell.querySelector('h1, h2, h3, h4, h5, h6') && titleCell.textContent.trim()) {
+    const h2 = document.createElement('h2');
+    h2.textContent = titleCell.textContent.trim();
+    titleCell.replaceChildren(h2);
+  }
+  videoRow.append(titleCell);
+  titleRow.remove();
+}
+
 export default function decorate(block) {
+  joinAuthoredRows(block);
   const fragment = document.createDocumentFragment();
   const container = document.createElement('div');
   container.innerHTML = block.innerHTML;
