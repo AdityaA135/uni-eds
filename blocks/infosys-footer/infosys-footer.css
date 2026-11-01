@@ -1,0 +1,179 @@
+/* stylelint-disable */
+/* From the Infosys Confluence EDS site: blocks/confluence/footer, used as is */
+.footer-wrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: black; /* Set the background color of the entire footer to black */
+  color: white; /* Ensure the text color contrasts with the black background */
+  font-size: 16px; /* Set the base font size for the footer */
+  padding-left: 10px;
+}
+.py-45 {
+  padding-top: 45px !important;
+  padding-bottom: 45px !important;
+}
+.mt-50 {
+  margin-top: 50px !important;
+}
+.m-0 {
+  margin: 0 !important;
+}
+.mb-10 {
+  margin-bottom: 10px !important;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr 1fr;
+  gap: 20px; /* Add gap between columns */
+  padding: 20px 20px 0px 20px;
+  /* margin-bottom: 50px; */
+  background-color: black; /* Ensure the grid container also inherits the black background */
+  margin-top: 20px; /* Move the grid container down */
+  height: 125px; /* Set the height of the grid container, adjust as needed */
+  overflow: hidden; /* Prevent overflow content */
+  margin-left: 30px;
+  font-weight: 400;
+}
+
+.grid-container .row-1,
+.grid-container .row-2,
+.grid-container .row-3,
+.grid-container .row-4,
+.grid-container .row-5 {
+  display: flex; /* Use flexbox layout */
+  flex-direction: column; /* Arrange content in a column */
+  gap: 10px; /* Add gap between columns within each row */
+}
+
+.grid-container .col {
+  padding: 0; /* Remove padding to eliminate box styling */
+  background-color: black; /* Ensure the columns also inherit the black background */
+  border: none; /* Remove borders to eliminate box styling */
+  color: white; /* Ensure the text color contrasts with the black background */
+}
+
+/* Specific styling for the fifth column's first content */
+.col-5 .col-1-5 {
+  grid-column: 5; /* Ensure the first content of fifth column is properly positioned */
+}
+
+.col-remaining-5 {
+  display: flex; /* Arrange remaining columns side by side */
+  margin-top: 5px; /* Reduce space between the first and remaining columns in the fifth column */
+}
+.scroll-to-top img {
+  width: 40px;
+  position: fixed;
+  bottom: 20px;
+  right: 15px;
+  z-index: 99;
+}
+.bottom-container {
+  display: block; /* Use flexbox layout */
+  justify-content: space-between; /* Distribute space between items */
+  font-size: 14px; /* Set the font size for the bottom container */
+}
+
+.bottom-content {
+  text-align: left;
+  margin-bottom: 10px;
+  color: white; /* Ensure the text color contrasts with the black background */
+}
+
+.bottom-container .eleventh-row {
+  text-align: right;
+  color: white; /* Ensure the text color contrasts with the black background */
+}
+
+.bottom-container .eleventh-row p {
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.eleventh-row {
+  padding-right: 65px;
+}
+
+.special-picture-1-1-1 img {
+  width: 180px; /* Increase the width */
+  height: auto; /* Adjust height to maintain aspect ratio */
+}
+
+.icon {
+  margin-right: 5px;
+}
+
+/* Add responsive styles if needed */
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  }
+  .bottom-container {
+  display: block; /* Use flexbox layout */
+  }
+}
+
+.footer-wrapper a {
+  color: inherit; /* Inherit the color from the parent element */
+  text-decoration: none; /* Remove underline */
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -ms-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  outline: 0;
+  font-weight: 400;
+}
+
+.footer-wrapper a:hover {
+  color: inherit; /* Keep the color the same on hover */
+  text-decoration: none; /* Remove underline on hover */
+}
+
+.icon::before {
+  font-size: 20px; /* Adjust the font size as needed */
+}
+
+.footer-icon {
+  width: 35px;
+}
+
+.tall-separator {
+  font-size: 17px; /* Adjust the font size as needed to increase height */
+  line-height: 1.5; /* Adjust the line height if needed */
+  padding-left: 10px;
+  padding-right: 5px;
+}
+
+.icon-twitter::before {
+  content: none; /* Hides the ::before content */
+}
+
+.icon-twitter img {
+  display: inline-block;
+  width: 16px; /* Adjust the size as needed */
+  height: 16px; /* Adjust the size as needed */
+  margin-left: 2px; /* Adjust the margin as needed */
+  vertical-align: middle; /* Aligns with text or other elements */
+  margin-top: -2px;
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(360deg)
+    brightness(100%) contrast(100%); /* Changes icon color to white */
+}
+
+.icon-linked-in {
+  margin-top: 2px; /* Adjust this value to move the icon down */
+}
+
+.icon-right-angle::before {
+  font-size: 19px;
+  font-weight: 900;
+  position: relative;
+  right: -10px;
+  top: 6px;
+}
+@media only screen and (max-width: 767px) {
+  .mb-30-xs {
+    margin-bottom: 30px !important;
+  }
+}

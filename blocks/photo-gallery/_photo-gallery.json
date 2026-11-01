@@ -1,0 +1,89 @@
+{
+  "definitions": [
+    {
+      "title": "Photo Gallery",
+      "id": "photo-gallery",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Photo Gallery",
+              "model": "photo-gallery",
+              "filter": "photo-gallery"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Photo Gallery Topic",
+      "id": "photo-gallery-topic",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Photo Gallery Topic",
+              "model": "photo-gallery-topic"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "photo-gallery",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "title",
+          "label": "Gallery title"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "classes",
+          "label": "Gallery ID",
+          "description": "Different for each gallery on the page, e.g. day2; its popups are named after it"
+        }
+      ]
+    },
+    {
+      "id": "photo-gallery-topic",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "title",
+          "label": "Topic title"
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "cover",
+          "label": "Cover image",
+          "multi": false
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "photos",
+          "label": "Photos",
+          "description": "The photos the card opens, in order",
+          "multi": true
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "photo-gallery",
+      "components": [
+        "photo-gallery-topic"
+      ]
+    }
+  ]
+}

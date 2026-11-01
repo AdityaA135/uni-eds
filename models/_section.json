@@ -26,6 +26,13 @@
           "description": "The label shown for this section in the Content Tree"
         },
         {
+          "component": "text",
+          "valueType": "string",
+          "name": "id",
+          "label": "Section ID",
+          "description": "The anchor jump links point to, e.g. day2"
+        },
+        {
           "component": "multiselect",
           "name": "style",
           "label": "Style",
@@ -33,6 +40,10 @@
             {
               "name": "Highlight",
               "value": "highlight"
+            },
+            {
+              "name": "Grey",
+              "value": "grey"
             }
           ]
         }
@@ -52,7 +63,12 @@
         "columns",
         "fragment",
         "nev-tech",
-        "interactive-showcase"
+        "interactive-showcase",
+        "banner",
+        "jumplinks",
+        "session",
+        "photo-gallery",
+        "infosys-footer"
       ]
     }
   ]

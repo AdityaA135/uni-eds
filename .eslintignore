@@ -1,2 +1,6 @@
 helix-importer-ui
 dompurify.min.js
+scripts/jquery.js
+blocks/photo-gallery/owl-carousel-min.js
+blocks/photo-gallery/bootstrap.min.js
+blocks/photo-gallery/photo-gallery-slider.js

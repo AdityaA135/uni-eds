@@ -1,0 +1,137 @@
+/* stylelint-disable */
+/* From the Infosys Confluence EDS site: blocks/confluence/banner, used as is */
+#speaker_bg {
+  padding: 100px 0px 40px;
+}
+
+.banner-container {
+  padding-block: 0 !important;
+}
+
+.container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    width: 750px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    width: 970px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
+}
+
+.row {
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.speaker-title {
+  text-align: left;
+  margin-bottom: 10px !important;
+}
+
+.h2-head {
+  color: #fff;
+  font-size: 70px;
+  line-height: 70px;
+  margin-top: 0;
+  text-transform: unset !important;
+  font-family: "tungstenw05-medium", "Oswald", sans-serif;
+}
+
+.heading-align
+{
+ text-shadow: 5px 5px 10px #000;
+ margin-top: -25px !important;
+}
+.insight-banner-image {
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+  min-height: 100%;
+  /*opacity: 0.7;*/
+  min-width: 100%;
+  object-fit: cover;
+  max-width: none;
+}
+
+.color-white,
+.white-color {
+  color: #ffffff !important;
+}
+
+.insight-hero {
+  position: relative;
+  padding: 200px 0 150px;
+  height: 75vh;
+}
+
+.bg-sapphire-dark {
+  background-color: #061838 !important;
+}
+
+.mb-30,
+.my-30 {
+  margin-bottom: 30px !important;
+}
+
+.hero-bread.breadcrumb {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  background: transparent;
+  padding: 0;
+  border-radius: 4px;
+  list-style: none;
+}
+.hero-bread > li + li:before {
+  content: " / ";
+  color: #fff;
+  padding: 0 5px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.breadcrumb > li {
+  display: inline-block;
+}
+
+.bg_margin {
+  /* margin-top: 90px !important; */
+}
+
+@media (max-width: 767px) {
+  .h2-head {
+    font-size: 40px;
+    line-height: 40px;
+  }
+}
+.hero-bread-item span {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.bg_margin{
+     margin-top: 90px !important;
+}
