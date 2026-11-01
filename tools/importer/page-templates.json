@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "projectType": "xwalk"
+  },
+  "templates": [
+    {
+      "name": "infosys-web-photo-gallery",
+      "urls": [
+        "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery"
+      ],
+      "description": "Infosys Confluence photo gallery: the Day 1 gallery section (#day2) as one photo-gallery block, imported to /infosys-web/photo-gallery",
+      "blocks": [
+        {
+          "name": "photo-gallery",
+          "instances": [
+            "div.section#day2 .photo-gallery-wrapper"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "day2",
+          "name": "Confluence Day 1 photo gallery",
+          "selector": [
+            "div.section#day2"
+          ],
+          "style": null,
+          "blocks": [
+            "photo-gallery"
+          ],
+          "defaultContent": []
+        }
+      ]
+    }
+  ]
+}

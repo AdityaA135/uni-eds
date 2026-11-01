@@ -1,0 +1,18 @@
+{
+  "status": "success",
+  "url": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/photo-gallery",
+  "path": "infosys-poc/photo-gallery",
+  "timestamp": "2026-10-30T20:24:10.216Z",
+  "title": "US Confluence 2026 | Photo Gallery",
+  "template": "infosys-photo-gallery",
+  "blocks": [
+    "infosys-banner",
+    "infosys-jumplinks",
+    "infosys-video",
+    "infosys-photo-gallery",
+    "infosys-photo-gallery",
+    "infosys-photo-gallery",
+    "infosys-photo-gallery",
+    "infosys-photo-gallery"
+  ]
+}

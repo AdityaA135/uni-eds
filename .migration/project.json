@@ -7,7 +7,8 @@
       "aemSitePath": "/content/uni-eds",
       "aemAssetsFolderPath": "/content/dam/uni-eds",
       "aemSiteName": "uni-eds",
-      "aemSiteTitle": "adi-infy-eds"
+      "aemSiteTitle": "adi-infy-eds",
+      "baseUrl": "https://main--uni-eds--adityaa135.aem.live/"
     }
   }
 }

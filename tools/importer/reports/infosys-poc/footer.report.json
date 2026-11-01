@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "url": "https://main--infosyseds--infosys-is-dotcom.aem.live/confluence/2026/us/footer.plain.html",
+  "path": "infosys-poc/footer",
+  "timestamp": "2026-10-30T20:31:54.411Z",
+  "title": "footer",
+  "template": "infosys-footer",
+  "blocks": [
+    "infosys-footer"
+  ]
+}
