@@ -17,8 +17,7 @@
       "columns",
       "fragment",
       "nev-tech",
-      "interactive-showcase",
-      "photo-gallery"
+      "interactive-showcase"
     ]
   },
   {
@@ -62,12 +61,6 @@
     "id": "nev-tech",
     "components": [
       "nev-tech-card"
-    ]
-  },
-  {
-    "id": "photo-gallery",
-    "components": [
-      "photo-gallery-topic"
     ]
   }
 ]
