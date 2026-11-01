@@ -1,8 +1,11 @@
 /* eslint-disable */
-// From the Infosys Confluence EDS site: blocks/confluence/jumplinks, used as is
+// From the Infosys Confluence EDS site: blocks/confluence/jumplinks. Change: its section is
+// "speaker-menu" (the id the styles use) unless the author gave it another id.
 import { createAemElement } from '../../scripts/scripts.js';
 
 export default function decorate(block) {
+  const blockSection = block.closest('.section');
+  if (blockSection && !blockSection.id) blockSection.id = 'speaker-menu';
   const container = document.createElement('div');
   container.innerHTML = block.innerHTML;
   block.innerHTML = '';
