@@ -2,7 +2,8 @@
 // From the Infosys Confluence EDS site: blocks/confluence/photo-gallery. Changes: the popup
 // photos are read from the topic's third cell (Universal Editor renders a multi-image field as
 // a list), the block stays in the page (so the editor can select it and its topics), and the
-// libraries load from this block's folder.
+// libraries load from this block's folder, jQuery and Owl Carousel first (the slider needs them),
+// and a gallery without a Gallery ID is numbered day1, day2... in page order (as the source's).
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 function loadScript(src) {
@@ -15,10 +16,22 @@ function loadScript(src) {
   });
 }
 
-export default function decorate(block) {
+let galleryCount = 0;
 
+// jQuery, Owl Carousel and Bootstrap once, then the slider script (it sets up every carousel on
+// the page that is not set up yet, so it runs again for each gallery)
+async function loadLibraries() {
+  const base = `${window.hlx.codeBasePath}/blocks/photo-gallery`;
+  if (!window.jQuery) await loadScript(`${window.hlx.codeBasePath}/scripts/jquery.js`);
+  if (!window.jQuery.fn.owlCarousel) await loadScript(`${base}/owl-carousel-min.js`);
+  if (!window.bootstrap) await loadScript(`${base}/bootstrap.min.js`);
+  await loadScript(`${base}/photo-gallery-slider.js`);
+}
+
+export default function decorate(block) {
+  galleryCount += 1;
   const dayClass = Array.from(block.classList).find(cls => /^day\d+$/.test(cls));
-  const sectionId = dayClass || 'default';
+  const sectionId = dayClass || `day${galleryCount}`;
   const section = document.createElement('section');
   section.id = 'photo_gallery';
   section.classList.add('pt-0');
@@ -111,8 +124,6 @@ export default function decorate(block) {
   // Replace the block's rows with the new section, the modals after it
   block.replaceChildren(section, ...modals);
 
-  loadScript(`${window.hlx.codeBasePath}/blocks/photo-gallery/owl-carousel-min.js`);
-  loadScript(`${window.hlx.codeBasePath}/blocks/photo-gallery/bootstrap.min.js`);
-  loadScript(`${window.hlx.codeBasePath}/blocks/photo-gallery/photo-gallery-slider.js`);
+  loadLibraries();
 }
 

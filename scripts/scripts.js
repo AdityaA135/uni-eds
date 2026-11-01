@@ -18,10 +18,11 @@ import {
 } from './aem.js';
 
 /**
- * Pages with the "infosys" template (the Infosys Confluence pages) use the Infosys site's
- * styles, libraries, header and footer.
+ * The Infosys Confluence pages (under /infosys-web/, or with the "infosys" template) use the
+ * Infosys site's styles, libraries, header and footer, as the Infosys site does under /confluence.
  */
-const INFOSYS = getMetadata('template') === 'infosys';
+const INFOSYS = getMetadata('template') === 'infosys'
+  || window.location.pathname.includes('/infosys-web/');
 
 /**
  * Creates an element with classes, attributes and an id (the Infosys blocks' helper).
