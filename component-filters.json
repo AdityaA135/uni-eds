@@ -18,7 +18,11 @@
       "fragment",
       "nev-tech",
       "interactive-showcase",
-      "photo-gallery"
+      "banner",
+      "jumplinks",
+      "session",
+      "photo-gallery",
+      "infosys-footer"
     ]
   },
   {
@@ -49,6 +53,15 @@
     ]
   },
   {
+    "id": "infosys-footer",
+    "components": [
+      "infosys-footer-logo",
+      "infosys-footer-links",
+      "infosys-footer-social",
+      "infosys-footer-text"
+    ]
+  },
+  {
     "id": "interactive-showcase",
     "components": [
       "interactive-showcase-item"
@@ -68,6 +81,12 @@
     "id": "photo-gallery",
     "components": [
       "photo-gallery-topic"
+    ]
+  },
+  {
+    "id": "session",
+    "components": [
+      "session-row"
     ]
   }
 ]

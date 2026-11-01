@@ -20,6 +20,13 @@
         "name": "keywords",
         "multi": true,
         "label": "Keywords"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "template",
+        "label": "Template",
+        "description": "The page template, e.g. infosys for the Infosys Confluence pages"
       }
     ]
   },
@@ -129,6 +136,13 @@
         "description": "The label shown for this section in the Content Tree"
       },
       {
+        "component": "text",
+        "valueType": "string",
+        "name": "id",
+        "label": "Section ID",
+        "description": "The anchor jump links point to, e.g. day2"
+      },
+      {
         "component": "multiselect",
         "name": "style",
         "label": "Style",
@@ -136,6 +150,44 @@
           {
             "name": "Highlight",
             "value": "highlight"
+          },
+          {
+            "name": "Grey",
+            "value": "grey"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "banner",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "color",
+        "label": "Background colour",
+        "description": "A hex colour, e.g. #df9926"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading"
+      },
+      {
+        "component": "select",
+        "name": "headingType",
+        "label": "Heading level",
+        "value": "h1",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
           }
         ]
       }
@@ -302,6 +354,85 @@
     ]
   },
   {
+    "id": "infosys-footer-logo",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Logo",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Logo alt text"
+      }
+    ]
+  },
+  {
+    "id": "infosys-footer-links",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "first",
+        "label": "First link",
+        "description": "e.g. Americas"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "second",
+        "label": "Second link",
+        "description": "e.g. Insights"
+      }
+    ]
+  },
+  {
+    "id": "infosys-footer-social",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Label",
+        "description": "e.g. Follow Us"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "facebook",
+        "label": "Facebook link"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "twitter",
+        "label": "X (Twitter) link"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "linkedin",
+        "label": "LinkedIn link"
+      }
+    ]
+  },
+  {
+    "id": "infosys-footer-text",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "text",
+        "label": "Text",
+        "description": "A legal link (e.g. Terms of Use) or the copyright line"
+      }
+    ]
+  },
+  {
     "id": "interactive-showcase",
     "fields": [
       {
@@ -388,6 +519,18 @@
     ]
   },
   {
+    "id": "jumplinks",
+    "fields": [
+      {
+        "component": "richtext",
+        "name": "links",
+        "label": "Links",
+        "description": "A bulleted list of links to the page's sections, e.g. #day2",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "nev-tech",
     "fields": [
       {
@@ -447,6 +590,13 @@
         "valueType": "string",
         "name": "title",
         "label": "Gallery title"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "classes",
+        "label": "Gallery ID",
+        "description": "Different for each gallery on the page, e.g. day2; its popups are named after it"
       }
     ]
   },
@@ -467,18 +617,30 @@
         "multi": false
       },
       {
-        "component": "text",
-        "valueType": "string",
-        "name": "coverAlt",
-        "label": "Cover image alt text"
-      },
-      {
         "component": "reference",
         "valueType": "string",
         "name": "photos",
         "label": "Photos",
-        "description": "The photos shown, in this order, when the card is opened",
+        "description": "The photos the card opens, in order",
         "multi": true
+      }
+    ]
+  },
+  {
+    "id": "session-row",
+    "fields": [
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "media",
+        "label": "Video or image",
+        "description": "A video link (e.g. a Vidyard URL) or an image link"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "label": "Text",
+        "valueType": "string"
       }
     ]
   }

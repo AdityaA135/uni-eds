@@ -1,16 +1,76 @@
 import {
+  buildBlock,
   loadHeader,
   loadFooter,
+  decorateBlock,
   decorateButtons,
   decorateIcons,
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
+  getMetadata,
+  loadBlock,
   waitForFirstImage,
+  loadScript,
   loadSection,
   loadSections,
   loadCSS,
 } from './aem.js';
+
+/**
+ * Pages with the "infosys" template (the Infosys Confluence pages) use the Infosys site's
+ * styles, libraries, header and footer.
+ */
+const INFOSYS = getMetadata('template') === 'infosys';
+
+/**
+ * Creates an element with classes, attributes and an id (the Infosys blocks' helper).
+ * @param {string} tag The tag name
+ * @param {string[]|null} classes Class names
+ * @param {Object|null} attributes Attributes
+ * @param {string|null} elementId The id
+ * @returns {Element} The element
+ */
+export function createAemElement(tag, classes, attributes, elementId) {
+  const element = document.createElement(tag);
+  if (classes) element.classList.add(...classes);
+  Object.entries(attributes || {}).forEach(([name, value]) => element.setAttribute(name, value));
+  if (elementId) element.id = elementId;
+  return element;
+}
+
+/**
+ * The Infosys pages' scroll-to-top button (from the Infosys site's scripts.js).
+ * @param {Element} main The main element
+ */
+function buildInfosysScrollToTop(main) {
+  const button = document.createElement('div');
+  button.classList.add('scroll-to-top');
+  button.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const img = document.createElement('img');
+  img.src = 'https://www.infosys.com/content/dam/infosys-web/en/global-resource/background-image/arrow_up.png';
+  img.alt = 'Arrow up';
+  img.className = 'img-responsive';
+  img.title = 'Scroll top';
+  button.append(img);
+  window.addEventListener('scroll', () => {
+    button.classList.toggle('show', window.scrollY >= 800);
+    button.classList.toggle('visible', window.scrollY > 10 && window.innerWidth >= 992);
+  });
+  main.append(button);
+}
+
+/**
+ * Loads an Infosys header or footer block into the page's header or footer.
+ * @param {Element} region The header or footer element
+ * @param {string} blockName The block
+ */
+async function loadInfosysRegion(region, blockName) {
+  const block = buildBlock(blockName, '');
+  region.append(block);
+  decorateBlock(block);
+  return loadBlock(block);
+}
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -81,7 +141,12 @@ export function decorateMain(main) {
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
+  if (INFOSYS) buildInfosysScrollToTop(main);
   decorateSections(main);
+  // a section's "id" metadata is its anchor (AEM authoring renders it as the id already)
+  main.querySelectorAll('.section[data-id]').forEach((section) => {
+    section.id = section.dataset.id;
+  });
   decorateBlocks(main);
 }
 
@@ -90,6 +155,14 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
+  if (INFOSYS) {
+    // the Infosys site's global styles replace this site's
+    document.querySelector('head link[rel="stylesheet"][href$="/styles/styles.css"]')?.remove();
+    await loadCSS(`${window.hlx.codeBasePath}/styles/infosys.css`);
+    await loadScript(`${window.hlx.codeBasePath}/scripts/jquery.js`);
+    // Owl Carousel 2.2.1, the version the Infosys site runs (the photo gallery's own copy)
+    await loadScript(`${window.hlx.codeBasePath}/blocks/photo-gallery/owl-carousel-min.js`);
+  }
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
@@ -121,8 +194,13 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  if (INFOSYS) {
+    loadInfosysRegion(doc.querySelector('header'), 'infosys-header');
+    loadInfosysRegion(doc.querySelector('footer'), 'infosys-footer');
+  } else {
+    loadHeader(doc.querySelector('header'));
+    loadFooter(doc.querySelector('footer'));
+  }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();

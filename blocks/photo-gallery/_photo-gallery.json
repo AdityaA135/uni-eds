@@ -41,6 +41,13 @@
           "valueType": "string",
           "name": "title",
           "label": "Gallery title"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "classes",
+          "label": "Gallery ID",
+          "description": "Different for each gallery on the page, e.g. day2; its popups are named after it"
         }
       ]
     },
@@ -61,17 +68,11 @@
           "multi": false
         },
         {
-          "component": "text",
-          "valueType": "string",
-          "name": "coverAlt",
-          "label": "Cover image alt text"
-        },
-        {
           "component": "reference",
           "valueType": "string",
           "name": "photos",
           "label": "Photos",
-          "description": "The photos shown, in this order, when the card is opened",
+          "description": "The photos the card opens, in order",
           "multi": true
         }
       ]

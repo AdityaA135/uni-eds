@@ -1,0 +1,171 @@
+{
+  "definitions": [
+    {
+      "title": "Infosys Footer",
+      "id": "infosys-footer",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Infosys Footer",
+              "filter": "infosys-footer"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Footer Logo",
+      "id": "infosys-footer-logo",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Footer Logo",
+              "model": "infosys-footer-logo"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Footer Links",
+      "id": "infosys-footer-links",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Footer Links",
+              "model": "infosys-footer-links"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Footer Social",
+      "id": "infosys-footer-social",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Footer Social",
+              "model": "infosys-footer-social"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Footer Text",
+      "id": "infosys-footer-text",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Footer Text",
+              "model": "infosys-footer-text"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "infosys-footer-logo",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Logo",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Logo alt text"
+        }
+      ]
+    },
+    {
+      "id": "infosys-footer-links",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "first",
+          "label": "First link",
+          "description": "e.g. Americas"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "second",
+          "label": "Second link",
+          "description": "e.g. Insights"
+        }
+      ]
+    },
+    {
+      "id": "infosys-footer-social",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "label",
+          "label": "Label",
+          "description": "e.g. Follow Us"
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "facebook",
+          "label": "Facebook link"
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "twitter",
+          "label": "X (Twitter) link"
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "linkedin",
+          "label": "LinkedIn link"
+        }
+      ]
+    },
+    {
+      "id": "infosys-footer-text",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "text",
+          "label": "Text",
+          "description": "A legal link (e.g. Terms of Use) or the copyright line"
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "infosys-footer",
+      "components": [
+        "infosys-footer-logo",
+        "infosys-footer-links",
+        "infosys-footer-social",
+        "infosys-footer-text"
+      ]
+    }
+  ]
+}
