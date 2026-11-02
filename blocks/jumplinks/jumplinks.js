@@ -34,12 +34,15 @@ function itemsToList(block) {
   const list = document.createElement('ul');
   [...block.children].forEach((row) => {
     const [label, anchor, target] = [...row.children].map((cell) => cell.textContent.trim());
-    if (!label) return;
+    // a link without a title is left out, except in Universal Editor, where a new (still empty)
+    // Jump Link must stay on the page to be selected and filled in
+    const inEditor = !!row.dataset.aueResource;
+    if (!label && !inEditor) return;
     const id = (anchor || '').replace(/^#/, '');
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = `#${id}`;
-    a.textContent = label;
+    a.textContent = label || 'Jump Link';
     li.append(a);
     moveInstrumentation(row, li);
     list.append(li);
