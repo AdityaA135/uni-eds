@@ -2,8 +2,8 @@
 // From the Infosys Confluence EDS site: blocks/confluence/jumplinks. Changes: its section is
 // "speaker-menu" (the id the styles use) unless the author gave it another id, and the links are
 // authored as Jump Link items [link title] [section ID] [goes to section]: they become the
-// source's list of links, and the section titled "goes to section" gets the section ID. The
-// block can be decorated again (Universal Editor) once its wrapper is replaced.
+// source's list of links, and the section titled "goes to section" gets the section ID. Only the
+// block's own wrapper div is replaced (never its section, when Universal Editor renders it again).
 import { createAemElement, moveInstrumentation } from '../../scripts/scripts.js';
 
 const normalize = (text) => (text || '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -150,7 +150,10 @@ export default function decorate(block) {
   // Initial check on page load
   setTimeout(updateActiveLink, 100);
   
-  // (the wrapper is gone when the block is decorated again, e.g. after an edit in Universal Editor)
-  const blockParent = block.closest('.jumplinks-wrapper');
-  if (blockParent?.parentElement) blockParent.parentElement.replaceChild(block, blockParent);
+  // only the block's own wrapper div: when Universal Editor renders the block again it sits in the
+  // section, which then has the wrapper class too
+  const blockParent = block.parentElement;
+  if (blockParent?.classList.contains('jumplinks-wrapper') && !blockParent.classList.contains('section')) {
+    blockParent.replaceWith(block);
+  }
 }
