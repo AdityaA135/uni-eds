@@ -4,8 +4,51 @@
 // a plain link (Universal Editor) gets its icon from its address, and the legal links are the rows
 // between the social row and the last row (the copyright), however many there are.
 // A leading cell naming the row's item type (imported content) is dropped, the social label is
-// taken as text and the logo's picture is taken out of a wrapping paragraph.
+// taken as text and the logo's picture is taken out of a wrapping paragraph. A footer authored as
+// link lists (logo, lists of column, legal and social links, copyright) is first put in the
+// source's row order.
 import { getMetadata } from '../../scripts/aem.js';
+
+/**
+ * A footer authored as lists is rebuilt as the source's rows: [logo], up to three rows of column
+ * links, [label] [social links], one row per legal link, [copyright].
+ * @param {Element} columns The footer block
+ */
+function listFooterToRows(columns) {
+  if (!columns.querySelector('ul')) return;
+  const cell = (content) => {
+    const div = document.createElement('div');
+    if (typeof content === 'string') div.textContent = content;
+    else if (content) div.append(content);
+    return div;
+  };
+  const row = (...cells) => {
+    const div = document.createElement('div');
+    div.append(...cells);
+    return div;
+  };
+  const isSocial = (a) => /facebook|twitter|x\.com|linkedin/i.test(a.href);
+  const lists = [...columns.querySelectorAll('ul')];
+  const socialList = lists.find((ul) => [...ul.querySelectorAll('a')].some(isSocial));
+  const legalList = lists.find((ul) => ul !== socialList && /terms|privacy|cookie|harbou?r/i.test(ul.textContent));
+  const columnLists = lists.filter((ul) => ul !== socialList && ul !== legalList).slice(0, 3);
+  const copyright = [...columns.children].map((r) => r.textContent.trim()).find((text) => text.includes('©'));
+
+  const out = [row(cell(columns.querySelector('picture')))];
+  columnLists.forEach((ul) => out.push(row(...[...ul.children].map((li) => cell(li.textContent.trim())))));
+  while (out.length < 4) out.push(row(cell('')));
+  const label = socialList?.previousElementSibling?.textContent.trim() || 'Follow Us';
+  const socialLinks = [...(socialList?.querySelectorAll('a') || [])].map((a) => {
+    const link = document.createElement('a');
+    link.href = a.href;
+    link.textContent = a.href;
+    return cell(link);
+  });
+  out.push(row(cell(label), ...socialLinks));
+  [...(legalList?.children || [])].forEach((li) => out.push(row(cell(li.textContent.trim()))));
+  out.push(row(cell(copyright || '')));
+  columns.replaceChildren(...out);
+}
 
 export default async function decorate(block) {
   // the page's "footer" metadata, else the footer page in the page's own folder (as the source does)
@@ -65,6 +108,7 @@ export default async function decorate(block) {
   [...columns.children].forEach((row) => {
     if (/^infosys-footer-[a-z]+$/.test(row.firstElementChild?.textContent.trim())) row.firstElementChild.remove();
   });
+  listFooterToRows(columns);
 
   // Helper function to get the link based on content
   function getLink(content) {
