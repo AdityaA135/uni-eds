@@ -587,6 +587,33 @@ main .section.highlight {
   padding-block: 0px;
 }
 
+/* the page container (on the Infosys site it comes with the banner, session and jumplinks block
+   styles, so a page without those blocks, such as the nav and footer pages, still gets it) */
+.container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 768px) {
+  .container {
+    width: 750px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    width: 970px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
+}
+
 /* EDS Style Library Starts*/
 /* ---------- Top margins ---------- */
 .margin-top-10  { margin-top: 10px; }
