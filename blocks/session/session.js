@@ -1,7 +1,8 @@
 /* eslint-disable */
 // From the Infosys Confluence EDS site: blocks/confluence/session. Change: the Universal Editor
 // block's two fields (Video URL, Title) render as two rows; they become the source's one row
-// [video] [title], the title an h2.
+// [video] [title], the title an h2. Only the block's own wrapper div is replaced (never its section,
+// when Universal Editor renders the block again).
 import { createAemElement } from '../../scripts/scripts.js';
 
 function joinAuthoredRows(block) {
@@ -389,9 +390,11 @@ export default function decorate(block) {
   block.append(fragment);
 
   // Replace parent
-  const blockParent = document.querySelector('.session-wrapper');
-  if (blockParent && blockParent.parentElement) {
-    blockParent.parentElement.replaceChild(block, blockParent);
+  // only the block's own wrapper div: when Universal Editor renders the block again it sits in the
+  // section, which then has the wrapper class too
+  const blockParent = block.parentElement;
+  if (blockParent?.classList.contains('session-wrapper') && !blockParent.classList.contains('section')) {
+    blockParent.replaceWith(block);
   }
 
   // Add class to h2 if id contains 'image'
