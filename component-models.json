@@ -27,6 +27,60 @@
         "name": "template",
         "label": "Template",
         "description": "The page template, e.g. infosys for the Infosys Confluence pages"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "author",
+        "label": "Author",
+        "description": "Structured data (BlogPosting): the article's author"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "author-url",
+        "label": "Author profile URL"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "video-url",
+        "label": "Video URL",
+        "description": "Structured data (VideoObject): the video file or page, e.g. https://play.vidyard.com/..."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "video-embed-url",
+        "label": "Video embed URL",
+        "description": "The player URL, if different from the video URL"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "video-title",
+        "label": "Video title",
+        "description": "Defaults to the page title"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "video-description",
+        "label": "Video description",
+        "description": "Defaults to the page description"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "video-thumbnail",
+        "label": "Video thumbnail",
+        "multi": false
+      },
+      {
+        "component": "date-time",
+        "valueType": "date",
+        "name": "video-upload-date",
+        "label": "Video upload / modified date"
       }
     ]
   },
