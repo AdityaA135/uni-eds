@@ -72,6 +72,12 @@
     "components": []
   },
   {
+    "id": "jumplinks",
+    "components": [
+      "jumplink"
+    ]
+  },
+  {
     "id": "nev-tech",
     "components": [
       "nev-tech-card"

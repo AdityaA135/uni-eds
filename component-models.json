@@ -519,14 +519,28 @@
     ]
   },
   {
-    "id": "jumplinks",
+    "id": "jumplink",
     "fields": [
       {
-        "component": "richtext",
-        "name": "links",
-        "label": "Links",
-        "description": "A bulleted list of links to the page's sections, e.g. #day2",
-        "valueType": "string"
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Link title",
+        "description": "The text of the link, e.g. Confluence Day 1"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "anchor",
+        "label": "Section ID",
+        "description": "The id the link goes to, without #, e.g. day2"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "target",
+        "label": "Goes to section",
+        "description": "The title of the section it jumps to, e.g. Confluence Day 1: that section gets the Section ID. Leave empty if the section has the ID already"
       }
     ]
   },
