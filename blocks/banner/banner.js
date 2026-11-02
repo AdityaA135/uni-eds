@@ -1,5 +1,6 @@
 /* eslint-disable */
-// From the Infosys Confluence EDS site: blocks/confluence/banner, used as is
+// From the Infosys Confluence EDS site: blocks/confluence/banner. Change: the colour is read as
+// text (AEM authoring renders a "#df9926" value as a link).
 import { createOptimizedPicture } from '../../scripts/aem.js';
 import { createAemElement } from '../../scripts/scripts.js';
 
@@ -40,7 +41,7 @@ export default function decorate(block) {
     if (hasP) {
         section.id = 'speaker_bg';
         //console.log("Background Color:", backgroundColorP.innerHTML);
-        section.style.backgroundColor = backgroundColorP.innerHTML;
+        section.style.backgroundColor = backgroundColorP.textContent.trim();
         
         // Check heading length and apply appropriate column classes
         const headingText = h1.innerHTML.trim();
