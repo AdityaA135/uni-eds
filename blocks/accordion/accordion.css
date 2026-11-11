@@ -1,0 +1,158 @@
+/* Accordion: numbered questions between hairlines, a + that turns into a black x when open */
+.accordion {
+  --accordion-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
+  --accordion-line: #e5e5e5;
+  --accordion-number: #8c8c8c;
+  --accordion-question: #3c3c3c;
+  --accordion-question-open: #000;
+  --accordion-answer: #6b6b6b;
+  --accordion-gutter: 72px;
+
+  max-width: 940px;
+  margin: 0 auto;
+  border-top: 1px solid var(--accordion-line);
+  font-family: var(--accordion-font);
+}
+
+.accordion .accordion-item {
+  border-bottom: 1px solid var(--accordion-line);
+}
+
+.accordion .accordion-item-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  padding: 24px 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.accordion .accordion-item-label::-webkit-details-marker {
+  display: none;
+}
+
+.accordion .accordion-item-label:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 4px;
+}
+
+.accordion .accordion-item-number {
+  flex: 0 0 var(--accordion-gutter);
+  color: var(--accordion-number);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.accordion .accordion-item-question {
+  flex: 1;
+  color: var(--accordion-question);
+  font-size: 26px;
+  line-height: 1.3;
+  transition: color 0.2s ease;
+}
+
+.accordion .accordion-item-question p {
+  margin: 0;
+}
+
+.accordion .accordion-item[open] .accordion-item-question {
+  color: var(--accordion-question-open);
+}
+
+/* the + (two hairlines); open, it turns 45 degrees into a black x */
+.accordion .accordion-item-icon {
+  position: relative;
+  flex: 0 0 22px;
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 24px;
+  color: var(--accordion-question);
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.accordion .accordion-item-icon::before,
+.accordion .accordion-item-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  margin-top: -1px;
+  background-color: currentcolor;
+}
+
+.accordion .accordion-item-icon::after {
+  transform: rotate(90deg);
+}
+
+.accordion .accordion-item[open] .accordion-item-icon {
+  color: var(--accordion-question-open);
+  transform: rotate(45deg);
+}
+
+.accordion .accordion-item[open] .accordion-item-icon::before,
+.accordion .accordion-item[open] .accordion-item-icon::after {
+  height: 3px;
+  margin-top: -1.5px;
+}
+
+.accordion .accordion-item-body {
+  padding: 0 66px 34px var(--accordion-gutter);
+  color: var(--accordion-answer);
+  font-size: 20px;
+  line-height: 1.8;
+}
+
+.accordion .accordion-item-body > :first-child {
+  margin-top: 0;
+}
+
+.accordion .accordion-item-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* opening and closing slide where the browser can animate the details' height */
+@supports (interpolate-size: allow-keywords) {
+  .accordion {
+    interpolate-size: allow-keywords;
+  }
+
+  .accordion .accordion-item::details-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease, content-visibility 0.3s allow-discrete;
+  }
+
+  .accordion .accordion-item[open]::details-content {
+    height: auto;
+  }
+}
+
+@media (width < 768px) {
+  .accordion {
+    --accordion-gutter: 40px;
+  }
+
+  .accordion .accordion-item-label {
+    padding: 18px 0;
+  }
+
+  .accordion .accordion-item-question {
+    font-size: 19px;
+  }
+
+  .accordion .accordion-item-icon {
+    flex-basis: 18px;
+    width: 18px;
+    height: 18px;
+    margin-left: 16px;
+  }
+
+  .accordion .accordion-item-body {
+    padding: 0 0 28px var(--accordion-gutter);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+}

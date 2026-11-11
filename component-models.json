@@ -160,6 +160,24 @@
     ]
   },
   {
+    "id": "accordion-item",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "summary",
+        "label": "Question",
+        "description": "The line that opens and closes the item"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Answer"
+      }
+    ]
+  },
+  {
     "id": "banner",
     "fields": [
       {
