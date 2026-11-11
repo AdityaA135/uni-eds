@@ -39,6 +39,10 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-slide-time: 0.6s;
   --interactive-showcase-slide-ease: cubic-bezier(0.33, 1, 0.68, 1);
 
+  /* the outgoing image fades out in the first part of that slide only, so it is all but gone
+     by the time the new one comes in and the new one is what is seen */
+  --interactive-showcase-fade-time: 0.35s;
+
   /* the closed hotspot's box: its tooltip starts as exactly this box and closes back into it */
   --interactive-showcase-spot: 60px;
   --interactive-showcase-spot-radius: 12px;
@@ -289,7 +293,8 @@ main > .section > .interactive-showcase-wrapper {
   /* picking a thumbnail (interactive-showcase.js): a vertical carousel inside the card. To the
      right, the current image slides up and out while the new one rises from the bottom edge;
      to the left, the current one slides down while the new one comes in from the top. The
-     outgoing image fades out as it slides, in step with its movement. */
+     outgoing image fades out as it starts to slide, quicker than it moves
+     (--interactive-showcase-fade-time), so the new one stands out. */
   .panel {
     position: absolute;
     inset: 0;
@@ -300,7 +305,7 @@ main > .section > .interactive-showcase-wrapper {
     transform: translateY(100%);
     transition:
       transform var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease),
-      opacity var(--interactive-showcase-slide-time) var(--interactive-showcase-slide-ease);
+      opacity var(--interactive-showcase-fade-time) var(--interactive-showcase-slide-ease);
   }
 
   .panel.is-active {
