@@ -2,8 +2,8 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
 
 /*
  * Accordion: one Accordion Item per row, [question] [answer]. Each item is a <details>, numbered
- * 01, 02...; one item is open at a time, the first one when the page loads. In Universal Editor
- * every item stays open, so every answer can be selected and edited. Dark theme (block option
+ * 01, 02...; all start closed and one is open at a time. In Universal Editor, selecting an item,
+ * or one of its fields, on the page or in the content tree opens it. Dark theme (block option
  * "dark") puts the block on a black band across the page, in white.
  */
 
@@ -43,15 +43,24 @@ function buildItem(row, i) {
  * @param {Element} block
  */
 export default function decorate(block) {
-  const inEditor = !!block.dataset.aueResource;
+  const editing = Boolean(block.closest('[data-aue-resource]'));
   const items = [...block.children].map(buildItem);
 
-  items.forEach((details, i) => { details.open = inEditor || i === 0; });
-  // one item open at a time (not in Universal Editor, where all stay open)
-  if (!inEditor) {
-    items.forEach((details) => details.addEventListener('toggle', () => {
-      if (details.open) items.forEach((other) => { if (other !== details) other.open = false; });
-    }));
+  // one item open at a time
+  items.forEach((details) => details.addEventListener('toggle', () => {
+    if (details.open) items.forEach((other) => { if (other !== details) other.open = false; });
+  }));
+
+  // Universal Editor: selecting an item, or one of its fields, in the content tree or on the
+  // page opens that item. Listened to while capturing, so it is heard wherever it is dispatched
+  if (editing && items.length) {
+    document.addEventListener('aue:ui-select', (e) => {
+      if (!block.isConnected || !e.detail?.selected) return;
+      const { resource } = e.detail;
+      const item = items.find((details) => (resource && details.dataset.aueResource === resource)
+        || (e.target instanceof Node && details.contains(e.target)));
+      if (item) item.open = true;
+    }, true);
   }
 
   block.replaceChildren(...items);
