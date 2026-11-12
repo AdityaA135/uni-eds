@@ -6,15 +6,14 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
  * a time, the first one when the page loads. In Universal Editor every item stays open, so every
  * answer can be selected and edited.
  *
- * Layout (block option): full (default) is the numbered list with a + / x; "right" puts the
- * questions in the right half and the title, text and button in the left half, "left" the other
- * way round, both as the compact list with a + / -.
+ * The title, text and button (all optional) sit above the numbered list. Dark theme (block
+ * option "dark") puts the block on a black band across the page, in white.
  */
 
 const isItemRow = (row) => row.dataset.aueModel === 'accordion-item' || row.children.length > 1;
 
 /**
- * The title, text and button beside (half layouts) or above (full) the questions.
+ * The title, text and button above the questions.
  * @param {Element[]} rows The block's own field rows: [title] [text] [link]
  * @param {boolean} inEditor
  * @returns {Element|null}

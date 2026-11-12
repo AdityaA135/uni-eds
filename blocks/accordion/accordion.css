@@ -1,18 +1,44 @@
-/* Accordion. Full (default): numbered questions between hairlines, a + that turns into a black x.
-   Right half / Left half: the compact list on that side, the title, text and button beside it. */
+/* Accordion: an optional title, text and button above numbered questions between hairlines, a +
+   that turns into an x when open. Dark theme: the same in white on a black band. */
 .accordion {
   --accordion-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
   --accordion-font-display: var(--font-family-display, new-science-extended, var(--accordion-font));
   --accordion-line: #e5e5e5;
   --accordion-number: #8c8c8c;
+  --accordion-title: #000;
   --accordion-question: #3c3c3c;
   --accordion-question-open: #000;
   --accordion-answer: #6b6b6b;
+  --accordion-button: #000;
+  --accordion-button-hover: #333;
+  --accordion-button-text: #fff;
   --accordion-gutter: 72px;
 
   max-width: 940px;
   margin: 0 auto;
   font-family: var(--accordion-font);
+}
+
+/* ---- dark theme: white on a black band across the page ---- */
+.accordion.dark {
+  --accordion-line: rgb(255 255 255 / 14%);
+  --accordion-number: #7d7d7d;
+  --accordion-title: #fff;
+  --accordion-question: #d9d9d9;
+  --accordion-question-open: #fff;
+  --accordion-answer: #a3a3a3;
+  --accordion-button: #fff;
+  --accordion-button-hover: #e0e0e0;
+  --accordion-button-text: #000;
+
+  color-scheme: dark;
+}
+
+.accordion-wrapper:has(> .accordion.dark) {
+  padding-block: 72px;
+  background-color: #0b0b0b;
+  box-shadow: 0 0 0 100vmax #0b0b0b;
+  clip-path: inset(0 -100vmax);
 }
 
 /* ---- intro: title, text, button ---- */
@@ -22,7 +48,7 @@
 
 .accordion .accordion-intro-title {
   margin: 0;
-  color: #000;
+  color: var(--accordion-title);
   font-family: var(--accordion-font-display);
   font-size: 28px;
   font-weight: 500;
@@ -32,7 +58,7 @@
 
 .accordion .accordion-intro-text {
   margin-top: 12px;
-  color: #666;
+  color: var(--accordion-answer);
   font-size: 14px;
   line-height: 1.4;
 }
@@ -50,8 +76,8 @@
   display: inline-block;
   padding: 17px 20px;
   border-radius: 4px;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--accordion-button);
+  color: var(--accordion-button-text);
   font-family: var(--accordion-font);
   font-size: 12px;
   font-weight: 500;
@@ -62,11 +88,11 @@
 }
 
 .accordion .accordion-intro-button:hover {
-  background-color: #333;
-  color: #fff;
+  background-color: var(--accordion-button-hover);
+  color: var(--accordion-button-text);
 }
 
-/* ---- the list (full layout) ---- */
+/* ---- the list ---- */
 .accordion .accordion-list {
   border-top: 1px solid var(--accordion-line);
 }
@@ -88,7 +114,7 @@
 }
 
 .accordion .accordion-item-label:focus-visible {
-  outline: 2px solid currentcolor;
+  outline: 2px solid var(--accordion-question-open);
   outline-offset: 4px;
 }
 
@@ -107,14 +133,6 @@
   transition: color 0.2s ease;
 }
 
-/* half layouts: 16px medium questions */
-.accordion.right .accordion-item-question,
-.accordion.left .accordion-item-question {
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
 .accordion .accordion-item-question p {
   margin: 0;
 }
@@ -123,7 +141,7 @@
   color: var(--accordion-question-open);
 }
 
-/* the + (two hairlines); open, it turns 45 degrees into a black x */
+/* the + (two hairlines); open, it turns 45 degrees into an x */
 .accordion .accordion-item-icon {
   position: relative;
   flex: 0 0 22px;
@@ -145,31 +163,11 @@
   height: 2px;
   margin-top: -1px;
   background-color: currentcolor;
-  transition: transform 0.25s ease;
 }
 
 .accordion .accordion-item-icon::after {
   transform: rotate(90deg);
 }
-
-/* half layouts: a 12px + in 1.29px lines; open, the upright line goes and it is a - */
-.accordion.right .accordion-item-icon,
-.accordion.left .accordion-item-icon {
-  flex: 0 0 12px;
-  width: 12px;
-  height: 12px;
-  margin-left: 0;
-  color: var(--accordion-icon);
-}
-
-.accordion.right .accordion-item-icon::before,
-.accordion.right .accordion-item-icon::after,
-.accordion.left .accordion-item-icon::before,
-.accordion.left .accordion-item-icon::after {
-  height: 1.29px;
-  margin-top: -0.645px;
-}
-
 
 .accordion .accordion-item[open] .accordion-item-icon {
   color: var(--accordion-question-open);
@@ -197,6 +195,11 @@
   margin-bottom: 0;
 }
 
+.accordion .accordion-item-body a:any-link {
+  color: var(--accordion-question-open);
+  text-decoration: underline;
+}
+
 /* opening and closing slide where the browser can animate the details' height */
 @supports (interpolate-size: allow-keywords) {
   .accordion {
@@ -214,156 +217,13 @@
   }
 }
 
-/* ---- half layouts: the compact list (662px of 1152px) on one side, the intro on the other ---- */
-.accordion.right,
-.accordion.left {
-  --accordion-line: rgb(0 0 0 / 5%);
-  --accordion-question: #333;
-  --accordion-question-open: #333;
-  --accordion-answer: #666;
-  --accordion-icon: #1a1a1a;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 48px;
-  max-width: 1152px;
-}
-
-.accordion.left {
-  flex-direction: row-reverse;
-}
-
-.accordion.right .accordion-intro,
-.accordion.left .accordion-intro {
-  flex: 0 1 400px;
-  margin-bottom: 0;
-}
-
-.accordion.right .accordion-list,
-.accordion.left .accordion-list {
-  flex: 0 1 662px;
-  min-width: 0;
-  border-top: 0;
-}
-
-.accordion.right .accordion-item,
-.accordion.left .accordion-item {
-  border-top: 1px solid var(--accordion-line);
-  border-bottom: 0;
-  background-color: #fff;
-}
-
-.accordion.right .accordion-item-number,
-.accordion.left .accordion-item-number {
-  display: none;
-}
-
-.accordion.right .accordion-item-label,
-.accordion.left .accordion-item-label {
-  align-items: center;
-  gap: 16px;
-  padding: 20px 0;
-}
-
-.accordion.right .accordion-item[open] .accordion-item-icon,
-.accordion.left .accordion-item[open] .accordion-item-icon {
-  color: var(--accordion-icon);
-  transform: none;
-}
-
-.accordion.right .accordion-item[open] .accordion-item-icon::before,
-.accordion.left .accordion-item[open] .accordion-item-icon::before {
-  height: 1.29px;
-  margin-top: -0.645px;
-}
-
-.accordion.right .accordion-item[open] .accordion-item-icon::after,
-.accordion.left .accordion-item[open] .accordion-item-icon::after {
-  height: 1.29px;
-  margin-top: -0.645px;
-  transform: rotate(0deg);
-}
-
-/* the question and answer 14px apart */
-.accordion.right .accordion-item[open] .accordion-item-label,
-.accordion.left .accordion-item[open] .accordion-item-label {
-  padding-bottom: 14px;
-}
-
-.accordion.right .accordion-item-body,
-.accordion.left .accordion-item-body {
-  padding: 0 48px 20px 0;
-  font-size: 14px;
-  letter-spacing: -0.01em;
-  line-height: 1.21;
-}
-
-/* the Figma spacing is between the capital letters' tops and the baseline (leading-trim): trim
-   the text boxes there; without that, the padding takes the line spacing off instead */
-@supports (text-box: trim-both cap alphabetic) {
-  .accordion.right .accordion-item-question,
-  .accordion.left .accordion-item-question,
-  .accordion.right .accordion-item-body > *,
-  .accordion.left .accordion-item-body > * {
-    text-box: trim-both cap alphabetic;
-  }
-
-  /* 4px of the 14px gap inside the answer, so letters taller than the capitals are not clipped
-     by the opening animation */
-  .accordion.right .accordion-item[open] .accordion-item-label,
-  .accordion.left .accordion-item[open] .accordion-item-label {
-    padding-bottom: 10px;
-  }
-
-  .accordion.right .accordion-item-body,
-  .accordion.left .accordion-item-body {
-    padding-top: 4px;
-  }
-}
-
-@supports not (text-box: trim-both cap alphabetic) {
-  .accordion.right .accordion-item-label,
-  .accordion.left .accordion-item-label {
-    padding: 15px 0;
-  }
-
-  .accordion.right .accordion-item[open] .accordion-item-label,
-  .accordion.left .accordion-item[open] .accordion-item-label {
-    padding-bottom: 6px;
-  }
-
-  .accordion.right .accordion-item-body,
-  .accordion.left .accordion-item-body {
-    padding-bottom: 17px;
-  }
-}
-
-/* ---- phones and small tablets ---- */
-@media (width < 900px) {
-  .accordion.right,
-  .accordion.left {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 32px;
-  }
-
-  .accordion.right .accordion-intro,
-  .accordion.left .accordion-intro,
-  .accordion.right .accordion-list,
-  .accordion.left .accordion-list {
-    flex: none;
-  }
-
-  .accordion.right .accordion-item-body,
-  .accordion.left .accordion-item-body {
-    padding-right: 28px;
-  }
-}
-
 @media (width < 768px) {
   .accordion {
     --accordion-gutter: 40px;
+  }
+
+  .accordion-wrapper:has(> .accordion.dark) {
+    padding-block: 48px;
   }
 
   .accordion .accordion-intro-title {

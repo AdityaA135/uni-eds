@@ -37,32 +37,18 @@
       "id": "accordion",
       "fields": [
         {
-          "component": "select",
-          "name": "classes",
-          "label": "Layout",
-          "description": "Full: the questions across the width. Right half / Left half: the questions on that side, the title, text and button on the other",
-          "value": "full",
-          "options": [
-            {
-              "name": "Full width",
-              "value": "full"
-            },
-            {
-              "name": "Right half",
-              "value": "right"
-            },
-            {
-              "name": "Left half",
-              "value": "left"
-            }
-          ]
+          "component": "boolean",
+          "valueType": "boolean",
+          "name": "classes_dark",
+          "label": "Dark theme",
+          "description": "White text on a black band across the page"
         },
         {
           "component": "text",
           "valueType": "string",
           "name": "title",
           "label": "Title",
-          "description": "Beside the questions (half layouts) or above them (full)"
+          "description": "Above the questions"
         },
         {
           "component": "richtext",
