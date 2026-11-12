@@ -1,17 +1,20 @@
-/* Accordion: numbered questions between hairlines, a + that turns into an x when open.
+/* Accordion: numbered titles between hairlines, a + that turns into an x when open.
    Dark theme: the same in white on a black band.
    Every selector is nested in .block.accordion, so nothing reaches outside the block. */
 .block.accordion {
-  /* design tokens: the project's own colours and text font where it defines them (as the
-     interactive-showcase does), else these values; a page can override any of them. The Adobe
-     Fonts kit with New Science is loaded by head.html */
+  /* design tokens; a page can override any of them. The text font is the project's own
+     (--text-font-family, as the interactive-showcase uses), else New Science, whose Adobe Fonts
+     kit head.html loads. The colours are shades of the text colour around the block (the page's,
+     or its section's), so the accordion reads on a light page (dark text) and on a dark page
+     (light text) alike: the open title in that colour, the others, the content, the numbers and
+     the hairlines in lighter shades of it */
   --accordion-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
   --accordion-white: #fff;
-  --accordion-line: #e5e5e5;
-  --accordion-number: #8c8c8c;
-  --accordion-question: var(--color-gray-70, #4d4d4d);
-  --accordion-question-open: var(--color-black, #000);
-  --accordion-answer: var(--color-gray-60, #666);
+  --accordion-line: color-mix(in srgb, currentcolor 15%, transparent);
+  --accordion-number: color-mix(in srgb, currentcolor 50%, transparent);
+  --accordion-question: color-mix(in srgb, currentcolor 80%, transparent);
+  --accordion-question-open: currentcolor;
+  --accordion-answer: color-mix(in srgb, currentcolor 65%, transparent);
   --accordion-gutter: 72px;
   --accordion-ease: ease;
 
@@ -29,14 +32,9 @@
     interpolate-size: allow-keywords;
   }
 
-  /* dark theme: white text (the black band is on the wrapper, below) */
+  /* dark theme: white text, its shades as above (the black band is on the wrapper, below) */
   &.dark {
-    --accordion-line: rgb(255 255 255 / 14%);
-    --accordion-number: #7d7d7d;
-    --accordion-question: #d9d9d9;
-    --accordion-question-open: var(--accordion-white);
-    --accordion-answer: #a3a3a3;
-
+    color: var(--accordion-white);
     color-scheme: dark;
   }
 
