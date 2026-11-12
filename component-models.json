@@ -160,6 +160,36 @@
     ]
   },
   {
+    "id": "accordion",
+    "fields": [
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_dark",
+        "label": "Dark theme",
+        "description": "White text on a black band across the page"
+      }
+    ]
+  },
+  {
+    "id": "accordion-item",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "summary",
+        "label": "Question",
+        "description": "The line that opens and closes the item"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Answer"
+      }
+    ]
+  },
+  {
     "id": "banner",
     "fields": [
       {
