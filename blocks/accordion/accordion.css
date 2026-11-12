@@ -1,7 +1,8 @@
 /* Accordion: numbered titles between hairlines, a + that turns into an x when open, in black on
-   a white band across the page (whatever the page's own background); dark theme: in white on a
-   black band.
-   Every selector is nested in .block.accordion, so nothing reaches outside the block. */
+   a white section (whatever the page's own background); dark theme: in white on a black
+   section.
+   Every selector is nested in .block.accordion, so nothing reaches outside the block, except the
+   background of the section it is in (at the end). */
 .block.accordion {
   /* design tokens; a page can override any of them. The text font is the project's own
      (--text-font-family, as the interactive-showcase uses), else New Science, whose Adobe Fonts
@@ -35,7 +36,7 @@
     interpolate-size: allow-keywords;
   }
 
-  /* dark theme: white text, its shades as above (the black band is on the wrapper, below) */
+  /* dark theme: white text, its shades as above (the black background is on the section, below) */
   &.dark {
     color: var(--accordion-white);
     color-scheme: dark;
@@ -211,18 +212,16 @@
   }
 }
 
-/* the band across the page, on the block's wrapper: white, so the accordion looks the same on a
-   light or a dark page; black in the dark theme */
-.accordion-wrapper:has(> .block.accordion) {
-  --accordion-band: #fff;
+/* the section the accordion is in: white, so the accordion looks the same on a light or a dark
+   page; black in the dark theme */
+main .section:has(.block.accordion) {
+  --accordion-section-background: #fff;
 
   padding-block: 72px;
-  background-color: var(--accordion-band);
-  box-shadow: 0 0 0 100vmax var(--accordion-band);
-  clip-path: inset(0 -100vmax);
+  background-color: var(--accordion-section-background);
 
-  &:has(> .block.accordion.dark) {
-    --accordion-band: #0d0d0d;
+  &:has(.block.accordion.dark) {
+    --accordion-section-background: #0d0d0d;
   }
 
   @media (width <= 599.98px) {
