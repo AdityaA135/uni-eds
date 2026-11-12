@@ -42,31 +42,6 @@
           "name": "classes_dark",
           "label": "Dark theme",
           "description": "White text on a black band across the page"
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "title",
-          "label": "Title",
-          "description": "Above the questions"
-        },
-        {
-          "component": "richtext",
-          "valueType": "string",
-          "name": "text",
-          "label": "Text"
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "link",
-          "label": "Button link"
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "linkText",
-          "label": "Button text"
         }
       ]
     },

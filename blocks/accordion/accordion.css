@@ -1,21 +1,17 @@
-/* Accordion: an optional title, text and button above numbered questions between hairlines, a +
-   that turns into an x when open. Dark theme: the same in white on a black band. */
+/* Accordion: numbered questions between hairlines, a + that turns into an x when open.
+   Dark theme: the same in white on a black band. */
 .accordion {
   --accordion-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
-  --accordion-font-display: var(--font-family-display, new-science-extended, var(--accordion-font));
   --accordion-line: #e5e5e5;
   --accordion-number: #8c8c8c;
-  --accordion-title: #000;
   --accordion-question: #3c3c3c;
   --accordion-question-open: #000;
   --accordion-answer: #6b6b6b;
-  --accordion-button: #000;
-  --accordion-button-hover: #333;
-  --accordion-button-text: #fff;
   --accordion-gutter: 72px;
 
   max-width: 940px;
   margin: 0 auto;
+  border-top: 1px solid var(--accordion-line);
   font-family: var(--accordion-font);
 }
 
@@ -23,13 +19,9 @@
 .accordion.dark {
   --accordion-line: rgb(255 255 255 / 14%);
   --accordion-number: #7d7d7d;
-  --accordion-title: #fff;
   --accordion-question: #d9d9d9;
   --accordion-question-open: #fff;
   --accordion-answer: #a3a3a3;
-  --accordion-button: #fff;
-  --accordion-button-hover: #e0e0e0;
-  --accordion-button-text: #000;
 
   color-scheme: dark;
 }
@@ -39,62 +31,6 @@
   background-color: #0b0b0b;
   box-shadow: 0 0 0 100vmax #0b0b0b;
   clip-path: inset(0 -100vmax);
-}
-
-/* ---- intro: title, text, button ---- */
-.accordion .accordion-intro {
-  margin-bottom: 32px;
-}
-
-.accordion .accordion-intro-title {
-  margin: 0;
-  color: var(--accordion-title);
-  font-family: var(--accordion-font-display);
-  font-size: 28px;
-  font-weight: 500;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.accordion .accordion-intro-text {
-  margin-top: 12px;
-  color: var(--accordion-answer);
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.accordion .accordion-intro-text > * {
-  margin: 0;
-}
-
-.accordion .accordion-intro-action {
-  margin: 28px 0 0;
-}
-
-.accordion .accordion-intro-button,
-.accordion .accordion-intro-button:any-link {
-  display: inline-block;
-  padding: 17px 20px;
-  border-radius: 4px;
-  background-color: var(--accordion-button);
-  color: var(--accordion-button-text);
-  font-family: var(--accordion-font);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-.accordion .accordion-intro-button:hover {
-  background-color: var(--accordion-button-hover);
-  color: var(--accordion-button-text);
-}
-
-/* ---- the list ---- */
-.accordion .accordion-list {
-  border-top: 1px solid var(--accordion-line);
 }
 
 .accordion .accordion-item {
@@ -224,10 +160,6 @@
 
   .accordion-wrapper:has(> .accordion.dark) {
     padding-block: 48px;
-  }
-
-  .accordion .accordion-intro-title {
-    font-size: 24px;
   }
 
   .accordion .accordion-item-label {
