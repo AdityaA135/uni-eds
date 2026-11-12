@@ -7,6 +7,55 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
  * "dark") puts the block on a black band across the page, in white.
  */
 
+// the most characters each text may have: enough for any question and answer, not for a wall of
+// pasted text (_accordion.json limits the question field to the same). Longer text, saved before
+// the limits or in the rich text answer, is shortened on the page, and listed in the editor
+const MAX_CHARS = {
+  question: 120,
+  answer: 600,
+};
+
+const length = (node) => node.textContent.replace(/\s+/g, ' ').trim().length;
+
+/** text cut to at most `max` characters, at a word where it can, ending in an ellipsis */
+function clip(text, max) {
+  const cut = text.slice(0, Math.max(0, max - 1));
+  const atWord = cut.replace(/\s+\S*$/, '');
+  return `${(atWord.length >= max / 2 ? atWord : cut).replace(/[\s.,;:–-]+$/, '')}…`;
+}
+
+/**
+ * Cuts the text in an element (a plain question, or a rich text answer with its paragraphs,
+ * lists and links) to `max` characters: the text past the limit, and the elements left empty,
+ * are removed. Returns the text's length if it was cut, else 0
+ * @param {Element} node
+ * @param {number} max
+ * @returns {number}
+ */
+function clipContent(node, max) {
+  const full = length(node);
+  if (full <= max) return 0;
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  let left = max;
+  texts.forEach((text) => {
+    const value = text.textContent.replace(/\s+/g, ' ');
+    if (left <= 0) {
+      text.remove();
+    } else if (value.length <= left) {
+      left -= value.length;
+    } else {
+      text.textContent = clip(value, left);
+      left = 0;
+    }
+  });
+  [...node.querySelectorAll('*')].reverse().forEach((el) => {
+    if (!el.textContent.trim() && !el.querySelector('img, picture, br')) el.remove();
+  });
+  return full;
+}
+
 /**
  * @param {Element} row [question] [answer]
  * @param {number} i
@@ -46,6 +95,15 @@ export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const items = [...block.children].map(buildItem);
 
+  // texts over their limit (MAX_CHARS): shortened, and listed for the author in the editor
+  const tooLong = [];
+  items.forEach((details, i) => {
+    const questionLength = clipContent(details.querySelector('.accordion-item-question'), MAX_CHARS.question);
+    if (questionLength) tooLong.push(`item ${i + 1}: its question (${questionLength} of ${MAX_CHARS.question} characters)`);
+    const answerLength = clipContent(details.querySelector('.accordion-item-body'), MAX_CHARS.answer);
+    if (answerLength) tooLong.push(`item ${i + 1}: its answer (${answerLength} of ${MAX_CHARS.answer} characters)`);
+  });
+
   // one item open at a time
   items.forEach((details) => details.addEventListener('toggle', () => {
     if (details.open) items.forEach((other) => { if (other !== details) other.open = false; });
@@ -63,5 +121,13 @@ export default function decorate(block) {
     }, true);
   }
 
-  block.replaceChildren(...items);
+  const content = [...items];
+  if (editing && tooLong.length) {
+    const note = document.createElement('p');
+    note.className = 'accordion-limit-note';
+    note.textContent = `Too long, so shortened on the page: ${tooLong.join('; ')}. `
+      + 'Shorten them in the properties.';
+    content.unshift(note);
+  }
+  block.replaceChildren(...content);
 }
