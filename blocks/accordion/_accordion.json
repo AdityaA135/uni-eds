@@ -53,13 +53,18 @@
           "valueType": "string",
           "name": "summary",
           "label": "Question",
-          "description": "The line that opens and closes the item"
+          "description": "Up to 120 characters, the line that opens and closes the item.",
+          "validation": {
+            "maxLength": 120,
+            "customErrorMsg": "Keep the question to 120 characters at most."
+          }
         },
         {
           "component": "richtext",
           "valueType": "string",
           "name": "text",
-          "label": "Answer"
+          "label": "Answer",
+          "description": "Up to 600 characters. Longer answers are shortened on the page."
         }
       ]
     }

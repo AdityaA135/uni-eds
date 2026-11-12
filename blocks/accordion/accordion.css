@@ -71,6 +71,8 @@
 
 .accordion .accordion-item-question {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
   color: var(--accordion-question);
   font-size: 26px;
   line-height: 1.3;
@@ -85,7 +87,8 @@
   color: var(--accordion-question-open);
 }
 
-/* the + (two hairlines); open, it turns 45 degrees into an x */
+/* the + (two hairlines); open, the two lines turn 45 degrees into an x (the lines turn, not the
+   box, so the x stays inside the block) */
 .accordion .accordion-item-icon {
   position: relative;
   flex: 0 0 22px;
@@ -94,7 +97,7 @@
   height: 22px;
   margin-left: 24px;
   color: var(--accordion-question);
-  transition: transform 0.25s var(--accordion-ease), color 0.2s var(--accordion-ease);
+  transition: color 0.2s var(--accordion-ease);
 }
 
 .accordion .accordion-item-icon::before,
@@ -107,6 +110,7 @@
   height: 2px;
   margin-top: -1px;
   background-color: currentcolor;
+  transition: transform 0.25s var(--accordion-ease);
 }
 
 .accordion .accordion-item-icon::after {
@@ -115,7 +119,6 @@
 
 .accordion .accordion-item[open] .accordion-item-icon {
   color: var(--accordion-question-open);
-  transform: rotate(45deg);
 }
 
 .accordion .accordion-item[open] .accordion-item-icon::before,
@@ -124,7 +127,16 @@
   margin-top: -1.5px;
 }
 
+.accordion .accordion-item[open] .accordion-item-icon::before {
+  transform: rotate(45deg);
+}
+
+.accordion .accordion-item[open] .accordion-item-icon::after {
+  transform: rotate(135deg);
+}
+
 .accordion .accordion-item-body {
+  overflow-wrap: anywhere;
   padding: 0 66px 34px var(--accordion-gutter);
   color: var(--accordion-answer);
   font-size: 20px;
@@ -142,6 +154,17 @@
 .accordion .accordion-item-body a:any-link {
   color: var(--accordion-question-open);
   text-decoration: underline;
+}
+
+/* Universal Editor: the texts over their limit, listed for the author */
+.accordion .accordion-limit-note {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fff3d6;
+  color: #5c3b00;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 /* opening and closing slide where the browser can animate the details' height */
@@ -196,6 +219,8 @@
 @media (prefers-reduced-motion: reduce) {
   .accordion .accordion-item-question,
   .accordion .accordion-item-icon,
+  .accordion .accordion-item-icon::before,
+  .accordion .accordion-item-icon::after,
   .accordion .accordion-item::details-content {
     transition: none;
   }
