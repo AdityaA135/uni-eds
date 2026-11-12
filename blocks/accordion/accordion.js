@@ -1,18 +1,18 @@
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 /*
- * Accordion: one Accordion Item per row, [question] [answer]. Each item is a <details>, numbered
+ * Accordion: one Accordion Item per row, [title] [content]. Each item is a <details>, numbered
  * 01, 02...; all start closed and one is open at a time. In Universal Editor, selecting an item,
  * or one of its fields, on the page or in the content tree opens it. Dark theme (block option
  * "dark") puts the block on a black band across the page, in white.
  */
 
-// the most characters each text may have: enough for any question and answer, not for a wall of
-// pasted text (_accordion.json limits the question field to the same). Longer text, saved before
-// the limits or in the rich text answer, is shortened on the page, and listed in the editor
+// the most characters each text may have: enough for any title and content, not for a wall of
+// pasted text (_accordion.json limits the title field to the same). Longer text, saved before
+// the limits or in the rich text content, is shortened on the page, and listed in the editor
 const MAX_CHARS = {
-  question: 120,
-  answer: 600,
+  title: 120,
+  content: 600,
 };
 
 const length = (node) => node.textContent.replace(/\s+/g, ' ').trim().length;
@@ -25,7 +25,7 @@ function clip(text, max) {
 }
 
 /**
- * Cuts the text in an element (a plain question, or a rich text answer with its paragraphs,
+ * Cuts the text in an element (a plain title, or rich text content with its paragraphs,
  * lists and links) to `max` characters: the text past the limit, and the elements left empty,
  * are removed. Returns the text's length if it was cut, else 0
  * @param {Element} node
@@ -57,7 +57,7 @@ function clipContent(node, max) {
 }
 
 /**
- * @param {Element} row [question] [answer]
+ * @param {Element} row [title] [content]
  * @param {number} i
  * @returns {HTMLDetailsElement}
  */
@@ -98,10 +98,10 @@ export default function decorate(block) {
   // texts over their limit (MAX_CHARS): shortened, and listed for the author in the editor
   const tooLong = [];
   items.forEach((details, i) => {
-    const questionLength = clipContent(details.querySelector('.accordion-item-question'), MAX_CHARS.question);
-    if (questionLength) tooLong.push(`item ${i + 1}: its question (${questionLength} of ${MAX_CHARS.question} characters)`);
-    const answerLength = clipContent(details.querySelector('.accordion-item-body'), MAX_CHARS.answer);
-    if (answerLength) tooLong.push(`item ${i + 1}: its answer (${answerLength} of ${MAX_CHARS.answer} characters)`);
+    const titleLength = clipContent(details.querySelector('.accordion-item-question'), MAX_CHARS.title);
+    if (titleLength) tooLong.push(`item ${i + 1}: its title (${titleLength} of ${MAX_CHARS.title} characters)`);
+    const contentLength = clipContent(details.querySelector('.accordion-item-body'), MAX_CHARS.content);
+    if (contentLength) tooLong.push(`item ${i + 1}: its content (${contentLength} of ${MAX_CHARS.content} characters)`);
   });
 
   // one item open at a time
