@@ -95,5 +95,11 @@
     "components": [
       "photo-gallery-topic"
     ]
+  },
+  {
+    "id": "social-deck",
+    "components": [
+      "social-card"
+    ]
   }
 ]
