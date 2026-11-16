@@ -1,16 +1,10 @@
 /* Social Deck "Strip" style: a flat row of portrait cards that scrolls
    sideways, with prev/next below it. The section's default content (eyebrow,
-   heading, social icon list) is laid out here too.
-
-   Every size follows the fold unit --sd-u (1px of the 1280×814 desktop frame /
-   420px-wide mobile frame). */
+   heading, social icon list) is laid out here too. */
 
 /* ---------- the strip ---------- */
 .social-deck.block.strip {
   --sd-card-radius: calc(32 * var(--sd-u, 1px));
-
-  /* how far (in card widths) a card fades in from the right edge (read by
-     social-deck-strip.js) */
   --sd-fade-in: 0.5825;
 
   overflow: visible;
@@ -352,7 +346,6 @@ main .section.social-deck-container:has(.social-deck.strip) {
     padding: calc(133 * var(--sd-u)) 0 calc(52 * var(--sd-u));
     background-color: var(--section-bg, #000);
 
-    /* head 58 tall, then 44 to the cards; social icons on the right */
     & .default-content-wrapper {
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-rows: calc(9 * var(--sd-u)) calc(29 * var(--sd-u));
@@ -361,13 +354,11 @@ main .section.social-deck-container:has(.social-deck.strip) {
       padding: 0 var(--sd-side);
     }
 
-    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
     & .default-content-wrapper > :is(p, h2) {
       margin: 0;
       text-box: trim-both cap alphabetic;
     }
 
-    /* without text-box: margins doing the same trim */
     @supports not (text-box: trim-both cap alphabetic) {
       /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
       & .default-content-wrapper > :is(p, h2) {
@@ -376,7 +367,6 @@ main .section.social-deck-container:has(.social-deck.strip) {
       }
     }
 
-    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
     & .default-content-wrapper > p {
       --sd-lh: 1.1;
       --sd-cap-top: 0.29;
