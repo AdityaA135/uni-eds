@@ -8,7 +8,7 @@
 
 /* ---------- the strip ---------- */
 .social-deck.block.strip {
-  --sd-card-radius: calc(32 * var(--sd-u, 1px));
+  --sd-card-radius: calc(24 * var(--sd-u, 1px));
 
   overflow: visible;
   text-align: start;
@@ -41,7 +41,7 @@
     }
 
     &:focus-visible {
-      outline: 2px solid var(--color-white);
+      outline: 2px solid var(--color-white, #fff);
       outline-offset: 4px;
     }
 
@@ -108,25 +108,25 @@
 
   & .social-deck-strip-card .social-deck-card-body {
     z-index: 1;
-    inset: auto calc(20 * var(--sd-u, 1px)) calc(24 * var(--sd-u, 1px));
+    inset: auto calc(20 * var(--sd-u, 1px)) calc(20 * var(--sd-u, 1px));
     padding: 0;
     background: none;
   }
 
-  /* caption — extended Regular, white */
+  /* caption — extended Regular 14 / 135%, #e6e6e6 */
   & .social-deck-cards .social-deck-card-media .social-deck-card-body p {
     margin: 0;
-    color: var(--color-white);
+    color: rgb(230 230 230);
     font-family: var(--font-family-display);
-    font-weight: var(--font-weight-regular);
+    font-weight: var(--font-weight-regular, 400);
     font-size: max(13px, calc(14 * var(--sd-u, 1px)));
-    line-height: 1.4;
+    line-height: 1.35;
     letter-spacing: 0;
-    text-wrap: balance;
   }
 
   /* arrow tile, top right of every card (linked or not, as on the source);
-     decorative, so it never takes the pointer */
+     decorative, so it never takes the pointer. 32 tile, radius 8, 16 Phosphor
+     arrow-up-right (its 9×9 vector at 3.5, 3.5) in #f2f2f2 */
   & .social-deck-strip-card::after {
     content: '';
     position: absolute;
@@ -136,10 +136,10 @@
     right: calc(20 * var(--sd-u, 1px));
     width: max(28px, calc(32 * var(--sd-u, 1px)));
     height: max(28px, calc(32 * var(--sd-u, 1px)));
-    border-radius: calc(6 * var(--sd-u, 1px));
+    border-radius: calc(8 * var(--sd-u, 1px));
     background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3.5 8.5l5-5M4.6 3.5h3.9v3.9' stroke='%23fff' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-      center / max(11px, calc(12 * var(--sd-u, 1px))) no-repeat,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 12 12 4M5.5 4H12v6.5' stroke='%23f2f2f2' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / max(14px, calc(16 * var(--sd-u, 1px))) no-repeat,
       rgb(255 255 255 / 20%);
     backdrop-filter: blur(8px);
     transition: background-color 0.25s;
@@ -172,7 +172,7 @@
     border: 0;
     border-radius: 12px;
     background: rgb(255 255 255 / 20%);
-    color: var(--color-white);
+    color: var(--color-white, #fff);
     cursor: pointer;
     transition: background-color 0.2s, opacity 0.3s;
 
@@ -188,11 +188,12 @@
     }
   }
 
+  /* Phosphor arrow-right (regular), 16 */
   & .social-deck-strip-icon {
     width: 16px;
     height: 16px;
     background: currentcolor;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3 8h10M8.5 3.5 13 8l-4.5 4.5' stroke='%23000' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M2.5 8h11M9 3.5 13.5 8 9 12.5' stroke='%23000' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 
   & .social-deck-strip-prev .social-deck-strip-icon {
@@ -237,7 +238,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
 
   justify-content: flex-start;
   padding: var(--sd-top) 0 0;
-  background-color: var(--section-bg);
+  background-color: var(--section-bg, #000);
   background-image: none;
   color: rgb(230 230 230);
 
@@ -253,38 +254,54 @@ main .section.social-deck-container:has(.social-deck.strip) {
     text-align: start;
   }
 
-  /* eyebrow — Medium 12 upper; margins trim the line box to the glyphs */
+  /* eyebrow and heading are trimmed to their cap height (Figma's leading-trim
+     CAP_HEIGHT), so their boxes are exactly the glyphs */
+  /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+  & .default-content-wrapper > :is(p, h2) {
+    max-width: none;
+    margin: 0;
+    color: var(--color-white, #fff);
+    line-height: var(--sd-lh);
+    text-transform: uppercase;
+    text-align: start;
+    text-box: trim-both cap alphabetic;
+  }
+
+  /* without text-box: margins doing the same trim. New Science (both widths)
+     has a 0.72em cap; its line box sits --sd-cap-top above the cap and
+     --sd-cap-bottom below the baseline */
+  @supports not (text-box: trim-both cap alphabetic) {
+    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+    & .default-content-wrapper > :is(p, h2) {
+      margin: calc((var(--sd-cap-top) - var(--sd-lh) / 2) * 1em) 0
+        calc((var(--sd-cap-bottom) - var(--sd-lh) / 2) * 1em);
+    }
+  }
+
+  /* eyebrow — New Science Medium 12 / 110%, -1%, upper, white at 70% */
   /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
   & .default-content-wrapper > p {
     --sd-lh: 1.1;
+    --sd-cap-top: 0.29;
+    --sd-cap-bottom: 0.43;
 
-    max-width: none;
-    margin: calc((0.3602 - var(--sd-lh) / 2) * 1em) 0;
-    color: var(--color-white);
-    opacity: 1;
+    opacity: 0.7;
     font-family: var(--font-family-base);
-    font-weight: var(--font-weight-medium);
-    font-size: var(--type-caption-size);
-    line-height: var(--sd-lh);
-    letter-spacing: var(--type-label-xs-tracking);
-    text-transform: uppercase;
-    text-align: start;
+    font-weight: var(--font-weight-medium, 500);
+    font-size: 12px;
+    letter-spacing: -0.01em;
   }
 
-  /* heading — extended Medium, upper */
+  /* heading — New Science Regular Extended, -4%, upper */
   & .default-content-wrapper > h2 {
     --sd-lh: 1.32;
+    --sd-cap-top: 0.28;
+    --sd-cap-bottom: 0.44;
 
-    max-width: none;
-    margin: calc((0.3602 - var(--sd-lh) / 2) * 1em) 0;
-    color: var(--color-white);
     font-family: var(--font-family-display);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-regular, 400);
     font-size: var(--sd-h-size);
-    line-height: var(--sd-lh);
-    letter-spacing: var(--heading-tracking-display);
-    text-transform: uppercase;
-    text-align: start;
+    letter-spacing: -0.04em;
   }
 
   /* social icon links: translucent rounded tiles */
@@ -308,7 +325,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
     overflow: hidden;
     border-radius: 10px;
     background: rgb(255 255 255 / 10%);
-    color: var(--color-white);
+    color: var(--color-white, #fff);
     text-decoration: none;
     transition: background-color 0.2s;
   }
@@ -339,8 +356,11 @@ main .section.social-deck-container:has(.social-deck.strip) {
     justify-content: center;
     padding: calc(133 * var(--sd-u)) 0 calc(52 * var(--sd-u));
 
+    /* head 58 tall (eyebrow 9, gap 20, heading 29), then 44 to the cards at 235;
+       social icons on the right, bottom-aligned with the heading */
     & .default-content-wrapper {
       grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: calc(9 * var(--sd-u)) calc(29 * var(--sd-u));
       gap: calc(20 * var(--sd-u)) 24px;
       height: calc(102 * var(--sd-u));
     }
@@ -349,25 +369,33 @@ main .section.social-deck-container:has(.social-deck.strip) {
       font-size: max(11px, calc(12 * var(--sd-u)));
     }
 
+    /* 40 / 48px */
     & .default-content-wrapper > h2 {
-      --sd-lh: 1.25;
+      --sd-lh: 1.2;
 
       grid-row: 2;
       font-size: calc(40 * var(--sd-u));
     }
 
+    /* 4 tiles of 40, 4 apart (172 wide) */
     & .default-content-wrapper > ul {
       grid-row: 1 / span 2;
       grid-column: 2;
       align-self: end;
-      gap: calc(8 * var(--sd-u));
+      gap: calc(4 * var(--sd-u));
       margin: 0;
     }
 
     & .default-content-wrapper > ul a:any-link {
-      width: calc(48 * var(--sd-u));
-      height: calc(48 * var(--sd-u));
-      border-radius: calc(10 * var(--sd-u));
+      width: calc(40 * var(--sd-u));
+      height: calc(40 * var(--sd-u));
+      border-radius: calc(8 * var(--sd-u));
+    }
+
+    /* 11.11 around the glyph */
+    & .default-content-wrapper > ul .icon {
+      width: calc(100% - 22.22 * var(--sd-u));
+      height: calc(100% - 22.22 * var(--sd-u));
     }
   }
 }
