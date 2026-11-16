@@ -103,6 +103,12 @@ export default async function decorate(block) {
 
   const cardRows = [...block.children];
 
+  // Universal Editor filters cannot limit how many cards a block takes: with
+  // MAX_AUTHORED cards it gets a filter that allows none, so no "Add" is offered
+  if (block.closest('[data-aue-resource]') && block.dataset.aueFilter) {
+    block.dataset.aueFilter = cardRows.length >= MAX_AUTHORED ? 'social-deck-full' : 'social-deck';
+  }
+
   // build a card <li> from a row (carries UE instrumentation)
   const buildCard = (row, index) => {
     const li = document.createElement('li');
