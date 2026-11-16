@@ -266,6 +266,11 @@ main .section.social-deck-container:has(.social-deck.strip) {
     line-height: var(--sd-lh);
     text-transform: uppercase;
     text-align: start;
+
+    /* one line; longer text ends in "…" */
+    overflow-x: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* eyebrow */

@@ -101,5 +101,9 @@
     "components": [
       "social-card"
     ]
+  },
+  {
+    "id": "social-deck-full",
+    "components": []
   }
 ]
