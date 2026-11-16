@@ -8,7 +8,12 @@
 
 /* ---------- the strip ---------- */
 .social-deck.block.strip {
-  --sd-card-radius: calc(24 * var(--sd-u, 1px));
+  /* 28.6 at 375 on mobile, 24 on desktop */
+  --sd-card-radius: calc(32 * var(--sd-u, 1px));
+
+  /* how far (in card widths) a card fades in from the right edge: the next
+     card peeking in at 375 is at 45% (read by social-deck-strip.js) */
+  --sd-fade-in: 0.5825;
 
   overflow: visible;
   text-align: start;
@@ -154,7 +159,7 @@
     display: flex;
     gap: 10px;
     justify-content: flex-start;
-    margin-top: 24px;
+    margin-top: 43.9px;
     padding: 0 var(--sd-side, 20px);
 
     &[hidden] {
@@ -201,6 +206,9 @@
   }
 
   @media (width >= 900px) {
+    --sd-card-radius: calc(24 * var(--sd-u, 1px));
+    --sd-fade-in: 0.85;
+
     & .social-deck-cards.social-deck-strip-track {
       cursor: grab;
     }
@@ -229,33 +237,38 @@
 
 /* ---------- section: one dark fold, head + strip + arrows ---------- */
 main .section.social-deck-container:has(.social-deck.strip) {
-  /* mobile frame (source ≤ 820px) */
+  /* mobile frame (Figma 375×815): head at 108, cards at 266.8, arrows at 713.4 */
   --sd-side: clamp(20px, 5.2vw, 44px);
-  --sd-h-size: clamp(20px, 5.4vw, 36px);
-  --sd-top: clamp(100px, 13.5svh, 140px);
-  --sd-head-h: calc(150px + 1.32 * var(--sd-h-size));
-  --sd-u: min(calc(100vw / 420), calc((100svh - var(--sd-top) - var(--sd-head-h) - 84px) / 451));
+  --sd-h-size: clamp(20px, 5.8667vw, 36px); /* 22 at 375 */
+  --sd-top: clamp(100px, 13.25svh, 140px); /* 108 at 815 */
+
+  /* head (eyebrow 14, 7, heading 27, 20, socials 40), then 50.8 to the cards */
+  --sd-h-row: calc(var(--sd-h-size) * 27 / 22);
+  --sd-head-h: calc(131.8px + var(--sd-h-row));
+
+  /* 43.9 to the arrows, 44 arrows, at least 16 below */
+  --sd-u: min(calc(100vw / 420), calc((100svh - var(--sd-top) - var(--sd-head-h) - 103.9px) / 451));
 
   justify-content: flex-start;
+  min-height: 100svh;
   padding: var(--sd-top) 0 0;
-  background-color: var(--section-bg, #000);
+  background-color: var(--section-bg, #0a0a0a);
   background-image: none;
   color: rgb(230 230 230);
 
-  /* head: eyebrow, heading and social icons, a fixed-height band above the row */
+  /* head: eyebrow, heading and social icons, a fixed-height band above the row
+     (Figma starts it 2px left of the cards) */
   & .default-content-wrapper {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 14px auto auto;
     align-content: start;
-    row-gap: 16px;
     box-sizing: border-box;
     height: var(--sd-head-h);
-    padding: 0 var(--sd-side);
+    padding: 0 var(--sd-side) 0 calc(var(--sd-side) - 2px);
     text-align: start;
   }
 
-  /* eyebrow and heading are trimmed to their cap height (Figma's leading-trim
-     CAP_HEIGHT), so their boxes are exactly the glyphs */
   /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
   & .default-content-wrapper > :is(p, h2) {
     max-width: none;
@@ -264,51 +277,37 @@ main .section.social-deck-container:has(.social-deck.strip) {
     line-height: var(--sd-lh);
     text-transform: uppercase;
     text-align: start;
-    text-box: trim-both cap alphabetic;
   }
 
-  /* without text-box: margins doing the same trim. New Science (both widths)
-     has a 0.72em cap; its line box sits --sd-cap-top above the cap and
-     --sd-cap-bottom below the baseline */
-  @supports not (text-box: trim-both cap alphabetic) {
-    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
-    & .default-content-wrapper > :is(p, h2) {
-      margin: calc((var(--sd-cap-top) - var(--sd-lh) / 2) * 1em) 0
-        calc((var(--sd-cap-bottom) - var(--sd-lh) / 2) * 1em);
-    }
-  }
-
-  /* eyebrow — New Science Medium 12 / 110%, -1%, upper, white at 70% */
+  /* eyebrow — New Science Medium 14 / 13.2, -0.12, upper, white at 60% */
   /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
   & .default-content-wrapper > p {
-    --sd-lh: 1.1;
-    --sd-cap-top: 0.29;
-    --sd-cap-bottom: 0.43;
+    --sd-lh: 13.2px;
 
-    opacity: 0.7;
+    opacity: 0.6;
     font-family: var(--font-family-base);
     font-weight: var(--font-weight-medium, 500);
-    font-size: 12px;
-    letter-spacing: -0.01em;
+    font-size: 14px;
+    letter-spacing: -0.12px;
   }
 
-  /* heading — New Science Regular Extended, -4%, upper */
+  /* heading — New Science Medium Extended 22 / 26.7, -0.81, upper */
   & .default-content-wrapper > h2 {
-    --sd-lh: 1.32;
-    --sd-cap-top: 0.28;
-    --sd-cap-bottom: 0.44;
+    --sd-lh: calc(26.7 / 22);
 
+    min-height: var(--sd-h-row);
+    margin-top: 7px;
     font-family: var(--font-family-display);
-    font-weight: var(--font-weight-regular, 400);
+    font-weight: var(--font-weight-medium, 500);
     font-size: var(--sd-h-size);
-    letter-spacing: -0.04em;
+    letter-spacing: calc(-0.81em / 22);
   }
 
-  /* social icon links: translucent rounded tiles */
+  /* social icon links: 40 tiles, 8 apart (184 wide), radius 9.09 */
   & .default-content-wrapper > ul {
     display: flex;
     gap: 8px;
-    margin: 8px 0 0;
+    margin: 20px 0 0;
     padding: 0;
     list-style: none;
   }
@@ -320,10 +319,10 @@ main .section.social-deck-container:has(.social-deck.strip) {
   & .default-content-wrapper > ul a:any-link {
     display: grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 9.09px;
     background: rgb(255 255 255 / 10%);
     color: var(--color-white, #fff);
     text-decoration: none;
@@ -335,10 +334,11 @@ main .section.social-deck-container:has(.social-deck.strip) {
     background: rgb(255 255 255 / 22%);
   }
 
+  /* 16.67 glyph, centred */
   & .default-content-wrapper > ul .icon {
     display: block;
-    width: 44%;
-    height: 44%;
+    width: calc(100% - 23.33px);
+    height: calc(100% - 23.33px);
   }
 
   & .default-content-wrapper > ul .icon img {
@@ -353,8 +353,10 @@ main .section.social-deck-container:has(.social-deck.strip) {
     --sd-side: calc(64 * min(calc(100vw / 1280), calc(100svh / 720)));
 
     height: 100svh;
+    min-height: 0;
     justify-content: center;
     padding: calc(133 * var(--sd-u)) 0 calc(52 * var(--sd-u));
+    background-color: var(--section-bg, #000);
 
     /* head 58 tall (eyebrow 9, gap 20, heading 29), then 44 to the cards at 235;
        social icons on the right, bottom-aligned with the heading */
@@ -363,18 +365,51 @@ main .section.social-deck-container:has(.social-deck.strip) {
       grid-template-rows: calc(9 * var(--sd-u)) calc(29 * var(--sd-u));
       gap: calc(20 * var(--sd-u)) 24px;
       height: calc(102 * var(--sd-u));
+      padding: 0 var(--sd-side);
     }
 
+    /* eyebrow and heading are trimmed to their cap height (Figma's leading-trim
+       CAP_HEIGHT), so their boxes are exactly the glyphs */
+    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+    & .default-content-wrapper > :is(p, h2) {
+      margin: 0;
+      text-box: trim-both cap alphabetic;
+    }
+
+    /* without text-box: margins doing the same trim. New Science (both widths)
+       has a 0.72em cap; its line box sits --sd-cap-top above the cap and
+       --sd-cap-bottom below the baseline */
+    @supports not (text-box: trim-both cap alphabetic) {
+      /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+      & .default-content-wrapper > :is(p, h2) {
+        margin: calc((var(--sd-cap-top) - var(--sd-lh) / 2) * 1em) 0
+          calc((var(--sd-cap-bottom) - var(--sd-lh) / 2) * 1em);
+      }
+    }
+
+    /* eyebrow — New Science Medium 12 / 110%, -1%, upper, white at 70% */
+    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
     & .default-content-wrapper > p {
+      --sd-lh: 1.1;
+      --sd-cap-top: 0.29;
+      --sd-cap-bottom: 0.43;
+
+      opacity: 0.7;
       font-size: max(11px, calc(12 * var(--sd-u)));
+      letter-spacing: -0.01em;
     }
 
-    /* 40 / 48px */
+    /* heading — New Science Regular Extended 40 / 48px, -4% */
     & .default-content-wrapper > h2 {
       --sd-lh: 1.2;
+      --sd-cap-top: 0.28;
+      --sd-cap-bottom: 0.44;
 
       grid-row: 2;
+      min-height: 0;
+      font-weight: var(--font-weight-regular, 400);
       font-size: calc(40 * var(--sd-u));
+      letter-spacing: -0.04em;
     }
 
     /* 4 tiles of 40, 4 apart (172 wide) */
