@@ -1,8 +1,8 @@
-// Social Deck "Strip" style (homepage socials): the cards in a flat,
-// horizontally scrolling row with prev/next buttons, instead of the arc
+// Social Deck "Strip" style: the cards in a flat, horizontally scrolling row
+// with prev/next buttons, instead of the arc
 
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-// power2.out: fast start, gentle finish
+// fast start, gentle finish
 const easeOut = (t) => 1 - (1 - t) ** 2;
 
 /**
@@ -125,7 +125,7 @@ export default function decorateStrip(block, {
     const vw = window.innerWidth;
     const ringStyle = getComputedStyle(ring);
     const side = parseFloat(ringStyle.paddingLeft) || 0;
-    // fade-in distance in card widths, per breakpoint (CSS --sd-fade-in)
+    // fade-in distance in card widths, per breakpoint
     const fadeInSpan = parseFloat(ringStyle.getPropertyValue('--sd-fade-in')) || 0.85;
     cards.forEach((li, i) => {
       const r = li.getBoundingClientRect();

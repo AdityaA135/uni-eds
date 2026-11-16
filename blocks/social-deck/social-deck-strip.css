@@ -1,18 +1,16 @@
-/* Social Deck "Strip" style (homepage "Across our socials"): a flat row of
-   portrait cards that scrolls sideways, with prev/next below it. The section's
-   default content (eyebrow, heading, social icon list) is laid out here too.
+/* Social Deck "Strip" style: a flat row of portrait cards that scrolls
+   sideways, with prev/next below it. The section's default content (eyebrow,
+   heading, social icon list) is laid out here too.
 
-   Every size follows the source's fold unit --sd-u (1px of its 1280×814
-   desktop frame / 420px-wide mobile frame), so the whole fold scales with the
-   viewport the way the source does. */
+   Every size follows the fold unit --sd-u (1px of the 1280×814 desktop frame /
+   420px-wide mobile frame). */
 
 /* ---------- the strip ---------- */
 .social-deck.block.strip {
-  /* 28.6 at 375 on mobile, 24 on desktop */
   --sd-card-radius: calc(32 * var(--sd-u, 1px));
 
-  /* how far (in card widths) a card fades in from the right edge: the next
-     card peeking in at 375 is at 45% (read by social-deck-strip.js) */
+  /* how far (in card widths) a card fades in from the right edge (read by
+     social-deck-strip.js) */
   --sd-fade-in: 0.5825;
 
   overflow: visible;
@@ -118,7 +116,6 @@
     background: none;
   }
 
-  /* caption — extended Regular 14 / 135%, #e6e6e6 */
   & .social-deck-cards .social-deck-card-media .social-deck-card-body p {
     margin: 0;
     color: rgb(230 230 230);
@@ -129,9 +126,8 @@
     letter-spacing: 0;
   }
 
-  /* arrow tile, top right of every card (linked or not, as on the source);
-     decorative, so it never takes the pointer. 32 tile, radius 8, 16 Phosphor
-     arrow-up-right (its 9×9 vector at 3.5, 3.5) in #f2f2f2 */
+  /* arrow tile, top right of every card; decorative, so it never takes the
+     pointer */
   & .social-deck-strip-card::after {
     content: '';
     position: absolute;
@@ -193,7 +189,7 @@
     }
   }
 
-  /* Phosphor arrow-right (regular), 16 */
+  /* Phosphor arrow-right */
   & .social-deck-strip-icon {
     width: 16px;
     height: 16px;
@@ -237,10 +233,10 @@
 
 /* ---------- section: one dark fold, head + strip + arrows ---------- */
 main .section.social-deck-container:has(.social-deck.strip) {
-  /* mobile frame (Figma 375×815): head at 108, cards at 266.8, arrows at 713.4 */
+  /* mobile frame (375×815) */
   --sd-side: clamp(20px, 5.2vw, 44px);
-  --sd-h-size: clamp(20px, 5.8667vw, 36px); /* 22 at 375 */
-  --sd-top: clamp(100px, 13.25svh, 140px); /* 108 at 815 */
+  --sd-h-size: clamp(20px, 5.8667vw, 36px);
+  --sd-top: clamp(100px, 13.25svh, 140px);
 
   /* head (eyebrow 14, 7, heading 27, 20, socials 40), then 50.8 to the cards */
   --sd-h-row: calc(var(--sd-h-size) * 27 / 22);
@@ -256,8 +252,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
   background-image: none;
   color: rgb(230 230 230);
 
-  /* head: eyebrow, heading and social icons, a fixed-height band above the row
-     (Figma starts it 2px left of the cards) */
+  /* head: a fixed-height band above the row, 2px left of the cards */
   & .default-content-wrapper {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -279,7 +274,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
     text-align: start;
   }
 
-  /* eyebrow — New Science Medium 14 / 13.2, -0.12, upper, white at 60% */
+  /* eyebrow */
   /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
   & .default-content-wrapper > p {
     --sd-lh: 13.2px;
@@ -291,7 +286,6 @@ main .section.social-deck-container:has(.social-deck.strip) {
     letter-spacing: -0.12px;
   }
 
-  /* heading — New Science Medium Extended 22 / 26.7, -0.81, upper */
   & .default-content-wrapper > h2 {
     --sd-lh: calc(26.7 / 22);
 
@@ -303,7 +297,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
     letter-spacing: calc(-0.81em / 22);
   }
 
-  /* social icon links: 40 tiles, 8 apart (184 wide), radius 9.09 */
+  /* social icon links */
   & .default-content-wrapper > ul {
     display: flex;
     gap: 8px;
@@ -334,7 +328,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
     background: rgb(255 255 255 / 22%);
   }
 
-  /* 16.67 glyph, centred */
+  /* 16.67 glyph */
   & .default-content-wrapper > ul .icon {
     display: block;
     width: calc(100% - 23.33px);
@@ -347,7 +341,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
     height: 100%;
   }
 
-  /* desktop frame (source 1280×814, centred in the fold) */
+  /* desktop frame (1280×814) */
   @media (width >= 900px) {
     --sd-u: min(calc(100vw / 1280), calc(100svh / 814));
     --sd-side: calc(64 * min(calc(100vw / 1280), calc(100svh / 720)));
@@ -358,8 +352,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
     padding: calc(133 * var(--sd-u)) 0 calc(52 * var(--sd-u));
     background-color: var(--section-bg, #000);
 
-    /* head 58 tall (eyebrow 9, gap 20, heading 29), then 44 to the cards at 235;
-       social icons on the right, bottom-aligned with the heading */
+    /* head 58 tall, then 44 to the cards; social icons on the right */
     & .default-content-wrapper {
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-rows: calc(9 * var(--sd-u)) calc(29 * var(--sd-u));
@@ -368,17 +361,13 @@ main .section.social-deck-container:has(.social-deck.strip) {
       padding: 0 var(--sd-side);
     }
 
-    /* eyebrow and heading are trimmed to their cap height (Figma's leading-trim
-       CAP_HEIGHT), so their boxes are exactly the glyphs */
     /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
     & .default-content-wrapper > :is(p, h2) {
       margin: 0;
       text-box: trim-both cap alphabetic;
     }
 
-    /* without text-box: margins doing the same trim. New Science (both widths)
-       has a 0.72em cap; its line box sits --sd-cap-top above the cap and
-       --sd-cap-bottom below the baseline */
+    /* without text-box: margins doing the same trim */
     @supports not (text-box: trim-both cap alphabetic) {
       /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
       & .default-content-wrapper > :is(p, h2) {
@@ -387,7 +376,6 @@ main .section.social-deck-container:has(.social-deck.strip) {
       }
     }
 
-    /* eyebrow — New Science Medium 12 / 110%, -1%, upper, white at 70% */
     /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
     & .default-content-wrapper > p {
       --sd-lh: 1.1;
@@ -399,7 +387,6 @@ main .section.social-deck-container:has(.social-deck.strip) {
       letter-spacing: -0.01em;
     }
 
-    /* heading — New Science Regular Extended 40 / 48px, -4% */
     & .default-content-wrapper > h2 {
       --sd-lh: 1.2;
       --sd-cap-top: 0.28;
@@ -412,7 +399,6 @@ main .section.social-deck-container:has(.social-deck.strip) {
       letter-spacing: -0.04em;
     }
 
-    /* 4 tiles of 40, 4 apart (172 wide) */
     & .default-content-wrapper > ul {
       grid-row: 1 / span 2;
       grid-column: 2;
