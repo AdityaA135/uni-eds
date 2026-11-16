@@ -123,11 +123,14 @@ export default function decorateStrip(block, {
     nav.hidden = ring.scrollWidth <= ring.clientWidth;
 
     const vw = window.innerWidth;
-    const side = parseFloat(getComputedStyle(ring).paddingLeft) || 0;
+    const ringStyle = getComputedStyle(ring);
+    const side = parseFloat(ringStyle.paddingLeft) || 0;
+    // fade-in distance in card widths, per breakpoint (CSS --sd-fade-in)
+    const fadeInSpan = parseFloat(ringStyle.getPropertyValue('--sd-fade-in')) || 0.85;
     cards.forEach((li, i) => {
       const r = li.getBoundingClientRect();
       const w = r.width || 1;
-      const fadeIn = easeOut(clamp((vw - r.left) / (w * 0.85), 0, 1));
+      const fadeIn = easeOut(clamp((vw - r.left) / (w * fadeInSpan), 0, 1));
       const fadeOut = easeOut(clamp((r.left + w - side * 0.5) / (w * 0.8), 0, 1));
       li.style.opacity = (0.12 + 0.88 * Math.min(fadeIn, fadeOut)).toFixed(3);
       if (!reduce && imgs[i]) {
