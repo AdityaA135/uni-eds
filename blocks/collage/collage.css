@@ -1,0 +1,331 @@
+main > .section > .collage-wrapper {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* showcase and collage in one section: the showcase sticks while the collage plays over it */
+main > .section.collage-pinned > .interactive-showcase-wrapper {
+  position: sticky;
+  top: 0;
+}
+
+main > .section.collage-pinned > .collage-wrapper {
+  position: relative;
+  z-index: 10;
+  margin-top: -100vh;
+  margin-top: -100svh;
+  pointer-events: none;
+}
+
+.block.collage {
+  --collage-screen: 100vh;
+  --collage-heading-color: #111;
+  --collage-text-color: #8a8a8a;
+
+  position: relative;
+
+  @supports (height: 1svh) {
+    --collage-screen: 100svh;
+  }
+
+  :root.panels-ready:has(.collage-pinned &) {
+    scroll-snap-type: none;
+  }
+
+  .stage {
+    position: sticky;
+    top: 0;
+    box-sizing: border-box;
+    height: var(--collage-screen);
+  }
+
+  .card {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 20px;
+  }
+
+  .veil,
+  .paper {
+    position: absolute;
+    inset: 0;
+  }
+
+  .veil {
+    opacity: 0;
+    background:
+      linear-gradient(291.69deg, rgb(0 0 0 / 18.24%) 0.96%, rgb(246 246 246 / 38%) 48.73%, rgb(255 255 255 / 38%) 62.61%),
+      #fff;
+  }
+
+  .paper {
+    background-color: #fff;
+  }
+
+  /* the 1280x720 Figma frame, scaled to the card (--collage-u, set by collage.js) */
+  .frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1280px;
+    height: 720px;
+    transform: translate(-50%, -50%) scale(var(--collage-u, 1));
+  }
+
+  .flight {
+    position: absolute;
+    z-index: 3;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+    transform-origin: 0 0;
+
+    img {
+      position: absolute;
+      display: block;
+      max-width: none;
+    }
+  }
+
+  .item {
+    position: absolute;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #0d0d0d;
+
+    picture,
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    img {
+      object-fit: cover;
+    }
+  }
+
+  /* Figma's 196x252 layers rotated -90deg about (98px, 98px), so they cover 252x196 from their
+     top/left; their photos are turned back upright */
+  .bottom-left,
+  .top-right {
+    width: 196px;
+    height: 252px;
+    transform: rotate(-90deg);
+    transform-origin: 98px 98px;
+  }
+
+  .bottom-left picture,
+  .top-right picture {
+    position: absolute;
+    top: 28px;
+    left: -28px;
+    width: 252px;
+    height: 196px;
+    transform: rotate(90deg);
+  }
+
+  .bottom-left {
+    top: 344px;
+    left: 236px;
+  }
+
+  .top-right {
+    top: 180px;
+    left: 792px;
+  }
+
+  .center-engine {
+    top: 180px;
+    left: 500px;
+    width: 280px;
+    height: 360px;
+
+    picture img {
+      transform: translate(12%, 10%) scale(1.22);
+    }
+
+    .landed {
+      position: absolute;
+      display: none;
+      max-width: none;
+      object-fit: contain;
+    }
+
+    &.inherits {
+      background-color: #000;
+
+      picture {
+        display: none;
+      }
+
+      .landed {
+        display: block;
+      }
+    }
+  }
+
+  .top-left {
+    top: 180px;
+    left: 368px;
+    width: 120px;
+    height: 152px;
+  }
+
+  .bottom-right {
+    top: 388px;
+    left: 792px;
+    width: 120px;
+    height: 152px;
+  }
+
+  .statement {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: calc(36px * var(--collage-u, 1));
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    text-align: center;
+
+    .title,
+    p {
+      max-width: 100%;
+      margin: 0;
+    }
+
+    .title {
+      width: max(calc(629px * var(--collage-u, 1)), min(100%, 340px));
+      color: var(--collage-heading-color);
+      font-family: var(--font-new-science-extended);
+      font-size: max(20px, calc(30px * var(--collage-u, 1)));
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    p {
+      width: max(calc(734px * var(--collage-u, 1)), min(100%, 340px));
+      color: var(--collage-text-color);
+      font-family: var(--font-new-science);
+      font-size: max(13px, calc(18px * var(--collage-u, 1)));
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: 0;
+      text-align: center;
+    }
+  }
+
+  .room {
+    display: none;
+    height: calc(2 * var(--collage-screen));
+  }
+
+  &.animated .room {
+    display: block;
+  }
+
+  &.static {
+    .stage {
+      position: relative;
+      height: auto;
+    }
+
+    .card {
+      height: calc(2 * var(--collage-screen));
+    }
+
+    .veil {
+      display: none;
+    }
+
+    .frame {
+      top: 25%;
+    }
+
+    .statement {
+      top: 50%;
+    }
+  }
+
+  /* the statement at its Figma box (734 wide at 273; 157 tall, centred on the frame: top
+     281.5); longer text grows evenly around that centre; phones keep it centred, readable */
+  @media (min-width: 900px) and (orientation: landscape) {
+    .statement {
+      inset: 0 auto;
+      left: calc(50% + (273px - 640px) * var(--collage-u, 1));
+      width: calc(734px * var(--collage-u, 1));
+      padding: 0;
+
+      /* Figma's text boxes run from the cap top to the last baseline: 629x58 and 734x63 */
+      .title,
+      p {
+        flex: none;
+        text-box: trim-both cap alphabetic;
+      }
+
+      .title {
+        width: calc(629px * var(--collage-u, 1));
+        min-height: calc(58px * var(--collage-u, 1));
+      }
+
+      p {
+        width: calc(734px * var(--collage-u, 1));
+        min-height: calc(63px * var(--collage-u, 1));
+      }
+
+      p + p {
+        margin-top: calc(-24px * var(--collage-u, 1));
+      }
+
+      @supports not (text-box: trim-both cap alphabetic) {
+        .title {
+          translate: 0 -0.3em;
+        }
+
+        p {
+          translate: 0 -0.4222em;
+        }
+      }
+    }
+
+    &.static .statement {
+      top: 50%;
+    }
+  }
+
+  &.editing {
+    --collage-screen: min(100vh, 1000px);
+
+    @supports (height: 1svh) {
+      --collage-screen: min(100svh, 1000px);
+    }
+  }
+
+  .unplaced {
+    display: none;
+  }
+
+  .limit-note {
+    margin: 0 0 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #5c3b00;
+    background-color: #fff3d6;
+    font-family: var(--font-new-science);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  &.animated:not(.ready) .card {
+    visibility: hidden;
+  }
+}

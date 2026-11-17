@@ -39,6 +39,16 @@
     ]
   },
   {
+    "id": "collage",
+    "components": [
+      "collage-item"
+    ]
+  },
+  {
+    "id": "collage-full",
+    "components": []
+  },
+  {
     "id": "columns",
     "components": [
       "column"
