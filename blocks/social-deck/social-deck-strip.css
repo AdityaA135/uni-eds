@@ -408,10 +408,10 @@ main .section.social-deck-container:has(.social-deck.strip) {
       border-radius: calc(8 * var(--sd-u));
     }
 
-    /* 11.11 around the glyph */
+    /* 16.67 glyph */
     & .default-content-wrapper > ul .icon {
-      width: calc(100% - 22.22 * var(--sd-u));
-      height: calc(100% - 22.22 * var(--sd-u));
+      width: calc(100% - 23.33 * var(--sd-u));
+      height: calc(100% - 23.33 * var(--sd-u));
     }
   }
 }
