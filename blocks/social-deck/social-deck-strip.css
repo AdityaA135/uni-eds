@@ -195,7 +195,7 @@
     transform: scaleX(-1);
   }
 
-  @media (width >= 900px) {
+  @media (width >= 900px) and (not ((hover: none) and (pointer: coarse))) {
     --sd-card-radius: calc(24 * var(--sd-u, 1px));
     --sd-fade-in: 0.85;
 
@@ -341,7 +341,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
   }
 
   /* desktop frame (1280×814) */
-  @media (width >= 900px) {
+  @media (width >= 900px) and (not ((hover: none) and (pointer: coarse))) {
     --sd-u: min(calc(100vw / 1280), calc(100svh / 814));
     --sd-side: calc(64 * min(calc(100vw / 1280), calc(100svh / 720)));
 

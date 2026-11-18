@@ -97,6 +97,12 @@ export default async function decorate(block) {
   // Stable anchor id for in-page links (e.g. #social); only set once per page.
   if (!document.getElementById('social')) block.id = 'social';
 
+  // the section's social icon links open in a new tab
+  block.closest('.section')?.querySelectorAll('.default-content-wrapper > ul a[href]').forEach((a) => {
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  });
+
   // the Auto-scroll option serializes as a leading single-column config row on
   // this container block; consume it into an autoplay-* class before reading cards
   consumeAutoplayConfig(block);
