@@ -340,15 +340,15 @@ main .section.social-deck-container:has(.social-deck.strip) {
     height: 100%;
   }
 
-  /* desktop frame (1280×814) */
+  /* desktop frame (1280×720): the 629 tall content centred, 45.5 above and below */
   @media (width >= 900px) {
-    --sd-u: min(calc(100vw / 1280), calc(100svh / 814));
-    --sd-side: calc(64 * min(calc(100vw / 1280), calc(100svh / 720)));
+    --sd-u: min(calc(100vw / 1280), calc(100svh / 720));
+    --sd-side: calc(64 * var(--sd-u));
 
     height: 100svh;
     min-height: 0;
     justify-content: center;
-    padding: calc(133 * var(--sd-u)) 0 calc(52 * var(--sd-u));
+    padding: calc(45.5 * var(--sd-u)) 0;
     background-color: var(--section-bg, #000);
 
     & .default-content-wrapper {
