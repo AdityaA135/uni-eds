@@ -1,0 +1,530 @@
+/* Cards "Roller" style (homepage highlights); --rl-u is one design pixel (1280 x 720) */
+
+main > .section.cards-container:has(.cards.roller) {
+  --rl-u: min(100vw / 1280, 100svh / 720);
+  --rl-move: 0.9s;
+  --rl-ease: cubic-bezier(0.37, 0, 0.63, 1);
+  --rl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* the title's grey isn't in the palette */
+  --rl-title: #61606c;
+  --rl-bar-bg: rgb(from var(--color-black) r g b / 35%);
+  --rl-bar-text: rgb(from var(--color-white) r g b / 95%);
+  --rl-fade: var(--color-white);
+  --rl-fade-mid: rgb(from var(--color-white) r g b / 75%);
+  --rl-fade-end: rgb(from var(--color-white) r g b / 0%);
+
+  padding: 0;
+  background-color: var(--color-white);
+  color: var(--color-black);
+
+  .cards-wrapper {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: clamp(20px, 5.33vw, 34px);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.2;
+    letter-spacing: normal;
+    text-align: center;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: var(--rl-title);
+
+    @media (width >= 900px) {
+      font-size: calc(40 * var(--rl-u));
+      line-height: 1;
+      white-space: nowrap;
+    }
+  }
+
+  /* price bar: model name, price and link on frosted glass */
+  .cards-wrapper ~ .default-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10.5px;
+    width: fit-content;
+    max-width: 100%;
+    padding: 5px 4.5px 5px 12.5px;
+    border-radius: 12px;
+    background: var(--rl-bar-bg);
+    backdrop-filter: blur(23px);
+
+    p {
+      margin: 0;
+    }
+
+    p:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: clamp(10px, 2.8vw, 12px);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.15;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: var(--rl-bar-text);
+    }
+
+    strong {
+      font-family: var(--font-family-display);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0.02em;
+      color: var(--color-white);
+    }
+
+    a:any-link {
+      display: grid;
+      place-items: center;
+      box-sizing: border-box;
+      height: 36px;
+      padding: 0 10.5px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--color-black);
+      font-family: var(--font-family-base);
+      font-size: clamp(10px, 2.8vw, 12px);
+      font-weight: var(--font-weight-regular);
+      line-height: normal;
+      letter-spacing: normal;
+      text-decoration: none;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: var(--color-white);
+    }
+
+    @media (width >= 600px) {
+      padding: 4px 4px 4px 14px;
+
+      p:first-child {
+        flex-direction: row;
+        gap: 6px;
+        line-height: normal;
+      }
+    }
+
+    @media (width >= 900px) {
+      gap: calc(16 * var(--rl-u));
+      padding: calc(4 * var(--rl-u)) calc(4 * var(--rl-u)) calc(4 * var(--rl-u)) calc(20 * var(--rl-u));
+      border-radius: calc(12 * var(--rl-u));
+
+      p:first-child {
+        gap: calc(8 * var(--rl-u));
+        font-size: max(11px, calc(14 * var(--rl-u)));
+      }
+
+      a:any-link {
+        height: calc(40 * var(--rl-u));
+        padding: 0 calc(16 * var(--rl-u));
+        border-radius: calc(8 * var(--rl-u));
+        font-size: max(11px, calc(14 * var(--rl-u)));
+      }
+    }
+  }
+}
+
+/* plain stack (Universal Editor, reduced motion) */
+main > .section.cards-container:has(.cards.roller.is-static) {
+  padding-block: var(--spacing-64);
+}
+
+/* While the drum plays, the section is a scroll runway (cards + 1.4) screens tall with the
+   title, drum and price bar held on screen (sticky). overflow: clip, not hidden, so sticky
+   still works */
+main > .section.cards-container:has(.cards.roller.is-stepped) {
+  position: relative;
+  justify-content: flex-start;
+  height: calc((var(--rl-count, 4) + 2.4) * 100svh);
+  overflow: clip;
+
+  > .default-content-wrapper:first-child {
+    position: sticky;
+    top: 50%;
+    z-index: 0;
+    align-self: center;
+    width: 90vw;
+    max-width: none;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    mix-blend-mode: darken;
+
+    @media (width >= 900px) {
+      width: auto;
+    }
+
+    /* rises, fades (and blurs on desktop) through the intro; --rl-q from cards-roller.js */
+    h2 {
+      translate: 0 -50%;
+      opacity: calc(1 - 1.1 * var(--rl-q, 0));
+      transform: translateY(calc(-70 * var(--rl-u) * var(--rl-q, 0)));
+
+      @media (width >= 900px) {
+        filter: blur(calc(6px * var(--rl-q, 0)));
+      }
+    }
+  }
+
+  .cards-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  /* the price bar sits at the end of the runway, held at the bottom of the screen */
+  .cards-wrapper ~ .default-content-wrapper {
+    position: sticky;
+    bottom: max(32px, 4.6svh);
+    z-index: 3;
+    align-self: center;
+    margin: auto 0 0;
+    transition:
+      opacity 0.35s ease,
+      transform 0.6s var(--rl-ease-out),
+      filter 0.5s var(--rl-ease-out),
+      visibility 0s;
+
+    @media (width >= 900px) {
+      bottom: calc(41 * var(--rl-u));
+    }
+  }
+
+  /* away at the start of the intro; hidden once faded, so its link leaves the tab order */
+  &:has(.cards.roller.is-intro) .cards-wrapper ~ .default-content-wrapper {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(4px);
+    transition-delay: 0s, 0s, 0s, 0.35s;
+  }
+
+  /* moving to or from the section above: the title travels with the section's first screen */
+  /* stylelint-disable-next-line no-descending-specificity -- the title, not the price bar these follow */
+  &.is-crossing > .default-content-wrapper:first-child {
+    position: absolute;
+    top: 50svh;
+    inset-inline: 0;
+    height: auto;
+    margin-inline: auto;
+    translate: 0 -50%;
+
+    h2 {
+      translate: none;
+    }
+  }
+}
+
+.cards.roller {
+  /* 345 x 205 on a 375 phone, 663 x 394 design pixels from 900px */
+  --rl-card-w: 92vw;
+  --rl-card-h: calc(92vw * 394 / 663);
+  --rl-card-r: 20px;
+  --rl-light: rgb(240 239 239);
+
+  /* light text on a dark photo, dark on a light one */
+  --rl-caption: rgb(from var(--color-white) r g b / 85%);
+  --rl-caption-desc: rgb(from var(--color-white) r g b / 65%);
+  --rl-caption-on-light: rgb(from var(--color-black) r g b / 80%);
+  --rl-caption-desc-on-light: rgb(from var(--color-black) r g b / 60%);
+
+  /* the drum: 18 degrees a card; on phones the side cards are whole, 25px from the front one
+     (radius = card height + 24px per 18 degrees; 1 / 0.3142 rad = 3.1831) */
+  --rl-angle: 18deg;
+  --rl-radius: calc((var(--rl-card-h) + 24px) * 3.1831);
+  --rl-shrink: 0;
+
+  /* steps from the front a card stays fully shown; further on the phone intro, so the second
+     card peeks in (--rl-intro-t eases between them) */
+  --rl-shown-to: 1.3;
+  --rl-shown-to-intro: 1.9;
+
+  /* the prototype's phone design unit (a 640 wide frame) */
+  --rl-pu: calc(100vw / 640);
+  --rl-perspective: calc(2400 * var(--rl-pu));
+
+  /* where the first card waits on the intro, in steps below the front */
+  --rl-intro-at: -0.88;
+
+  position: relative;
+
+  @media (width >= 900px) {
+    --rl-card-w: calc(663 * var(--rl-u));
+    --rl-card-h: calc(394 * var(--rl-u));
+    --rl-card-r: calc(29 * var(--rl-u));
+    --rl-pu: var(--rl-u);
+
+    /* side cards about 78% wide, about 50 design pixels from the front one
+       (radius = 394 design pixels per 18 degrees; 1 / sin 18deg = 3.2361) */
+    --rl-shrink: 0.22;
+    --rl-radius: calc(394 * var(--rl-u) * 3.2361);
+    --rl-shown-to-intro: 1.3;
+    --rl-intro-at: -0.75;
+  }
+
+  .card-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    position: relative;
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--rl-card-r);
+    background-color: var(--rl-light);
+  }
+
+  .card-image {
+    position: absolute;
+    inset: 0;
+
+    > *,
+    picture {
+      display: block;
+      height: 100%;
+      margin: 0;
+    }
+  }
+
+  .card-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+
+  /* caption colours picked from the photo (cards-roller.js); until then, or if it can't be
+     read, white blended by "difference" */
+  .card.is-light {
+    --rl-caption: var(--rl-caption-on-light);
+    --rl-caption-desc: var(--rl-caption-desc-on-light);
+  }
+
+  .card:not(.is-light, .is-dark) :where(.rl-title, .rl-desc) {
+    mix-blend-mode: difference;
+  }
+
+  .rl-copy {
+    position: absolute;
+
+    /* phones: matches Figma's untrimmed text boxes */
+    inset: auto auto clamp(20px, 5.33vw, 32px) clamp(14px, 3.73vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 46%;
+    margin: 0;
+    padding: 0;
+
+    @media (width >= 900px) {
+      inset: auto auto calc(34 * var(--rl-u)) calc(34 * var(--rl-u));
+      gap: calc(14 * var(--rl-u));
+      max-width: calc(256 * var(--rl-u));
+    }
+  }
+
+  .rl-title {
+    margin: calc((0.3602 - 1.375 / 2) * 1em) 0;
+    font-family: var(--font-family-base);
+    font-size: clamp(12px, 3.2vw, 17px);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.375;
+    letter-spacing: normal;
+    text-transform: uppercase;
+    color: var(--rl-caption);
+
+    @media (width >= 900px) {
+      font-size: max(13px, calc(16 * var(--rl-u)));
+    }
+  }
+
+  .rl-desc {
+    margin: calc((0.3602 - 1.4286 / 2) * 1em) 0;
+    font-family: var(--font-family-base);
+    font-size: clamp(11px, 2.9vw, 15px);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.4286;
+    letter-spacing: -0.02em;
+    color: var(--rl-caption-desc);
+
+    @media (width >= 900px) {
+      font-size: max(12px, calc(14 * var(--rl-u)));
+    }
+  }
+
+  &.is-static .card-list {
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+    padding: 32px 0;
+  }
+
+  &.is-static .card {
+    width: var(--rl-card-w);
+    aspect-ratio: 663 / 394;
+  }
+
+  /* the drum follows the scroll frame by frame (cards-roller.js), so no transitions */
+  &.is-stepped {
+    display: grid;
+    place-items: center;
+    height: 100svh;
+    overflow: hidden;
+    perspective: var(--rl-perspective);
+
+    .rl-drum {
+      position: relative;
+      width: var(--rl-card-w);
+      height: var(--rl-card-h);
+      transform-style: preserve-3d;
+    }
+
+    /* each card turns around an axis behind the screen (an arc, not a straight line) and fades
+       out 0.6 of a step after --rl-shown-to */
+    .card {
+      --rl-at: clamp(-2.4, var(--offset, 0), 2.4);
+      --rl-far: max(var(--rl-at), -1 * var(--rl-at));
+      --rl-scale: calc(1 - var(--rl-shrink) * min(var(--rl-far), 1));
+
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      transform:
+        translateZ(calc(var(--rl-radius) * -1))
+        rotateX(calc(var(--rl-at) * var(--rl-angle) * -1))
+        translateZ(var(--rl-radius))
+        scale(var(--rl-scale));
+      opacity:
+        clamp(
+          0,
+          1 - (var(--rl-far) - var(--rl-shown-to)
+            - (var(--rl-shown-to-intro) - var(--rl-shown-to)) * var(--rl-intro-t, 0)) / 0.6,
+          1
+        );
+      will-change: transform, opacity;
+    }
+
+    /* only the front card shows its caption */
+    .rl-copy > * {
+      opacity: 0;
+      transform: translateY(12px);
+      filter: blur(3px);
+      transition:
+        opacity 0.2s,
+        transform 0.2s,
+        filter 0.2s;
+    }
+
+    .card.is-active .rl-copy > * {
+      opacity: 1;
+      transform: none;
+      filter: none;
+      transition:
+        opacity 0.5s var(--rl-ease-out),
+        transform 0.5s var(--rl-ease-out),
+        filter 0.5s var(--rl-ease-out);
+    }
+
+    .card.is-active .rl-copy > :nth-child(2) {
+      transition-delay: 0.06s;
+    }
+
+    @media (width < 900px) {
+      .rl-copy > *,
+      .card.is-active .rl-copy > * {
+        filter: none;
+      }
+    }
+
+    /* white fades at the top and bottom edges */
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    &::before {
+      top: 0;
+      height: calc(84 * var(--rl-pu));
+      background: linear-gradient(var(--rl-fade) 40%, var(--rl-fade-end));
+    }
+
+    &::after {
+      bottom: 0;
+      height: calc(96 * var(--rl-pu));
+      background: linear-gradient(var(--rl-fade-end), var(--rl-fade) 75%);
+    }
+
+    /* phones: washes over the side cards, their opacity set from the scroll (cards-roller.js) */
+    .rl-wash {
+      position: absolute;
+      inset-inline: 0;
+      z-index: 2;
+      height: calc(50% - var(--rl-card-h) / 2 - 28px);
+      pointer-events: none;
+      opacity: 0;
+
+      @media (width >= 900px) {
+        display: none;
+      }
+    }
+
+    .rl-wash-top {
+      top: 0;
+      background: linear-gradient(var(--rl-fade) 40%, var(--rl-fade-end));
+    }
+
+    .rl-wash-bottom {
+      bottom: 0;
+      background: linear-gradient(var(--rl-fade-end), var(--rl-fade) 75%);
+    }
+  }
+
+  /* progress marks: shown only while one has keyboard focus */
+  .rl-rail {
+    position: absolute;
+    inset: 50% 16px auto auto;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transform: translateY(-50%);
+    opacity: 0;
+
+    &:focus-within {
+      opacity: 1;
+    }
+  }
+
+  .rl-mark {
+    width: 4px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: currentcolor;
+    opacity: 0.3;
+    cursor: pointer;
+  }
+
+  .rl-mark[aria-current] {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card,
+    .rl-copy > * {
+      transition: none;
+    }
+  }
+}

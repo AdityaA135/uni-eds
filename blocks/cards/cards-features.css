@@ -1,0 +1,1185 @@
+/* Cards "Features" style: cards (or stat tiles) that open their detail in place, in a dialog.
+   Loaded by cards.js only when the style is used. Values from the Code T prototype
+   (.tech-card / .perf-stat / .pop / .detail--centre); phone first, desktop from 600px / 900px. */
+
+@property --ft-fade-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --ft-fade-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 20px;
+}
+
+.cards.features {
+  --ft-gutter: 20px;
+  --ft-gap: 10px;
+  --ft-radius: 18px;
+  --ft-move: 300ms;
+  --ft-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ft-ink: #2e2e2e;
+  --ft-paper: #fcfdfc;
+  --ft-progress-gap: 24px;
+
+  position: relative;
+  container-type: inline-size;
+
+  .card-list {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--ft-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    /* image cards: a rail that bleeds to both edges of the screen; the first card lines up with
+       the section's text and the rail fades out under the screen edges */
+    margin-inline: calc(50cqi - 50vw);
+    padding-inline: calc(50vw - 50cqi);
+    scroll-padding-inline: calc(50vw - 50cqi);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    --ft-fade-end: var(--ft-gutter);
+
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      rgb(0 0 0 / 3%) calc(var(--ft-fade-start) * 0.14),
+      rgb(0 0 0 / 12%) calc(var(--ft-fade-start) * 0.28),
+      rgb(0 0 0 / 28%) calc(var(--ft-fade-start) * 0.42),
+      rgb(0 0 0 / 48%) calc(var(--ft-fade-start) * 0.56),
+      rgb(0 0 0 / 68%) calc(var(--ft-fade-start) * 0.7),
+      rgb(0 0 0 / 85%) calc(var(--ft-fade-start) * 0.84),
+      #000 var(--ft-fade-start),
+      #000 calc(100% - var(--ft-fade-end)),
+      rgb(0 0 0 / 85%) calc(100% - var(--ft-fade-end) * 0.84),
+      rgb(0 0 0 / 68%) calc(100% - var(--ft-fade-end) * 0.7),
+      rgb(0 0 0 / 48%) calc(100% - var(--ft-fade-end) * 0.56),
+      rgb(0 0 0 / 28%) calc(100% - var(--ft-fade-end) * 0.42),
+      rgb(0 0 0 / 12%) calc(100% - var(--ft-fade-end) * 0.28),
+      rgb(0 0 0 / 3%) calc(100% - var(--ft-fade-end) * 0.14),
+      transparent 100%
+    );
+  }
+
+  .card-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* the left fade shows once the rail has moved, the right one goes at its end */
+  @supports (animation-timeline: scroll()) {
+    .card-list {
+      animation:
+        ft-fade-start linear both,
+        ft-fade-end linear both;
+      animation-timeline: scroll(self inline), scroll(self inline);
+      animation-range: 0 64px, calc(100% - 64px) 100%;
+    }
+  }
+
+  .ft-card {
+    position: relative;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: calc(100vw - 2 * var(--ft-gutter) - 72px);
+    height: max(320px, 100svh - 345px);
+    border: 0;
+    border-radius: var(--ft-radius);
+    overflow: hidden;
+    scroll-snap-align: start;
+    background: #1e1e1e;
+    color: var(--color-white, #fff);
+    cursor: pointer;
+  }
+
+  /* the picture fills the card, a shade at the foot keeps the copy legible */
+  .card-image {
+    position: absolute;
+    inset: 0;
+    line-height: 0;
+  }
+
+  .card-image > p {
+    height: 100%;
+    margin: 0;
+  }
+
+  .card-image picture,
+  .card-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+
+  .ft-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 45%));
+    pointer-events: none;
+  }
+
+  .card-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 18px;
+  }
+
+  .ft-title,
+  .ft-line {
+    margin: 0;
+    color: inherit;
+  }
+
+  .ft-card .ft-title {
+    font-family: var(--font-family-display);
+    font-size: 17px;
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  .ft-card .ft-line {
+    font-size: 13px;
+    line-height: 1.45;
+    opacity: 0.85;
+    text-wrap: pretty;
+  }
+
+  /* the "+" button, in the card's corner */
+  .ft-open {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-end: 12px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: rgb(20 20 20 / 38%);
+    color: var(--color-white, #fff);
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition: background-color 0.25s;
+  }
+
+  .ft-open:focus-visible,
+  .ft-detail :focus-visible {
+    outline: 2px solid var(--color-accent, currentcolor);
+    outline-offset: 2px;
+  }
+
+  .ft-open:hover,
+  .ft-card:hover .ft-open {
+    background: rgb(20 20 20 / 62%);
+  }
+
+  .ft-open-icon,
+  .ft-close-icon {
+    position: relative;
+    width: 12.4px;
+    height: 12.4px;
+  }
+
+  .ft-open-icon::before,
+  .ft-open-icon::after,
+  .ft-close-icon::before,
+  .ft-close-icon::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto;
+    height: 2px;
+    border-radius: 1px;
+    background: currentcolor;
+    translate: 0 -50%;
+  }
+
+  .ft-open-icon::after {
+    rotate: 90deg;
+  }
+
+  .ft-close-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .ft-close-icon::before,
+  .ft-close-icon::after {
+    height: 1.5px;
+  }
+
+  .ft-close-icon::before {
+    rotate: 45deg;
+  }
+
+  .ft-close-icon::after {
+    rotate: -45deg;
+  }
+
+  /* the rail's position: a dash per card under the rail (cards-features.js) */
+  .ft-progress {
+    position: absolute;
+    inset-block-start: calc(100% + var(--ft-progress-gap));
+    inset-inline-start: 0;
+    display: flex;
+    gap: 6px;
+    pointer-events: none;
+  }
+
+  .ft-progress i {
+    width: 22px;
+    height: 1.5px;
+    background: rgb(0 0 0 / 15%);
+    transition: background-color 0.3s;
+  }
+
+  .ft-progress i.is-active {
+    background: #1b1b1b;
+  }
+
+  /* Performance: stat tiles (a value and a label, no picture on the tile) */
+  &.is-stats .card-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 16px;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+    mask-image: none;
+    animation: none;
+    color: var(--color-white, #fff);
+    text-shadow: 0 1px 14px rgb(0 0 0 / 45%);
+  }
+
+  .ft-card.is-stat {
+    display: block;
+    width: auto;
+    height: auto;
+    border-radius: 6px;
+    overflow: visible;
+    background: none;
+  }
+
+  .ft-card.is-stat::after,
+  .ft-card.is-stat .card-image {
+    display: none;
+  }
+
+  .ft-card.is-stat .card-body {
+    display: block;
+    padding: 0;
+  }
+
+  .ft-card.is-stat .ft-title {
+    display: block;
+    font-family: var(--font-family-display);
+    font-size: 24px;
+    font-weight: var(--font-weight-regular, 400);
+
+    /* the source's "normal" line height of its Extended face (29px at 24px) */
+    line-height: 1.21;
+    text-transform: none;
+    text-wrap: pretty;
+  }
+
+  .ft-card.is-stat .ft-title strong {
+    font-weight: inherit;
+  }
+
+  .ft-card.is-stat .ft-line {
+    width: auto;
+    display: block;
+    margin-top: 4px;
+    font-family: var(--font-family-base);
+    font-size: 13px;
+    font-weight: var(--font-weight-regular, 400);
+    line-height: 1.35;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 0.78;
+    transition: opacity 0.25s;
+  }
+
+  /* the "+" follows the value */
+  .ft-card.is-stat .ft-open {
+    position: relative;
+    inset: -3px auto auto;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: -4px 0 0 8px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 12%);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 32%);
+    vertical-align: middle;
+    backdrop-filter: blur(8px);
+    transition:
+      background-color 0.25s,
+      box-shadow 0.25s;
+  }
+
+  .ft-card.is-stat .ft-open-icon {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 8px;
+    height: 1.5px;
+    translate: -50% -50%;
+  }
+
+  .ft-card.is-stat .ft-open-icon::before,
+  .ft-card.is-stat .ft-open-icon::after {
+    height: 1.5px;
+  }
+
+  .ft-card.is-stat:hover .ft-open,
+  .ft-card.is-stat .ft-open:focus-visible {
+    background: rgb(255 255 255 / 30%);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 60%);
+  }
+
+  .ft-card.is-stat:hover .ft-line,
+  .ft-card.is-stat:has(.ft-open:focus-visible) .ft-line {
+    opacity: 0.85;
+  }
+
+  /* the focus ring goes round the whole tile, as on the source */
+  .ft-card.is-stat .ft-open:focus-visible {
+    outline: none;
+  }
+
+  .ft-card.is-stat:has(.ft-open:focus-visible) {
+    outline: 2px solid rgb(255 255 255 / 60%);
+    outline-offset: 8px;
+  }
+
+  /* Universal Editor: every part of every card visible and editable */
+  &.is-authoring .card-list {
+    flex-wrap: wrap;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+    mask-image: none;
+    animation: none;
+  }
+
+  &.is-authoring .ft-card:not(.is-stat) {
+    width: 280px;
+    height: auto;
+    min-height: 400px;
+    cursor: auto;
+  }
+
+  &.is-authoring .ft-more {
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px dashed currentcolor;
+  }
+
+  /* --- the detail: a dialog in the top layer, as large as the screen, holding a shade over
+     the page and the panel on it (the source's .pop / .perf-tint and #perfPop).
+     cards-features.js plays the opening and closing (the picture growing out of the card).
+     Image cards: a light panel, the picture on top (phone) or at the left (desktop). The
+     picture lies over an empty slot in the panel, so it can move on its own. --- */
+  .ft-detail {
+    --ft-pop-w: calc(100% - 24px);
+    --ft-pop-h: min(100% - 48px, 540px);
+    --ft-pop-media: 46%;
+
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    background: none;
+    color: var(--ft-ink);
+  }
+
+  .ft-detail::backdrop {
+    background: none;
+  }
+
+  .ft-back {
+    position: absolute;
+    inset: 0;
+    background: rgb(10 10 10 / 55%);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+  }
+
+  .ft-panel {
+    position: absolute;
+    inset-block-start: calc((100% - var(--ft-pop-h)) / 2);
+    inset-inline-start: calc((100% - var(--ft-pop-w)) / 2);
+    display: flex;
+    flex-direction: column;
+    width: var(--ft-pop-w);
+    height: var(--ft-pop-h);
+    overflow: hidden;
+    background: var(--ft-paper);
+    clip-path: inset(0 round 24px);
+  }
+
+  .ft-slot {
+    flex: none;
+    height: var(--ft-pop-media);
+  }
+
+  .ft-media {
+    position: absolute;
+    z-index: 2;
+    inset-block-start: calc((100% - var(--ft-pop-h)) / 2);
+    inset-inline-start: calc((100% - var(--ft-pop-w)) / 2);
+    width: var(--ft-pop-w);
+    height: calc(var(--ft-pop-h) * 0.46);
+    border-radius: 24px 24px 0 0;
+    overflow: hidden;
+    background: #1e1e1e;
+    line-height: 0;
+  }
+
+  .ft-media[hidden],
+  .ft-detail.is-text-only .ft-slot {
+    display: none;
+  }
+
+  .ft-media-pic,
+  .ft-media picture,
+  .ft-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+  }
+
+  .ft-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    min-height: 0;
+    padding: 22px 64px 24px 22px;
+    overflow-y: auto;
+  }
+
+  .ft-eyebrow {
+    margin: 0;
+    font-family: var(--font-family-base);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    color: rgb(0 0 0 / 55%);
+  }
+
+  .ft-eyebrow[hidden] {
+    display: none;
+  }
+
+  .ft-close {
+    position: absolute;
+    inset-block-start: calc(var(--ft-pop-media) + 14px);
+    inset-inline-end: 14px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: rgb(0 0 0 / 6%);
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+
+  /* a card without a picture: no picture room, the close button at the top */
+  .ft-detail.is-text-only {
+    --ft-pop-media: 0%;
+  }
+
+  .ft-close:hover {
+    background: rgb(0 0 0 / 12%);
+  }
+
+  .ft-detail-title {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: 24px;
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.05;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: inherit;
+  }
+
+  .ft-detail-text {
+    max-width: 380px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgb(0 0 0 / 62%);
+  }
+
+  .ft-detail-text p {
+    margin: 0;
+    color: inherit;
+  }
+
+  .ft-detail-text > * + * {
+    margin-top: 0.8em;
+  }
+
+  /* stat tiles (Performance): a frosted glass panel holding its picture, with a "next"
+     control; a sheet from the foot of the screen on phones, centred from 600px */
+  .ft-next {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    min-height: 44px;
+    margin: 0 20px 24px;
+    padding: 16px 0 0;
+    border: 0;
+    border-top: 1px solid rgb(255 255 255 / 30%);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .ft-next[hidden] {
+    display: none;
+  }
+
+  .ft-next-thumb {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    line-height: 0;
+  }
+
+  .ft-next-thumb:empty {
+    display: none;
+  }
+
+  .ft-next-thumb picture,
+  .ft-next-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ft-next-label {
+    flex: 1;
+    font-size: 14px;
+    font-weight: var(--font-weight-medium, 500);
+    text-transform: capitalize;
+  }
+
+  .ft-next-arrow {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    background: currentcolor;
+    mask: url('../../icons/arrow-right.svg') center / 16px no-repeat;
+  }
+
+  &.is-stats .ft-detail {
+    color: var(--color-white, #fff);
+  }
+
+  &.is-stats .ft-back {
+    background: rgb(0 0 0 / 42%);
+    backdrop-filter: blur(10px);
+  }
+
+  &.is-stats .ft-panel {
+    inset: auto 0 0;
+    width: 100%;
+    height: fit-content;
+    max-height: calc(100% - 24px);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    border-radius: 24px 24px 0 0;
+    overflow-y: auto;
+    background: rgb(255 255 255 / 35%);
+    clip-path: none;
+    backdrop-filter: blur(50px);
+  }
+
+  /* the grab handle of the sheet */
+  &.is-stats .ft-panel::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-start: 50%;
+    z-index: 2;
+    width: 40px;
+    height: 4px;
+    margin-inline-start: -20px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 85%);
+    box-shadow: 0 1px 6px rgb(0 0 0 / 30%);
+  }
+
+  &.is-stats .ft-close {
+    inset-block-start: 14px;
+    border-radius: 8px;
+    background: rgb(0 0 0 / 32%);
+    backdrop-filter: blur(10px);
+  }
+
+  &.is-stats .ft-close:hover {
+    background: rgb(0 0 0 / 48%);
+  }
+
+  &.is-stats .ft-media {
+    position: static;
+    flex: none;
+    width: auto;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 0;
+    background: none;
+  }
+
+  &.is-stats .ft-body {
+    display: block;
+    flex: 1 0 auto;
+    padding: 18px 20px 16px;
+    overflow: visible;
+  }
+
+  &.is-stats .ft-media[hidden] + .ft-body {
+    padding-inline-end: 64px;
+  }
+
+  &.is-stats .ft-detail-title {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  &.is-stats .ft-detail-text {
+    max-width: none;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 20px;
+    color: rgb(255 255 255 / 60%);
+  }
+
+  @media (width >= 600px) {
+    --ft-gutter: 64px;
+    --ft-gap: 16px;
+
+    .ft-card {
+      width: clamp(360px, 38vw, 720px);
+      height: max(320px, 100svh - 335px);
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .ft-card .ft-title {
+      font-size: clamp(16px, 1.4vw, 20px);
+    }
+
+    .ft-card .ft-line {
+      width: 88%;
+      font-size: clamp(13px, 1.05vw, 15px);
+    }
+
+    .ft-open {
+      inset-block-start: 16px;
+      inset-inline-end: 16px;
+      width: 36px;
+      height: 36px;
+    }
+
+    .ft-progress {
+      gap: 8px;
+    }
+
+    .ft-progress i {
+      width: 24px;
+    }
+
+    &.is-stats .ft-panel {
+      inset: 0;
+      width: 440px;
+      max-height: calc(100% - 48px);
+      margin: auto;
+      padding-bottom: 0;
+      border-radius: 24px;
+    }
+
+    &.is-stats .ft-panel::before {
+      content: none;
+    }
+
+    &.is-stats .ft-close {
+      width: 36px;
+      height: 36px;
+    }
+
+    &.is-stats .ft-body {
+      padding: 22px 24px 24px;
+    }
+
+    &.is-stats .ft-detail-title {
+      font-size: 24px;
+    }
+
+    &.is-stats .ft-detail-text {
+      margin-top: 20px;
+    }
+  }
+
+  @media (width >= 900px) {
+    /* stat tiles: one row of figures across the section */
+    &.is-stats .card-list {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      text-shadow: none;
+    }
+
+    .ft-card.is-stat .ft-title {
+      font-size: clamp(26px, 2.35vw, 34px);
+    }
+
+    .ft-card.is-stat .ft-line {
+      margin-top: 10px;
+      font-size: clamp(17px, 1.5vw, 20px);
+      line-height: 1.2;
+      opacity: 0.55;
+    }
+
+    .ft-card.is-stat .ft-open {
+      inset-block-start: -5px;
+      width: 24px;
+      height: 24px;
+      margin-inline-start: 12px;
+    }
+
+    .ft-card.is-stat .ft-open-icon {
+      width: 10px;
+    }
+
+    /* image-card detail: picture at the left, copy at the right */
+    .ft-detail {
+      --ft-pop-w: min(1000px, 84%);
+      --ft-pop-h: min(580px, 78%);
+    }
+
+    .ft-panel {
+      flex-direction: row;
+    }
+
+    .ft-slot {
+      width: 56%;
+      height: auto;
+    }
+
+    .ft-media {
+      width: calc(var(--ft-pop-w) * 0.56);
+      height: var(--ft-pop-h);
+      border-radius: 24px 0 0 24px;
+    }
+
+    .ft-body {
+      justify-content: center;
+      gap: 18px;
+      padding: 48px 44px;
+    }
+
+    .ft-close {
+      inset-block-start: 18px;
+      inset-inline-end: 18px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .ft-detail-title {
+      font-size: clamp(24px, 2.2vw, 34px);
+    }
+
+    .ft-detail-text {
+      font-size: clamp(14px, 1.25vw, 16px);
+    }
+
+    &.is-stats .ft-panel {
+      flex-direction: column;
+    }
+
+    &.is-stats .ft-close {
+      inset-inline-end: 14px;
+    }
+
+    &.is-stats .ft-body {
+      justify-content: initial;
+      padding: 22px 24px 24px;
+    }
+  }
+
+  /* short desktop screens, as the source */
+  @media (width >= 768px) and (height <= 820px) {
+    &.is-stats .ft-detail-title {
+      font-size: 20px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-list {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@keyframes ft-fade-start {
+  from {
+    --ft-fade-start: 0;
+  }
+
+  to {
+    --ft-fade-start: var(--ft-gutter);
+  }
+}
+
+@keyframes ft-fade-end {
+  from {
+    --ft-fade-end: var(--ft-gutter);
+  }
+
+  to {
+    --ft-fade-end: 0;
+  }
+}
+
+/* --- the sections holding the Features cards (Code T prototype: .rail-wrap .fold-head, .perf-hero,
+   .perf-tag). They sit here, next to the cards, because they only apply to a section holding a
+   Features block; selectors start at the section, so no other section is reached. --- */
+
+/* Technology, Safety (Light sections): as the source's .rail-wrap, the heading at a fixed
+   distance below the top, the rail filling the screen down to a fixed distance above the foot,
+   the progress dashes in that foot room; across the full width, a 20px / 64px gutter */
+main > .section.light:has(.cards.features) {
+  --ft-rail-top: 84px;
+  --ft-rail-bottom: 116px;
+  --ft-rail-gap: 20px;
+  --ft-rail-dash: 82px;
+  --ft-rail-gutter: 20px;
+
+  justify-content: flex-start;
+  gap: var(--ft-rail-gap);
+
+  /* the heading never under the site header's bar (--nav-offset), shown again on a move up */
+  padding-block: max(var(--ft-rail-top), var(--nav-offset, 90px) + 16px) var(--ft-rail-bottom);
+
+  @media (width >= 600px) {
+    --ft-rail-top: 104px;
+    --ft-rail-bottom: 104px;
+    --ft-rail-gap: 40px;
+    --ft-rail-dash: 51px;
+    --ft-rail-gutter: 64px;
+  }
+
+  /* short desktop screens, as the source */
+  @media (width >= 900px) and (height <= 860px) {
+    --ft-rail-top: 88px;
+    --ft-rail-bottom: 88px;
+    --ft-rail-gap: 32px;
+    --ft-rail-dash: 43px;
+  }
+
+  > :is(.default-content-wrapper, .cards-wrapper) {
+    max-width: none;
+    margin: 0;
+    padding-inline: var(--ft-rail-gutter);
+  }
+
+  /* the rail takes the room left under the heading; its cards are as tall as it */
+  > .cards-wrapper {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .cards.features:not(.is-stats, .is-authoring) {
+    --ft-progress-gap: calc(var(--ft-rail-bottom) - var(--ft-rail-dash) - 1.5px);
+
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+
+    > .card-list {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .ft-card {
+      height: auto;
+      min-height: 320px;
+    }
+  }
+}
+
+/* the title and its sub-line above the rail, side by side from 600px */
+main > .section.light:has(.cards.features) > .default-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 0;
+
+  > * {
+    margin: 0;
+  }
+
+  > h2 {
+    color: #2e2e2e;
+    font-family: var(--font-family-display);
+    font-size: clamp(21px, 6.3vw, 26px);
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  > h2 + p {
+    color: rgb(0 0 0 / 55%);
+    font-family: var(--font-family-base);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  @media (width >= 600px) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 64px;
+
+    > h2 {
+      max-width: 22ch;
+      font-size: clamp(26px, 3.125vw, 44px);
+    }
+
+    > h2 + p {
+      flex: 0 1 420px;
+      font-size: clamp(14px, 1.25vw, 16px);
+      line-height: 1.6;
+    }
+  }
+
+  /* short desktop screens, as the source */
+  @media (width >= 900px) and (height <= 860px) {
+    > h2 {
+      font-size: clamp(26px, 2.5vw, 34px);
+    }
+
+    > h2 + p {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+}
+
+/* Performance (stat tiles): the picture fills the section; over it, the big figure at the top
+   left (cards-features.js splits "359 PS" into its number and unit), its label beside the unit,
+   the tag line at the top right (from 1200px), and the tiles at the foot */
+main > .section:has(.cards.features.is-stats) {
+  position: relative;
+  isolation: isolate;
+
+  /* the picture reaches past the section's sides: always clipped, also where sections let their
+     content overflow (reduced motion, Universal Editor), or it widens the page */
+  overflow: clip;
+
+  > .default-content-wrapper {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-rows: auto 1fr;
+    max-width: none;
+    margin: 0 0 auto;
+
+    /* clear of the site header's bar (--nav-offset), shown again on a move up */
+    padding: max(84px, var(--nav-offset, 90px) + 12px) 20px 0;
+    color: var(--color-white, #fff);
+
+    > * {
+      margin: 0;
+    }
+
+    /* the picture: behind everything, larger than the section and anchored at its foot, as the
+       source's .perf-bg (2% above, 8% beyond each side, 14% below; the section clips it) */
+    > p:has(> picture:only-child) {
+      position: absolute;
+      inset: -2% -8% -14%;
+      z-index: -1;
+    }
+
+    > p:has(> picture:only-child) picture,
+    > p:has(> picture:only-child) img {
+      display: block;
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 100%;
+    }
+
+    /* the figure (a bold paragraph, or a bare <strong> as Universal Editor publishes it): number
+       (rows 1-2), unit beside its top, the label beside its foot */
+    > p:has(> strong:only-child) {
+      display: contents;
+    }
+
+    :is(& > p:has(> strong:only-child) > strong, & > strong) {
+      grid-area: 1 / 1 / 3 / 2;
+      font-family: var(--font-family-display);
+      font-size: clamp(88px, 27vw, 120px);
+      font-weight: var(--font-weight-regular, 400);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+    }
+
+    :is(& > p:has(> strong:only-child) > strong, & > strong):has(> .ft-figure-unit) {
+      display: contents;
+    }
+
+    .ft-figure-number {
+      grid-area: 1 / 1 / 3 / 2;
+    }
+
+    .ft-figure-unit {
+      grid-area: 1 / 2;
+      margin: 8px 0 0;
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: normal;
+    }
+
+    > :is(p:has(> strong:only-child), strong) + p {
+      grid-area: 2 / 2;
+      align-self: end;
+      max-width: 7em;
+      margin: 0 0 4px 4px;
+      font-family: var(--font-family-base);
+      font-size: 13px;
+      line-height: 15px;
+    }
+
+    /* the tag line: desktop only, as the source */
+    > p:last-child:not(:has(> strong:only-child, > picture:only-child)) {
+      display: none;
+    }
+  }
+
+  /* the tiles: their foot 76px above the screen's (the source's dock room) */
+  > .cards-wrapper {
+    margin-top: auto;
+    margin-bottom: 76px;
+  }
+
+  /* from 600px: a 64px gutter, the source's desktop figure */
+  @media (width >= 600px) {
+    > .default-content-wrapper {
+      /* as the source: up to 210px, smaller (never under 70%) on short screens so the figure
+         stays clear of the car; the unit (52px) scales with it. The figure starts 12px under
+         the site header's bar (--nav-offset, the source has it at 64px), so it ends where it
+         did: the room is the source's 34.4svh - 102px less that shift */
+      --ft-figure: clamp(120px, 15.2vw, 210px);
+      --ft-figure-k: clamp(0.7, tan(atan2(34.4svh - 50px - var(--nav-offset, 90px), var(--ft-figure))), 1);
+
+      padding: calc(var(--nav-offset, 90px) + 12px) 64px 0;
+
+      /* Universal Editor: the frame grows with the page, so size as on a 900px tall screen */
+      body:has([data-aue-resource]) & {
+        --ft-figure-k: clamp(0.7, tan(atan2(259.6px - var(--nav-offset, 90px), var(--ft-figure))), 1);
+      }
+
+      :is(& > p:has(> strong:only-child) > strong, & > strong) {
+        font-size: calc(var(--ft-figure) * var(--ft-figure-k));
+      }
+
+      .ft-figure-unit {
+        margin: 14px 0 0 4px;
+        font-size: calc(52px * var(--ft-figure-k));
+      }
+
+      > :is(p:has(> strong:only-child), strong) + p {
+        max-width: 7.6em;
+        margin: 0 0 6px 4px;
+        font-size: 20px;
+        line-height: 20px;
+      }
+    }
+
+    > .cards-wrapper {
+      max-width: none;
+      margin-bottom: 100px;
+      padding-inline: 64px;
+    }
+  }
+
+  /* short screens, as the source */
+  @media (width >= 600px) and (height <= 800px) {
+    > .cards-wrapper {
+      margin-bottom: 84px;
+    }
+  }
+
+  /* the tag line at the top right, where there is room for it beside the figure */
+  @media (width >= 1200px) {
+    > .default-content-wrapper > p:last-child:not(:has(> strong:only-child, > picture:only-child)) {
+      display: block;
+      grid-area: 1 / 4 / 3 / 5;
+      align-self: start;
+      width: max-content;
+      font-family: var(--font-family-display);
+      font-size: 32px;
+      font-weight: var(--font-weight-medium, 500);
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+  }
+}

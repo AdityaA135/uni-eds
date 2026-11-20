@@ -9,6 +9,7 @@
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
               "name": "Cards",
+              "model": "cards",
               "filter": "cards"
             }
           }
@@ -33,6 +34,26 @@
   ],
   "models": [
     {
+      "id": "cards",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "description": "Carousel auto-rotates; recommended: 6 to 12 cards. Timeline: 6 to 10 cards. Pillars: up to 6 cards, JPG or PNG images only. Roller: 3 to 6 cards, one per scroll step. Rail: a horizontally scrolling row of fixed-width cards, any number. Features: cards that open their detail in place, with a next button (tech, safety or performance features).",
+          "options": [
+            { "name": "Default", "value": "" },
+            { "name": "Carousel", "value": "carousel" },
+            { "name": "Timeline", "value": "timeline" },
+            { "name": "Pillars", "value": "pillars" },
+            { "name": "Roller", "value": "roller" },
+            { "name": "Rail", "value": "rail" },
+            { "name": "Features", "value": "features" }
+          ]
+        }
+      ]
+    },
+    {
       "id": "card",
       "fields": [
         {
@@ -40,13 +61,22 @@
           "valueType": "string",
           "name": "image",
           "label": "Image",
+          "required": true,
           "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Image Alt Text",
+          "value": ""
         },
         {
           "component": "richtext",
           "name": "text",
           "value": "",
           "label": "Text",
+          "description": "Pillars: 1. Label 2. Heading 3. Description, opening words in bold. Timeline: 1. Title as a heading, 2. Description 3. Location in italics. Roller: 1. Title as a heading 2. Description. Features: 1. Title as a heading (or in bold for a stat tile, e.g. 590 Nm) 2. Short line 3. and on: the detail, shown with the image when the card is opened (a heading first is the detail title).",
           "valueType": "string"
         }
       ]
