@@ -457,7 +457,8 @@ body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving
    900px. These rules sit here because they only apply to a section holding the (light)
    accordion; the dark theme and accordions outside Light sections are left as above. */
 main > .section.light:has(.block.accordion:not(.dark)) {
-  --accordion-section-background: var(--section-bg);
+  /* the prototype's off-white, set here: the site's --section-bg can be the dark page colour */
+  --accordion-section-background: #fcfdfc;
 
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
