@@ -136,7 +136,6 @@
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 12 12 4M5.5 4H12v6.5' stroke='%23f2f2f2' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
       center / max(14px, calc(16 * var(--sd-u, 1px))) no-repeat,
       rgb(255 255 255 / 20%);
-    backdrop-filter: blur(8px);
     transition: background-color 0.25s;
   }
 
@@ -151,6 +150,9 @@
     justify-content: flex-start;
     margin-top: 43.9px;
     padding: 0 var(--sd-side, 20px);
+
+    /* fast repeated taps (also on a disabled arrow) must not double-tap zoom */
+    touch-action: manipulation;
 
     &[hidden] {
       display: none;
@@ -170,6 +172,7 @@
     color: var(--color-white, #fff);
     cursor: pointer;
     transition: background-color 0.2s, opacity 0.3s;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover,
     &:focus-visible {
