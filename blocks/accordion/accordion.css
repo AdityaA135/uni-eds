@@ -13,7 +13,9 @@
   --accordion-white: #fff;
   --accordion-black: var(--color-black, #000);
   --accordion-line: color-mix(in srgb, currentcolor 15%, transparent);
-  --accordion-number: color-mix(in srgb, currentcolor 50%, transparent);
+
+  /* 60%: item numbers keep >= 4.5:1 contrast on white and on dark */
+  --accordion-number: color-mix(in srgb, currentcolor 60%, transparent);
   --accordion-question: color-mix(in srgb, currentcolor 80%, transparent);
   --accordion-question-open: currentcolor;
   --accordion-answer: color-mix(in srgb, currentcolor 65%, transparent);
@@ -226,5 +228,519 @@ main .section:has(.block.accordion) {
 
   @media (width <= 599.98px) {
     padding-block: 48px;
+  }
+}
+
+/* ---------- Combat theme (body.combat): the FAQ beside the intro of a "split" section ----------
+   Values from the source prototype's FAQ list: 12% hairlines, questions in 66% black (black when
+   open or hovered), 10px numbers, a 14px + that turns into an x, answers in 60% black. The numbers
+   stay at the block's 60% (not the source's 40%) to keep 4.5:1 contrast on the light stage. */
+
+/* the theme rules come after the base ones on purpose, and win by their body.combat prefix */
+/* stylelint-disable no-descending-specificity */
+body.combat .accordion {
+  /* the shades are of the block's own ink, not of currentcolor: the question row (summary) is
+     dimmed itself, and the number and question inside it must not dim again */
+  --accordion-ink: var(--accordion-black);
+  --accordion-line: color-mix(in srgb, currentcolor 12%, transparent);
+  --accordion-number: color-mix(in srgb, var(--accordion-ink) 60%, transparent);
+  --accordion-question: color-mix(in srgb, var(--accordion-ink) 66%, transparent);
+  --accordion-question-open: var(--accordion-ink);
+  --accordion-answer: color-mix(in srgb, currentcolor 60%, transparent);
+  --accordion-gutter: 22px;
+  --accordion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  max-width: none;
+  margin: 0;
+
+  &.dark {
+    --accordion-ink: var(--accordion-white);
+  }
+
+  /* the whole row is dimmed like the question (the source's .faq__q), and darkens with it on
+     hover and open; the number keeps its own 60% */
+  .accordion-item-label {
+    box-sizing: border-box;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 14px 34px 14px 0;
+    color: var(--accordion-question);
+    transition: color 0.25s;
+  }
+
+  .accordion-item-label:hover,
+  .accordion-item[open] > .accordion-item-label,
+  .accordion-item-label:hover .accordion-item-question,
+  .accordion-item-label:hover .accordion-item-icon {
+    color: var(--accordion-question-open);
+  }
+
+  .accordion-item-number {
+    font-size: 10px;
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+  }
+
+  .accordion-item-question {
+    font-size: 15px;
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.35;
+    text-wrap: pretty;
+    transition: color 0.25s;
+  }
+
+  .accordion-item-icon {
+    flex-basis: 14px;
+    width: 14px;
+    height: 14px;
+    margin-left: 0;
+    transition: color 0.25s;
+
+    &::before,
+    &::after {
+      height: 1.5px;
+      margin-top: -0.75px;
+      transition: transform 0.45s var(--accordion-ease);
+    }
+  }
+
+  .accordion-item[open] .accordion-item-icon::before,
+  .accordion-item[open] .accordion-item-icon::after {
+    height: 1.5px;
+    margin-top: -0.75px;
+  }
+
+  .accordion-item-body {
+    box-sizing: border-box;
+    max-width: 640px;
+    padding: 0 0 16px calc(var(--accordion-gutter) + 12px);
+    font-size: 14px;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  /* phones and tablets: the fold is one screen, so the list scrolls inside the space left under
+     the intro (as on the source) instead of running past the section, which clips it */
+  @media (width <= 899.98px) {
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* inside the scrolling list, so the outline is not cut off at the sides */
+    .accordion-item-label:focus-visible {
+      outline-offset: -2px;
+    }
+  }
+
+  @media (width >= 900px) {
+    --accordion-gutter: 28px;
+
+    .accordion-item-label {
+      gap: 20px;
+      min-height: 0;
+      padding: 20px 0;
+    }
+
+    .accordion-item-question {
+      font-size: clamp(16px, 1.4vw, 19px);
+    }
+
+    .accordion-item-body {
+      padding: 0 34px 22px calc(var(--accordion-gutter) + 20px);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+  }
+
+  /* short desktop screens: tighter rows, as on the source */
+  @media (width >= 1024px) and (height <= 860px) {
+    .accordion-item-label {
+      padding: 15px 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .accordion-item-label,
+    .accordion-item-question,
+    .accordion-item-icon,
+    .accordion-item-icon::before,
+    .accordion-item-icon::after {
+      transition: none;
+    }
+  }
+}
+
+/* stylelint-enable no-descending-specificity */
+
+/* Combat theme: the wrapper fills its grid row on phones and tablets, so the list can scroll */
+@media (width <= 899.98px) {
+  body.combat .accordion-wrapper {
+    align-self: stretch;
+    min-height: 0;
+  }
+}
+
+/* ---------- Combat motion (accordion.js wireCombatMotion) ----------
+   The script eases each item's height open and closed (and fades its answer), in every
+   browser, so the details' own height transition is off; an item clips its answer only while
+   it animates, so the focus ring is never cut off. */
+body.combat .accordion.combat-accordion .accordion-item::details-content {
+  transition: none;
+}
+
+body.combat .accordion.combat-accordion .accordion-item.is-animating {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* arrival (needs body.combat-motion, scripts/combat-motion.js): as the page moves down to the
+   FAQ, its intro rises 70px, one line after another (72ms apart), then the questions 60px
+   (48ms apart; power3.out, timed to the 1.2s move as on the prototype). Moving up to it, it is
+   there at once. */
+body.combat-motion main > .section:has(.accordion):not([data-arrive='up']) > .default-content-wrapper > * {
+  --combat-arrive-delay: 0.46s;
+
+  transition:
+    opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1) var(--combat-arrive-delay),
+    translate 0.5s cubic-bezier(0.25, 1, 0.5, 1) var(--combat-arrive-delay);
+}
+
+body.combat-motion main > .section:has(.accordion):not([data-arrive='up']) > .default-content-wrapper > :nth-child(2) {
+  --combat-arrive-delay: 0.53s;
+}
+
+body.combat-motion main > .section:has(.accordion):not([data-arrive='up']) > .default-content-wrapper > :nth-child(3) {
+  --combat-arrive-delay: 0.6s;
+}
+
+body.combat-motion main > .section:has(.accordion):not([data-arrive='up']) > .default-content-wrapper > :nth-child(n + 4) {
+  --combat-arrive-delay: 0.68s;
+}
+
+body.combat-motion main > .section:has(.accordion):not([data-arrive='up']) .accordion > .accordion-item {
+  transition:
+    opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1) calc(0.54s + var(--accordion-i, 0) * 0.048s),
+    translate 0.45s cubic-bezier(0.25, 1, 0.5, 1) calc(0.54s + var(--accordion-i, 0) * 0.048s);
+}
+
+/* the hidden state last, so it wins over the transitions above (no transition: it is
+   taken off screen) */
+body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving) > .default-content-wrapper > * {
+  opacity: 0;
+  translate: 0 70px;
+  transition: none;
+}
+
+body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving) .accordion > .accordion-item {
+  opacity: 0;
+  translate: 0 60px;
+  transition: none;
+}
+
+/* --- in a Light section (Code T FAQ, values from the prototype's .faq) ---
+   The section's own off-white instead of the white above, its default content (eyebrow, title,
+   sub-line, link) as the FAQ's head: above the list on phones and tablets, beside it from
+   900px. These rules sit here because they only apply to a section holding the (light)
+   accordion; the dark theme and accordions outside Light sections are left as above. */
+main > .section.light:has(.block.accordion:not(.dark)) {
+  --accordion-section-background: var(--section-bg);
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: start;
+  row-gap: 20px;
+  padding: max(84px, var(--nav-offset, 0px) + 10px) 20px 32px;
+
+  > div {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* the list scrolls inside the screen-tall section when it does not fit */
+  > .accordion-wrapper {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  > .accordion-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  > .default-content-wrapper {
+    color: #2e2e2e;
+    font-family: var(--font-family-base);
+
+    > * {
+      margin: 0;
+    }
+
+    /* the eyebrow: a paragraph right before the title */
+    > p:has(+ h2) {
+      color: rgb(0 0 0 / 55%);
+      font-size: 12px;
+      font-weight: var(--font-weight-semibold, 600);
+      line-height: 1.3;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+    }
+
+    > h2 {
+      margin-top: 10px;
+      color: #2e2e2e;
+      font-family: var(--font-family-display);
+      font-size: 26px;
+      font-weight: var(--font-weight-medium, 500);
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: uppercase;
+    }
+
+    > h2 + p {
+      margin-top: 10px;
+      max-width: 380px;
+      color: rgb(0 0 0 / 55%);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* the link: an outlined small button, from 600px (phones have the list only) */
+    > p:has(> a:only-child) {
+      display: none;
+    }
+
+    > p > a:only-child:any-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      height: 40px;
+      padding: 0 24px;
+      border: 1px solid #111;
+      border-radius: 8px;
+      background: transparent;
+      color: #111;
+      font-size: 12px;
+      font-weight: var(--font-weight-regular, 400);
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    > p > a:only-child:any-link:hover,
+    > p > a:only-child:any-link:focus-visible {
+      background-color: #111;
+      color: #fff;
+    }
+  }
+
+  /* short phones: the design drops the sub-line to leave the list room */
+  @media (width < 600px) and (height <= 720px) {
+    padding-top: max(76px, var(--nav-offset, 0px) + 10px);
+
+    > .default-content-wrapper > h2 + p {
+      display: none;
+    }
+  }
+
+  @media (width >= 600px) {
+    row-gap: 28px;
+    padding: max(96px, var(--nav-offset, 0px) + 12px) 20px 32px;
+
+    > .default-content-wrapper {
+      > h2 {
+        margin-top: 18px;
+        max-width: 11ch;
+        font-size: clamp(26px, 3.125vw, 44px);
+      }
+
+      > h2 + p {
+        margin-top: 20px;
+        font-size: clamp(14px, 1.25vw, 16px);
+      }
+
+      > p:has(> a:only-child) {
+        display: block;
+        margin-top: 32px;
+      }
+    }
+  }
+
+  /* the head at the left (5 parts), the list at the right (7 parts) */
+  @media (width >= 900px) {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: start;
+    column-gap: 64px;
+    padding: 120px 64px 64px;
+
+    > .accordion-wrapper {
+      max-height: 100%;
+    }
+  }
+
+  @media (width >= 900px) and (height <= 860px) {
+    padding-top: max(96px, var(--nav-offset, 0px) + 12px);
+  }
+}
+
+main > .section.light .block.accordion:not(.dark) {
+  --accordion-line: rgb(0 0 0 / 12%);
+  --accordion-number: rgb(0 0 0 / 60%);
+  --accordion-question: rgb(0 0 0 / 66%);
+  --accordion-question-open: #000;
+  --accordion-answer: rgb(0 0 0 / 60%);
+  --accordion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  max-width: none;
+  margin: 0;
+  font-family: var(--font-family-base);
+
+  .accordion-item-label {
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    min-height: 48px;
+    padding: 14px 34px 14px 0;
+    color: var(--accordion-question);
+    font-weight: var(--font-weight-medium, 500);
+    transition: color 0.25s;
+
+    &:hover {
+      color: var(--accordion-question-open);
+    }
+
+    &:focus-visible {
+      outline-offset: -2px;
+    }
+  }
+
+  .accordion-item-number {
+    flex: 0 0 22px;
+    color: var(--accordion-number);
+    font-size: 10px;
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+  }
+
+  .accordion-item-question {
+    flex: 1 1 0;
+    color: inherit;
+    font-size: 15px;
+    line-height: 1.35;
+    transition: none;
+  }
+
+  /* a thin + that turns a quarter, into an x, when open */
+  .accordion-item-icon {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    color: inherit;
+    transition: transform 0.45s var(--accordion-ease);
+
+    &::before,
+    &::after {
+      transition: none;
+    }
+
+    &::before {
+      height: 1.5px;
+      margin-top: -0.75px;
+    }
+
+    &::after {
+      top: 0;
+      left: 50%;
+      width: 1.5px;
+      height: 100%;
+      margin: 0 0 0 -0.75px;
+      transform: none;
+    }
+  }
+
+  .accordion-item[open] {
+    .accordion-item-label {
+      color: var(--accordion-question-open);
+    }
+
+    .accordion-item-icon {
+      transform: rotate(45deg);
+    }
+
+    .accordion-item-icon::before {
+      height: 1.5px;
+      margin-top: -0.75px;
+      transform: none;
+    }
+
+    .accordion-item-icon::after {
+      height: 100%;
+      margin: 0 0 0 -0.75px;
+      transform: none;
+    }
+  }
+
+  .accordion-item-body {
+    box-sizing: border-box;
+    max-width: 640px;
+    padding: 0 0 16px 34px;
+    color: var(--accordion-answer);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  @media (width >= 600px) {
+    .accordion-item-label {
+      gap: 20px;
+      min-height: 0;
+      padding: 20px 0;
+    }
+
+    .accordion-item-number {
+      flex-basis: 28px;
+    }
+
+    .accordion-item-question {
+      font-size: clamp(16px, 1.4vw, 19px);
+    }
+
+    .accordion-item-icon {
+      flex-basis: 14px;
+      width: 14px;
+      height: 14px;
+      margin: 0;
+    }
+
+    .accordion-item-body {
+      padding: 0 34px 22px 48px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+  }
+
+  @media (width >= 900px) and (height <= 860px) {
+    .accordion-item-label {
+      padding-block: 15px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .accordion-item-label,
+    .accordion-item-icon {
+      transition: none;
+    }
   }
 }

@@ -88,6 +88,95 @@ function buildItem(row, i) {
   return details;
 }
 
+/* ---------- Combat motion ----------
+ * On the Combat page (body.combat) an answer opens and closes as on the design prototype, in
+ * every browser: the item's height eases open in 0.55s and closed in 0.4s (power3.inOut), the
+ * answer fading in 6px down after 0.12s (0.45s) and out in 0.2s. The item stays open while it
+ * closes, so its answer can be seen going; opening one closes the one open. Only with motion
+ * allowed (checked at each click); otherwise, and for anything else that opens an item (find in
+ * page, a link), the details open and close at once as everywhere else.
+ */
+const COMBAT_EASE = {
+  power2In: 'cubic-bezier(0.32, 0, 0.67, 0)',
+  power3Out: 'cubic-bezier(0.25, 1, 0.5, 1)',
+  power3InOut: 'cubic-bezier(0.76, 0, 0.24, 1)',
+};
+
+/**
+ * @param {Element} block
+ * @param {HTMLDetailsElement[]} items
+ */
+function wireCombatMotion(block, items) {
+  const motionOk = () => window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+  block.classList.add('combat-accordion');
+  // the items' order, for their arrival one after another (accordion.css)
+  items.forEach((details, i) => details.style.setProperty('--accordion-i', i));
+  const running = new Map();
+  const stop = (details) => {
+    const anims = running.get(details);
+    running.delete(details);
+    anims?.forEach((a) => a.cancel());
+    details.classList.remove('is-animating');
+  };
+
+  /** eases an item open or closed from where it is (also part way, when interrupted) */
+  const animate = (details, open) => {
+    const summary = details.querySelector('summary');
+    const answer = details.querySelector('.accordion-item-body');
+    // border-box heights (the item is border-box while it animates, accordion.css)
+    const { height } = details.getBoundingClientRect();
+    const fade = answer ? getComputedStyle(answer) : null;
+    const answerFrom = fade && { opacity: fade.opacity, translate: fade.translate === 'none' ? '0 0' : fade.translate };
+    stop(details);
+    details.classList.toggle('is-closing', !open);
+    details.open = true;
+    const borders = details.offsetHeight - details.clientHeight;
+    const to = open ? details.offsetHeight : summary.offsetHeight + borders;
+    details.classList.add('is-animating');
+    const size = details.animate([{ height: `${height}px` }, { height: `${to}px` }], {
+      duration: open ? 550 : 400, easing: COMBAT_EASE.power3InOut,
+    });
+    const anims = [size];
+    if (answer) {
+      anims.push(open
+        ? answer.animate([{ opacity: 0, translate: '0 -6px' }, { opacity: 1, translate: '0 0' }], {
+          duration: 450, delay: 120, easing: COMBAT_EASE.power3Out, fill: 'backwards',
+        })
+        : answer.animate([answerFrom, { opacity: 0, translate: '0 -6px' }], {
+          duration: 200, easing: COMBAT_EASE.power2In, fill: 'forwards',
+        }));
+    }
+    running.set(details, anims);
+    size.finished.then(() => {
+      if (running.get(details) !== anims) return;
+      if (!open) {
+        details.classList.remove('is-closing');
+        details.open = false;
+      }
+      stop(details);
+    }).catch(() => {
+      // interrupted: the next animation takes over from where this one was
+    });
+  };
+
+  items.forEach((details) => {
+    const summary = details.querySelector('summary');
+    summary.addEventListener('click', (e) => {
+      if (!motionOk()) return;
+      e.preventDefault();
+      const opening = !details.open || details.classList.contains('is-closing');
+      if (opening) {
+        items.forEach((other) => {
+          if (other !== details && other.open && !other.classList.contains('is-closing')) {
+            animate(other, false);
+          }
+        });
+      }
+      animate(details, opening);
+    });
+  });
+}
+
 /**
  * @param {Element} block
  */
@@ -104,10 +193,20 @@ export default function decorate(block) {
     if (contentLength) tooLong.push(`item ${i + 1}: its content (${contentLength} of ${MAX_CHARS.content} characters)`);
   });
 
-  // one item open at a time
+  // Combat theme: the first question starts open, as on the source
+  if (document.body.classList.contains('combat') && items.length) items[0].open = true;
+
+  // one item open at a time (one still closing, Combat motion, closes when it is done)
   items.forEach((details) => details.addEventListener('toggle', () => {
-    if (details.open) items.forEach((other) => { if (other !== details) other.open = false; });
+    if (details.open) {
+      items.forEach((other) => {
+        if (other !== details && !other.classList.contains('is-closing')) other.open = false;
+      });
+    }
   }));
+  if (document.body.classList.contains('combat') && !editing && items.length) {
+    wireCombatMotion(block, items);
+  }
 
   // Universal Editor: selecting an item, or one of its fields, in the content tree or on the
   // page opens that item. Listened to while capturing, so it is heard wherever it is dispatched
