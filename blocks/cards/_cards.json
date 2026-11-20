@@ -76,7 +76,7 @@
           "name": "text",
           "value": "",
           "label": "Text",
-          "description": "Pillars: 1. Label 2. Heading 3. Description, opening words in bold. Timeline: 1. Title as a heading, 2. Description 3. Location in italics. Roller: 1. Title as a heading 2. Description. Features: 1. Title as a heading (or in bold for a stat tile, e.g. 590 Nm) 2. Short line 3. and on: the detail, shown with the image when the card is opened (a heading first is the detail title).",
+          "description": "Pillars: 1. Label 2. Heading 3. Description, opening words in bold. Timeline: 1. Title as a heading, 2. Description 3. Location in italics. Roller: 1. Title as a heading 2. Description. Carousel in a Light section: 1. Label 2. Title as a heading 3. Description 4. Link. Features: 1. Title as a heading (or in bold for a stat tile, e.g. 590 Nm) 2. Short line 3. and on: the detail, shown with the image when the card is opened (a heading first is the detail title).",
           "valueType": "string"
         }
       ]

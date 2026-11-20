@@ -614,7 +614,7 @@ export default async function decorate(block) {
       loadCSS(`${window.hlx.codeBasePath}/blocks/cards/cards-carousel-light.css`),
       import('./cards-carousel-light.js'),
     ]);
-    decorateCarouselLight(block, ul, decorateCarousel, CARDS_MAX);
+    decorateCarouselLight(block, ul, decorateCarousel);
     return;
   }
 
