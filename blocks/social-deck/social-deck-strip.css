@@ -361,8 +361,9 @@ main .section.social-deck-container:has(.social-deck.strip) {
     & .default-content-wrapper {
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-rows: calc(9 * var(--sd-u)) calc(29 * var(--sd-u));
-      gap: calc(20 * var(--sd-u)) 24px;
-      height: calc(90 * var(--sd-u));
+      gap: calc(20 * var(--sd-u)) 0;
+      height: auto;
+      margin-bottom: calc(32 * var(--sd-u));
       padding: 0 var(--sd-side);
     }
 
@@ -406,7 +407,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
       grid-column: 2;
       align-self: end;
       gap: calc(4 * var(--sd-u));
-      margin: 0;
+      margin: 0 0 0 24px;
     }
 
     & .default-content-wrapper > ul a:any-link {
