@@ -484,18 +484,24 @@ main > .section.light:has(.block.accordion:not(.dark)) {
       margin: 0;
     }
 
-    /* the eyebrow: a paragraph right before the title */
+    /* the eyebrow: a paragraph right before the title; one line, then "…" */
     > p:has(+ h2) {
+      overflow: hidden;
       color: rgb(0 0 0 / 55%);
       font-size: 12px;
       font-weight: var(--font-weight-semibold, 600);
       line-height: 1.3;
       letter-spacing: 0.045em;
+      text-overflow: ellipsis;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
+    /* two lines, then "…" */
     > h2 {
+      display: -webkit-box;
       margin-top: 10px;
+      overflow: hidden;
       color: #2e2e2e;
       font-family: var(--font-family-display);
       font-size: 26px;
@@ -503,14 +509,21 @@ main > .section.light:has(.block.accordion:not(.dark)) {
       line-height: 1;
       letter-spacing: normal;
       text-transform: uppercase;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
+    /* two lines, then "…" */
     > h2 + p {
+      display: -webkit-box;
       margin-top: 10px;
       max-width: 380px;
+      overflow: hidden;
       color: rgb(0 0 0 / 55%);
       font-size: 14px;
       line-height: 1.6;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
     /* the link: an outlined small button, from 600px (phones have the list only) */
@@ -518,12 +531,14 @@ main > .section.light:has(.block.accordion:not(.dark)) {
       display: none;
     }
 
+    /* one line, centred in the 40 (38 inside the border); "…" past the column */
     > p > a:only-child:any-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: inline-block;
       box-sizing: border-box;
+      max-width: 100%;
       height: 40px;
+      margin: 0;
+      overflow: hidden;
       padding: 0 24px;
       border: 1px solid #111;
       border-radius: 8px;
@@ -531,8 +546,11 @@ main > .section.light:has(.block.accordion:not(.dark)) {
       color: #111;
       font-size: 12px;
       font-weight: var(--font-weight-regular, 400);
+      line-height: 38px;
       letter-spacing: 0.03em;
+      text-align: center;
       text-decoration: none;
+      text-overflow: ellipsis;
       text-transform: uppercase;
       white-space: nowrap;
       transition: background-color 0.25s, color 0.25s;
@@ -588,6 +606,27 @@ main > .section.light:has(.block.accordion:not(.dark)) {
     > .accordion-wrapper {
       max-height: 100%;
     }
+
+    /* eyebrow 16, 17.58 to the title; 31.19 from the description to the button (its paragraph
+       as tall as the button) */
+    > .default-content-wrapper {
+      > p:has(+ h2) {
+        min-height: 16px;
+      }
+
+      > h2 {
+        margin-top: 17.58px;
+      }
+
+      > p:has(> a:only-child) {
+        display: flex;
+        margin-top: 31.19px;
+      }
+
+      > p > a:only-child:any-link {
+        padding: 0 26px;
+      }
+    }
   }
 
   @media (width >= 900px) and (height <= 860px) {
@@ -597,7 +636,7 @@ main > .section.light:has(.block.accordion:not(.dark)) {
 
 main > .section.light .block.accordion:not(.dark) {
   --accordion-line: rgb(0 0 0 / 12%);
-  --accordion-number: rgb(0 0 0 / 60%);
+  --accordion-number: rgb(0 0 0 / 40%);
   --accordion-question: rgb(0 0 0 / 66%);
   --accordion-question-open: #000;
   --accordion-answer: rgb(0 0 0 / 60%);
@@ -642,7 +681,7 @@ main > .section.light .block.accordion:not(.dark) {
     transition: none;
   }
 
-  /* a thin + that turns a quarter, into an x, when open */
+  /* a thin + that turns into a 10.95 square when open */
   .accordion-item-icon {
     flex: 0 0 14px;
     width: 14px;
@@ -676,20 +715,16 @@ main > .section.light .block.accordion:not(.dark) {
       color: var(--accordion-question-open);
     }
 
-    .accordion-item-icon {
-      transform: rotate(45deg);
-    }
-
     .accordion-item-icon::before {
-      height: 1.5px;
-      margin-top: -0.75px;
+      left: calc(50% - 5.475px);
+      width: 10.95px;
+      height: 10.95px;
+      margin-top: -5.475px;
       transform: none;
     }
 
     .accordion-item-icon::after {
-      height: 100%;
-      margin: 0 0 0 -0.75px;
-      transform: none;
+      display: none;
     }
   }
 
@@ -731,9 +766,32 @@ main > .section.light .block.accordion:not(.dark) {
     }
   }
 
+  /* the number and the icon centred on the question's first line */
+  @media (width >= 900px) {
+    --accordion-question-lh: calc(clamp(16px, 1.4vw, 19px) * 1.35);
+
+    .accordion-item-label {
+      align-items: flex-start;
+    }
+
+    .accordion-item-number {
+      margin-top: calc((var(--accordion-question-lh) - 13.5px) / 2);
+    }
+
+    .accordion-item-icon {
+      align-self: flex-start;
+      margin-top: calc((var(--accordion-question-lh) - 14px) / 2);
+    }
+  }
+
+  /* the question's box rounded up to whole pixels (25), 15 above it and 14.19 to the answer */
   @media (width >= 900px) and (height <= 860px) {
     .accordion-item-label {
-      padding-block: 15px;
+      padding: 15px 0 14.19px;
+    }
+
+    .accordion-item-question {
+      min-height: round(up, var(--accordion-question-lh), 1px);
     }
   }
 
