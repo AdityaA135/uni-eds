@@ -199,6 +199,10 @@
     --sd-card-radius: calc(24 * var(--sd-u, 1px));
     --sd-fade-in: 0.85;
 
+    & .social-deck-strip-card {
+      height: calc(421 * var(--sd-u, 1px));
+    }
+
     & .social-deck-cards.social-deck-strip-track {
       cursor: grab;
     }
@@ -340,22 +344,22 @@ main .section.social-deck-container:has(.social-deck.strip) {
     height: 100%;
   }
 
-  /* desktop frame (1280×814) */
+  /* desktop frame (1280×720) */
   @media (width >= 1200px), (width >= 900px) and (not ((hover: none) and (pointer: coarse))) {
-    --sd-u: min(calc(100vw / 1280), calc(100svh / 814));
-    --sd-side: calc(64 * min(calc(100vw / 1280), calc(100svh / 720)));
+    --sd-u: min(calc(100vw / 1280), calc(100svh / 720));
+    --sd-side: calc(64 * var(--sd-u));
 
     height: 100svh;
     min-height: 0;
     justify-content: center;
-    padding: calc(133 * var(--sd-u)) 0 calc(52 * var(--sd-u));
+    padding: calc(104 * var(--sd-u)) 0 calc(29 * var(--sd-u));
     background-color: var(--section-bg, #000);
 
     & .default-content-wrapper {
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-rows: calc(9 * var(--sd-u)) calc(29 * var(--sd-u));
       gap: calc(20 * var(--sd-u)) 24px;
-      height: calc(102 * var(--sd-u));
+      height: calc(90 * var(--sd-u));
       padding: 0 var(--sd-side);
     }
 
