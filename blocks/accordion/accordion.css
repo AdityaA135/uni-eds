@@ -269,7 +269,7 @@ body.combat .accordion {
     transition: color 0.25s;
   }
 
-  .accordion-item[open] > .accordion-item-label {
+  .accordion-item[open]:not(.is-closing) > .accordion-item-label {
     color: var(--accordion-question-open);
   }
 
@@ -398,11 +398,11 @@ body.combat .accordion {
    The script eases each item's height open and closed (and fades its answer), in every
    browser, so the details' own height transition is off; an item clips its answer only while
    it animates, so the focus ring is never cut off. */
-body.combat .accordion.combat-accordion .accordion-item::details-content {
+.accordion.combat-accordion .accordion-item::details-content {
   transition: none;
 }
 
-body.combat .accordion.combat-accordion .accordion-item.is-animating {
+.accordion.combat-accordion .accordion-item.is-animating {
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -730,7 +730,9 @@ main > .section.light .block.accordion:not(.dark) {
     }
   }
 
-  .accordion-item[open] {
+  /* not while it closes (accordion.js): its question greys and the x turns back at once, as on
+     the prototype, while the answer slides shut */
+  .accordion-item[open]:not(.is-closing) {
     .accordion-item-label {
       color: var(--accordion-question-open);
     }
