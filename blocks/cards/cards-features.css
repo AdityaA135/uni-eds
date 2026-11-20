@@ -271,9 +271,12 @@
     text-shadow: 0 1px 14px rgb(0 0 0 / 45%);
   }
 
+  /* min-width 0: a tile shrinks (its texts end in "…") rather than push the row off screen */
   .ft-card.is-stat {
     display: block;
+    flex: 0 1 auto;
     width: auto;
+    min-width: 0;
     height: auto;
     border-radius: 6px;
     overflow: visible;
@@ -302,14 +305,19 @@
     text-wrap: pretty;
   }
 
+  /* the value (at most MAX_CHARS.value characters, cards-features.js) */
   .ft-card.is-stat .ft-title strong {
     font-weight: inherit;
   }
 
+  /* two lines, then "…" */
   .ft-card.is-stat .ft-line {
     width: auto;
-    display: block;
+    display: -webkit-box;
     margin-top: 4px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     font-family: var(--font-family-base);
     font-size: 13px;
     font-weight: var(--font-weight-regular, 400);
@@ -657,7 +665,10 @@
     box-shadow: 0 1px 6px rgb(0 0 0 / 30%);
   }
 
+  /* above the picture: the panel is a flex box, so its picture (z-index 2, after the button)
+     was drawn over the button */
   &.is-stats .ft-close {
+    z-index: 3;
     inset-block-start: 14px;
     border-radius: 8px;
     background: rgb(0 0 0 / 32%);
@@ -689,9 +700,14 @@
     padding-inline-end: 64px;
   }
 
+  /* three lines, then "…" (the text under it scrolls in the panel) */
   &.is-stats .ft-detail-title {
+    display: -webkit-box;
+    overflow: hidden;
     font-size: 20px;
     line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
   }
 
   &.is-stats .ft-detail-text {
@@ -1073,6 +1089,7 @@ main > .section:has(.cards.features.is-stats) {
       display: contents;
     }
 
+    /* the figure (its number and unit at most MAX_CHARS characters, cards-features.js) */
     :is(& > p:has(> strong:only-child) > strong, & > strong) {
       grid-area: 1 / 1 / 3 / 2;
       font-family: var(--font-family-display);
@@ -1090,6 +1107,13 @@ main > .section:has(.cards.features.is-stats) {
       grid-area: 1 / 1 / 3 / 2;
     }
 
+    /* phones: four characters (e.g. 1250) a quarter smaller, so the unit stays on screen */
+    @media (width < 600px) {
+      .ft-figure-number.is-long {
+        font-size: 0.75em;
+      }
+    }
+
     .ft-figure-unit {
       grid-area: 1 / 2;
       margin: 8px 0 0;
@@ -1098,14 +1122,19 @@ main > .section:has(.cards.features.is-stats) {
       letter-spacing: normal;
     }
 
+    /* the figure's label: three lines on phones (its column is narrow), two from 600px, then "…" */
     > :is(p:has(> strong:only-child), strong) + p {
+      display: -webkit-box;
       grid-area: 2 / 2;
       align-self: end;
       max-width: 7em;
       margin: 0 0 4px 4px;
+      overflow: hidden;
       font-family: var(--font-family-base);
       font-size: 13px;
       line-height: 15px;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
     }
 
     /* the tag line: desktop only, as the source */
@@ -1151,6 +1180,7 @@ main > .section:has(.cards.features.is-stats) {
         margin: 0 0 6px 4px;
         font-size: 20px;
         line-height: 20px;
+        -webkit-line-clamp: 2;
       }
     }
 
@@ -1168,13 +1198,18 @@ main > .section:has(.cards.features.is-stats) {
     }
   }
 
-  /* the tag line at the top right, where there is room for it beside the figure */
+  /* the tag line at the top right, where there is room for it beside the figure; two lines,
+     then "…" */
   @media (width >= 1200px) {
     > .default-content-wrapper > p:last-child:not(:has(> strong:only-child, > picture:only-child)) {
-      display: block;
+      display: -webkit-box;
       grid-area: 1 / 4 / 3 / 5;
       align-self: start;
       width: max-content;
+      max-width: 16em;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
       font-family: var(--font-family-display);
       font-size: 32px;
       font-weight: var(--font-weight-medium, 500);

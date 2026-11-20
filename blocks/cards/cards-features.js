@@ -15,6 +15,12 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 const OPEN_CLASS = 'is-modal-open';
 let uid = 0;
 
+// the most characters the one-word texts may have (published page; Universal Editor keeps the
+// whole text): the section's figure and unit (e.g. "359" "PS"), a stat tile's value (e.g.
+// "1.5L Turbo GDI"). Longer ones end in "…"; the other texts are cut by line (cards-features.css)
+const MAX_CHARS = { figure: 4, unit: 4, value: 16 };
+const clipText = (text, max) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
+
 const isHeading = (el) => /^H[1-6]$/.test(el?.tagName || '');
 const isAuthoring = (block) => !!block.closest('[data-aue-resource]')
   || !!document.querySelector('[data-aue-resource]');
@@ -76,6 +82,10 @@ function readCard(li, authoring) {
   if (!detail.length && !img) return null;
 
   const name = (detailTitle || title || line)?.textContent.trim() || '';
+  const value = stat && !authoring && title.querySelector('strong, b');
+  if (value && !value.children.length) {
+    value.textContent = clipText(value.textContent.trim(), MAX_CHARS.value);
+  }
   return {
     li,
     img,
@@ -165,16 +175,21 @@ function splitSectionFigure(block) {
   const holder = content && [...content.children]
     .find((el) => isBoldLine(el) || /^(STRONG|B)$/.test(el.tagName));
   const figure = holder?.matches('strong, b') ? holder : holder?.querySelector('strong, b');
-  const match = figure?.children.length === 0
-    && figure.textContent.trim().match(/^([\d.,]+)\s+(\S.*)$/);
-  if (!match) return;
+  if (!figure || figure.children.length) return;
+  const match = figure.textContent.trim().match(/^([\d.,]+)\s+(\S.*)$/);
+  if (!match) {
+    figure.textContent = clipText(figure.textContent.trim(), MAX_CHARS.figure + MAX_CHARS.unit + 1);
+    return;
+  }
   const [, value, unitText] = match;
   const number = document.createElement('span');
   number.className = 'ft-figure-number';
-  number.textContent = value;
+  number.textContent = clipText(value, MAX_CHARS.figure);
+  // a long figure is set smaller on phones (cards-features.css)
+  if (number.textContent.length > 3) number.classList.add('is-long');
   const unit = document.createElement('span');
   unit.className = 'ft-figure-unit';
-  unit.textContent = unitText;
+  unit.textContent = clipText(unitText, MAX_CHARS.unit);
   figure.replaceChildren(number, ' ', unit);
 }
 
