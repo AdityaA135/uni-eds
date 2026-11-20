@@ -740,7 +740,11 @@ main > .section.light .block.accordion:not(.dark) {
     .accordion-item-icon {
       transform: rotate(45deg);
     }
+  }
 
+  /* the two lines stay thin and straight while open, also while closing: only the icon turns
+     (the block's own open x, two 3px lines turned 45 and 135 degrees, must not show) */
+  .accordion-item[open] {
     .accordion-item-icon::before {
       height: 1.5px;
       margin-top: -0.75px;
