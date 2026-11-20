@@ -104,16 +104,24 @@ function buildItem(row, i) {
 function wireCtaGlitch(block) {
   const link = block.closest('.section.light')
     ?.querySelector(':scope > .default-content-wrapper > p > a:only-child');
-  if (!link || link.children.length) return;
-  const text = link.textContent;
-  link.setAttribute('aria-label', text.trim());
-  const letters = [...text].map((char) => {
-    const letter = document.createElement('span');
-    letter.textContent = char;
-    letter.setAttribute('aria-hidden', 'true');
-    return letter;
+  if (!link || link.classList.contains('accordion-cta-glitch')) return;
+  link.classList.add('accordion-cta-glitch');
+  link.setAttribute('aria-label', link.textContent.trim());
+  // every text in the link (also inside a span or strong it may hold) split into letters
+  const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  const letters = [];
+  texts.forEach((text) => {
+    const split = [...text.data].map((char) => {
+      const letter = document.createElement('span');
+      letter.textContent = char;
+      letter.setAttribute('aria-hidden', 'true');
+      letters.push(letter);
+      return letter;
+    });
+    text.replaceWith(...split);
   });
-  link.replaceChildren(...letters);
 
   let running = [];
   // a mouse hover only: a tap on a touch screen also "enters" the link, and must not glitch
