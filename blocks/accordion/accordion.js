@@ -116,7 +116,9 @@ function wireCtaGlitch(block) {
   link.replaceChildren(...letters);
 
   let running = [];
-  link.addEventListener('mouseenter', () => {
+  // a mouse hover only: a tap on a touch screen also "enters" the link, and must not glitch
+  link.addEventListener('pointerenter', (e) => {
+    if (e.pointerType !== 'mouse') return;
     running.forEach((animation) => animation.cancel());
     running = [];
     if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
