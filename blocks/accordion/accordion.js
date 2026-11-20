@@ -149,7 +149,8 @@ function wireCtaGlitch(block) {
 }
 
 /* ---------- Combat motion ----------
- * On the Combat page (body.combat) an answer opens and closes as on the design prototype, in
+ * On the Combat page (body.combat), and in the FAQ of a Light section, an answer opens and
+ * closes as on the design prototype, in
  * every browser: the item's height eases open in 0.55s and closed in 0.4s (power3.inOut), the
  * answer fading in 6px down after 0.12s (0.45s) and out in 0.2s. The item stays open while it
  * closes, so its answer can be seen going; opening one closes the one open. Only with motion
@@ -264,7 +265,8 @@ export default function decorate(block) {
       });
     }
   }));
-  if (document.body.classList.contains('combat') && !editing && items.length) {
+  const prototypeMotion = document.body.classList.contains('combat') || block.closest('.section.light');
+  if (prototypeMotion && !editing && items.length) {
     wireCombatMotion(block, items);
   }
   if (!editing) wireCtaGlitch(block);
