@@ -1128,7 +1128,8 @@ main > .section:has(.cards.features.is-stats) {
       grid-area: 2 / 2;
       align-self: end;
       max-width: 7em;
-      margin: 0 0 4px 4px;
+      margin: 0 0 calc(4px - 0.07em) 4px;
+      padding-bottom: 0.07em; /* room for the letters below the line (g, p, y), not for the hidden next line; the margin less by as much */
       overflow: hidden;
       font-family: var(--font-family-base);
       font-size: 13px;
@@ -1177,7 +1178,7 @@ main > .section:has(.cards.features.is-stats) {
 
       > :is(p:has(> strong:only-child), strong) + p {
         max-width: 7.6em;
-        margin: 0 0 6px 4px;
+        margin: 0 0 calc(6px - 0.07em) 4px;
         font-size: 20px;
         line-height: 20px;
         -webkit-line-clamp: 2;
@@ -1215,6 +1216,30 @@ main > .section:has(.cards.features.is-stats) {
       font-weight: var(--font-weight-medium, 500);
       line-height: 1.15;
       text-transform: uppercase;
+    }
+  }
+
+  /* desktop: the Figma frame (1280×720), scaled down evenly on smaller or shorter screens, and
+     not tied to the site header's height: the figure 64 from the top, 146.09 (134.4 a line), its
+     unit 39.04 and 14 below its top; the tiles' lines 83 above the foot */
+  @media (width >= 900px) {
+    --ft-u: min(calc(100vw / 1280), calc(100svh / 720));
+
+    > .default-content-wrapper {
+      padding-top: calc(64 * var(--ft-u));
+
+      :is(& > p:has(> strong:only-child) > strong, & > strong) {
+        font-size: calc(146.09 * var(--ft-u));
+      }
+
+      .ft-figure-unit {
+        margin-top: calc(14 * var(--ft-u));
+        font-size: calc(39.04 * var(--ft-u));
+      }
+    }
+
+    > .cards-wrapper {
+      margin-bottom: calc(83 * var(--ft-u));
     }
   }
 }
