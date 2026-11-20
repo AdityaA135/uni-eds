@@ -299,8 +299,8 @@
     font-size: 24px;
     font-weight: var(--font-weight-regular, 400);
 
-    /* the source's "normal" line height of its Extended face (29px at 24px) */
-    line-height: 1.21;
+    /* the Figma's line: 28.5 at 24px (36 at 30.08 on desktop, below) */
+    line-height: 1.1875;
     text-transform: none;
     text-wrap: pretty;
   }
@@ -798,6 +798,7 @@
 
     .ft-card.is-stat .ft-title {
       font-size: clamp(26px, 2.35vw, 34px);
+      line-height: 1.1968;
     }
 
     .ft-card.is-stat .ft-line {
@@ -1057,8 +1058,9 @@ main > .section:has(.cards.features.is-stats) {
     max-width: none;
     margin: 0 0 auto;
 
-    /* clear of the site header's bar (--nav-offset), shown again on a move up */
-    padding: max(84px, var(--nav-offset, 90px) + 12px) 20px 0;
+    /* phones: the Figma frame (375 wide): 84 from the top (not tied to the site header's
+       height), 20 at the sides */
+    padding: 84px 20px 0;
     color: var(--color-white, #fff);
 
     > * {
@@ -1144,10 +1146,11 @@ main > .section:has(.cards.features.is-stats) {
     }
   }
 
-  /* the tiles: their foot 76px above the screen's (the source's dock room) */
+  /* the tiles: their foot 76px above the screen's (the source's dock room), 20 from the sides */
   > .cards-wrapper {
     margin-top: auto;
     margin-bottom: 76px;
+    padding-inline: 20px;
   }
 
   /* from 600px: a 64px gutter, the source's desktop figure */
