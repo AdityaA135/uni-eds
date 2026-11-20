@@ -269,11 +269,18 @@ body.combat .accordion {
     transition: color 0.25s;
   }
 
-  .accordion-item-label:hover,
-  .accordion-item[open] > .accordion-item-label,
-  .accordion-item-label:hover .accordion-item-question,
-  .accordion-item-label:hover .accordion-item-icon {
+  .accordion-item[open] > .accordion-item-label {
     color: var(--accordion-question-open);
+  }
+
+  /* hover darkens a question with a mouse, not after a tap (touch keeps the hover), and not
+     right after it was closed with a click (is-hover-off, accordion.js, until the pointer leaves) */
+  @media (hover: hover) {
+    .accordion-item-label:not(.is-hover-off):hover,
+    .accordion-item-label:not(.is-hover-off):hover .accordion-item-question,
+    .accordion-item-label:not(.is-hover-off):hover .accordion-item-icon {
+      color: var(--accordion-question-open);
+    }
   }
 
   .accordion-item-number {
@@ -556,10 +563,16 @@ main > .section.light:has(.block.accordion:not(.dark)) {
       transition: background-color 0.25s, color 0.25s;
     }
 
+    /* no fill on hover (as on the prototype): the label glitches instead (accordion.js) */
     > p > a:only-child:any-link:hover,
+    > p > a:only-child:any-link:focus {
+      background-color: transparent;
+      color: #111;
+    }
+
     > p > a:only-child:any-link:focus-visible {
-      background-color: #111;
-      color: #fff;
+      outline: 2px solid #111;
+      outline-offset: 2px;
     }
   }
 
@@ -656,8 +669,11 @@ main > .section.light .block.accordion:not(.dark) {
     font-weight: var(--font-weight-medium, 500);
     transition: color 0.25s;
 
-    &:hover {
-      color: var(--accordion-question-open);
+    /* with a mouse only, and not right after a click closed it (as in the Combat theme above) */
+    @media (hover: hover) {
+      &:not(.is-hover-off):hover {
+        color: var(--accordion-question-open);
+      }
     }
 
     &:focus-visible {
