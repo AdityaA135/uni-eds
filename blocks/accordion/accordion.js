@@ -85,7 +85,57 @@ function buildItem(row, i) {
   details.className = 'accordion-item';
   moveInstrumentation(row, details);
   details.append(summary, answer);
+
+  // closed with a click, the question takes the closed colour at once, though the pointer is
+  // still on it (accordion.css darkens hovered questions); hover works again once it leaves
+  summary.addEventListener('click', () => {
+    summary.classList.toggle('is-hover-off', details.open && !details.classList.contains('is-closing'));
+  });
+  summary.addEventListener('pointerleave', () => summary.classList.remove('is-hover-off'));
   return details;
+}
+
+/**
+ * The button of the FAQ section (a Light section): on hover its letters flicker off and back,
+ * each at a random moment, a third of them twice, as on the design prototype. The link keeps
+ * its text (and gets it as its label, the letters being split into spans)
+ * @param {Element} block
+ */
+function wireCtaGlitch(block) {
+  const link = block.closest('.section.light')
+    ?.querySelector(':scope > .default-content-wrapper > p > a:only-child');
+  if (!link || link.children.length) return;
+  const text = link.textContent;
+  link.setAttribute('aria-label', text.trim());
+  const letters = [...text].map((char) => {
+    const letter = document.createElement('span');
+    letter.textContent = char;
+    letter.setAttribute('aria-hidden', 'true');
+    return letter;
+  });
+  link.replaceChildren(...letters);
+
+  let running = [];
+  link.addEventListener('mouseenter', () => {
+    running.forEach((animation) => animation.cancel());
+    running = [];
+    if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+    running = letters.filter((letter) => letter.textContent.trim()).map((letter) => {
+      // [seconds, opacity]: off in 0.04s at a moment in the first 0.22s, back in 0.06s
+      const off = Math.random() * 0.22;
+      const back = off + 0.06 + Math.random() * 0.1;
+      const stops = [[0, 1], [off, 1], [off + 0.04, 0], [back, 0], [back + 0.06, 1]];
+      if (Math.random() < 0.35) {
+        const again = off + 0.24 + Math.random() * 0.1;
+        stops.push([again, 1], [again + 0.03, 0.15], [again + 0.05, 0.15], [again + 0.1, 1]);
+      }
+      const end = stops[stops.length - 1][0];
+      return letter.animate(
+        stops.map(([at, opacity]) => ({ offset: at / end, opacity })),
+        { duration: end * 1000, easing: 'linear' },
+      );
+    });
+  });
 }
 
 /* ---------- Combat motion ----------
@@ -207,6 +257,7 @@ export default function decorate(block) {
   if (document.body.classList.contains('combat') && !editing && items.length) {
     wireCombatMotion(block, items);
   }
+  if (!editing) wireCtaGlitch(block);
 
   // Universal Editor: selecting an item, or one of its fields, in the content tree or on the
   // page opens that item. Listened to while capturing, so it is heard wherever it is dispatched
