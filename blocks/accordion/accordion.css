@@ -1,4 +1,4 @@
-/* Accordion: numbered titles between hairlines, a + that turns into an x when open, in black on
+/* Accordion: numbered titles between hairlines, a + that turns into a square when open, in black on
    a white section (whatever the page's own background); dark theme: in white on a black
    section.
    Every selector is nested in .block.accordion, so nothing reaches outside the block, except the
@@ -12,12 +12,12 @@
   --accordion-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
   --accordion-white: #fff;
   --accordion-black: var(--color-black, #000);
-  --accordion-line: color-mix(in srgb, currentcolor 15%, transparent);
-  --accordion-number: color-mix(in srgb, currentcolor 50%, transparent);
-  --accordion-question: color-mix(in srgb, currentcolor 80%, transparent);
+  --accordion-line: color-mix(in srgb, currentcolor 12%, transparent);
+  --accordion-number: color-mix(in srgb, currentcolor 40%, transparent);
+  --accordion-question: color-mix(in srgb, currentcolor 66%, transparent);
   --accordion-question-open: currentcolor;
-  --accordion-answer: color-mix(in srgb, currentcolor 65%, transparent);
-  --accordion-gutter: 72px;
+  --accordion-answer: color-mix(in srgb, currentcolor 60%, transparent);
+  --accordion-gutter: 48px;
   --accordion-ease: ease;
 
   max-width: 940px;
@@ -58,10 +58,11 @@
     }
   }
 
+  /* 15 above the question, 14.19 below its 25 tall box: 55.19 with the hairline */
   .accordion-item-label {
     display: flex;
-    align-items: baseline;
-    padding: 24px 0;
+    align-items: flex-start;
+    padding: 15px 0 14.19px;
     list-style: none;
     cursor: pointer;
 
@@ -79,20 +80,27 @@
     }
   }
 
+  /* centred on the question's first line */
   .accordion-item-number {
     flex: 0 0 var(--accordion-gutter);
+    margin-top: calc((24.19px - 13.5px) / 2);
     color: var(--accordion-number);
-    font-size: 14px;
-    letter-spacing: 0.04em;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 13.5px;
+    letter-spacing: 0.8px;
   }
 
   .accordion-item-question {
     flex: 1;
     min-width: 0;
+    min-height: 25px;
     overflow-wrap: anywhere;
     color: var(--accordion-question);
-    font-size: 26px;
-    line-height: 1.3;
+    font-size: 17.92px;
+    font-weight: 500;
+    line-height: 24.19px;
+    letter-spacing: 0;
     transition: color 0.2s var(--accordion-ease);
 
     p {
@@ -104,14 +112,14 @@
     }
   }
 
-  /* the + (two hairlines); open, the two lines turn 45 degrees into an x (the lines turn, not
-     the box, so the x stays inside the block) */
+  /* the + (two 1.5 bars in a 14 box, centred on the question's first line); open, a 10.95
+     square */
   .accordion-item-icon {
     position: relative;
-    flex: 0 0 22px;
-    align-self: center;
-    width: 22px;
-    height: 22px;
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    margin-top: calc((24.19px - 14px) / 2);
     margin-left: 24px;
     color: var(--accordion-question);
     transition: color 0.2s var(--accordion-ease);
@@ -121,16 +129,16 @@
       content: '';
       position: absolute;
       top: 50%;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      margin-top: -1px;
+      left: 50%;
+      width: 14px;
+      height: 1.5px;
       background-color: currentcolor;
-      transition: transform 0.25s var(--accordion-ease);
+      transform: translate(-50%, -50%);
     }
 
     &::after {
-      transform: rotate(90deg);
+      width: 1.5px;
+      height: 14px;
     }
 
     @media (width <= 599.98px) {
@@ -147,27 +155,25 @@
       color: var(--accordion-question-open);
     }
 
-    .accordion-item-icon::before,
-    .accordion-item-icon::after {
-      height: 3px;
-      margin-top: -1.5px;
-    }
-
     .accordion-item-icon::before {
-      transform: rotate(45deg);
+      width: 10.95px;
+      height: 10.95px;
     }
 
     .accordion-item-icon::after {
-      transform: rotate(135deg);
+      display: none;
     }
   }
 
+  /* the answer, 553 wide; 22 below it, then the hairline (23 to the next question) */
   .accordion-item-body {
     overflow-wrap: anywhere;
-    padding: 0 66px 34px var(--accordion-gutter);
+    padding: 0 33.66px 22px var(--accordion-gutter);
     color: var(--accordion-answer);
-    font-size: 20px;
-    line-height: 1.8;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0;
 
     > :first-child {
       margin-top: 0;
@@ -226,5 +232,131 @@ main .section:has(.block.accordion) {
 
   @media (width <= 599.98px) {
     padding-block: 48px;
+  }
+}
+
+/* with text and a button before the accordion: those on the left (eyebrow, heading, description,
+   button), the accordion on the right. The texts end in "…" past their lines (eyebrow 1, heading
+   and description 2), so long text never breaks the layout. In the editor a text field may sit
+   in its own wrapper, hence the "div >" alternatives */
+/* stylelint-disable-next-line no-descending-specificity -- a section with text, not the dark one */
+main .section:has(.block.accordion):has(> .default-content-wrapper) {
+  --accordion-section-text: #000;
+
+  color: var(--accordion-section-text);
+
+  &:has(.block.accordion.dark) {
+    --accordion-section-text: #fff;
+  }
+
+  > .default-content-wrapper {
+    font-family: var(--font-family-base, new-science, 'Helvetica Neue', arial, sans-serif);
+    text-align: start;
+
+    /* eyebrow: the text right before the heading */
+    > p:has(+ :is(h1, h2, h3)),
+    > div:has(+ :is(h1, h2, h3)) > p {
+      min-height: 16px;
+      margin: 0 0 17.58px;
+      overflow: hidden;
+      color: color-mix(in srgb, currentcolor 55%, transparent);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 15.6px;
+      letter-spacing: 0.54px;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    > :is(h1, h2, h3) {
+      display: -webkit-box;
+      max-width: 421px;
+      margin: 0 0 20px;
+      overflow: hidden;
+      color: color-mix(in srgb, currentcolor 82%, transparent);
+      font-family: var(--font-family-display, new-science-extended, sans-serif);
+      font-size: 40px;
+      font-weight: 500;
+      line-height: 40px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    /* description: the text right after the heading */
+    /* stylelint-disable-next-line no-descending-specificity -- not the eyebrow */
+    > :is(h1, h2, h3) + div > p,
+    > :is(h1, h2, h3) + p:not(.button-container) {
+      display: -webkit-box;
+      max-width: 380px;
+      margin: 0;
+      overflow: hidden;
+      color: color-mix(in srgb, currentcolor 55%, transparent);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 25.6px;
+      letter-spacing: 0;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    > .button-container {
+      display: flex;
+      margin: 31.19px 0 0;
+    }
+
+    a.button:any-link {
+      display: inline-block;
+      box-sizing: border-box;
+      height: 40px;
+      margin: 0;
+      padding: 12.75px 26px 0;
+      border: 1px solid;
+      border-radius: 8px;
+      background-color: transparent;
+      color: color-mix(in srgb, currentcolor 93%, transparent);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 0.36px;
+      text-transform: uppercase;
+
+      &:hover,
+      &:focus-visible {
+        background-color: color-mix(in srgb, currentcolor 6%, transparent);
+      }
+    }
+  }
+
+  /* desktop: 96 from the top; text column 453.33 and accordion 634.66, 64 apart, 64 from the
+     page edges */
+  @media (width >= 900px) {
+    display: grid;
+    grid-template-columns: minmax(0, 453.33fr) minmax(0, 634.66fr);
+    column-gap: 64px;
+    align-items: start;
+    padding: 96px 64px;
+
+    > .default-content-wrapper,
+    > .accordion-wrapper {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    > .default-content-wrapper {
+      grid-column: 1;
+    }
+
+    > .accordion-wrapper {
+      grid-column: 2;
+    }
+
+    .block.accordion {
+      max-width: none;
+    }
   }
 }
