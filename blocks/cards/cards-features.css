@@ -822,11 +822,12 @@
   }
 
   @media (width >= 900px) {
-    /* stat tiles: one row of figures across the section */
+    /* stat tiles: one row of figures across the section, 30.45 apart (the Figma frame's unit,
+       --ft-u, set on the section) */
     &.is-stats .card-list {
       display: flex;
-      justify-content: space-between;
-      gap: 16px;
+      justify-content: flex-start;
+      gap: calc(30.45 * var(--ft-u, 1px));
     }
 
     .ft-card.is-stat .ft-title {
@@ -1164,6 +1165,7 @@ main > .section:has(.cards.features.is-stats) {
 
     .ft-figure-unit {
       grid-area: 1 / 2;
+      justify-self: start; /* as wide as its text (the label below sets the column) */
       margin: 8px 0 0;
       font-size: 30px;
       line-height: 1;
@@ -1176,14 +1178,20 @@ main > .section:has(.cards.features.is-stats) {
       grid-area: 2 / 2;
       align-self: end;
       max-width: 7em;
-      margin: 0 0 calc(4px - 0.07em) 4px;
-      padding-bottom: 0.07em; /* room for the letters below the line (g, p, y), not for the hidden next line; the margin less by as much */
+      margin: 0 0 4px 4px;
       overflow: hidden;
       font-family: var(--font-family-base);
       font-size: 13px;
       line-height: 15px;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 3;
+
+      /* the cut edge 0.07em below the box: room for the letters below the line (g, p, y), not
+         for the hidden next line; the box itself stays as tall as its lines */
+      @supports (overflow-clip-margin: 1px) {
+        overflow: clip;
+        overflow-clip-margin: 0.07em;
+      }
     }
 
     /* the tag line: desktop only, as the source */
@@ -1227,7 +1235,7 @@ main > .section:has(.cards.features.is-stats) {
 
       > :is(p:has(> strong:only-child), strong) + p {
         max-width: 7.6em;
-        margin: 0 0 calc(6px - 0.07em) 4px;
+        margin: 0 0 6px 4px;
         font-size: 20px;
         line-height: 20px;
         -webkit-line-clamp: 2;
@@ -1256,7 +1264,7 @@ main > .section:has(.cards.features.is-stats) {
       grid-area: 1 / 4 / 3 / 5;
       align-self: start;
       width: max-content;
-      max-width: 16em;
+      max-width: 14.5625em; /* 466 at 32px, the Figma's: its left 214.42 from the unit's right */
       overflow: hidden;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
@@ -1270,7 +1278,7 @@ main > .section:has(.cards.features.is-stats) {
 
   /* desktop: the Figma frame (1280×720), scaled down evenly on smaller or shorter screens, and
      not tied to the site header's height: the figure 64 from the top, 146.09 (134.4 a line), its
-     unit 39.04 and 14 below its top; the tiles' lines 83 above the foot */
+     unit 39.04 and 14 below its top; the tiles' lines 83 above the foot (titles at 568) */
   @media (width >= 900px) {
     --ft-u: min(calc(100vw / 1280), calc(100svh / 720));
 
