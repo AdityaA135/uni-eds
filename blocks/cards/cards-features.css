@@ -23,6 +23,7 @@
   --ft-ink: #2e2e2e;
   --ft-paper: #fcfdfc;
   --ft-progress-gap: 24px;
+  --ft-progress-h: 1.5px;
 
   position: relative;
   container-type: inline-size;
@@ -162,6 +163,21 @@
     text-wrap: pretty;
   }
 
+  /* image cards: the title on one line, the rest cut off (no ellipsis) */
+  .ft-card:not(.is-stat) .ft-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+  }
+
+  /* image cards: the short line in two lines, then an ellipsis */
+  .ft-card:not(.is-stat) .ft-line {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
   /* the "+" button, in the card's corner */
   .ft-open {
     position: absolute;
@@ -248,7 +264,7 @@
 
   .ft-progress i {
     width: 22px;
-    height: 1.5px;
+    height: var(--ft-progress-h);
     background: rgb(0 0 0 / 15%);
     transition: background-color 0.3s;
   }
@@ -268,7 +284,6 @@
     mask-image: none;
     animation: none;
     color: var(--color-white, #fff);
-    text-shadow: 0 1px 14px rgb(0 0 0 / 45%);
   }
 
   /* min-width 0: a tile shrinks (its texts end in "…") rather than push the row off screen */
@@ -506,6 +521,11 @@
     letter-spacing: 0.045em;
     text-transform: uppercase;
     color: rgb(0 0 0 / 55%);
+
+    /* one line, the rest cut off (no ellipsis) */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
   }
 
   .ft-eyebrow[hidden] {
@@ -550,13 +570,22 @@
     text-transform: uppercase;
     text-wrap: balance;
     color: inherit;
+
+    /* two lines, the rest cut off (no ellipsis) */
+    max-height: 2lh;
+    overflow: hidden;
   }
 
+  /* six lines on phones (eight from 600px), then an ellipsis */
   .ft-detail-text {
+    display: -webkit-box;
     max-width: 380px;
+    overflow: hidden;
     font-size: 14px;
     line-height: 1.6;
     color: rgb(0 0 0 / 62%);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
   }
 
   .ft-detail-text p {
@@ -722,6 +751,7 @@
   @media (width >= 600px) {
     --ft-gutter: 64px;
     --ft-gap: 16px;
+    --ft-progress-h: 2px;
 
     .ft-card {
       width: clamp(360px, 38vw, 720px);
@@ -782,6 +812,10 @@
       font-size: 24px;
     }
 
+    .ft-detail-text {
+      -webkit-line-clamp: 8;
+    }
+
     &.is-stats .ft-detail-text {
       margin-top: 20px;
     }
@@ -793,7 +827,6 @@
       display: flex;
       justify-content: space-between;
       gap: 16px;
-      text-shadow: none;
     }
 
     .ft-card.is-stat .ft-title {
@@ -922,12 +955,13 @@ main > .section.light:has(.cards.features) {
   --ft-rail-gap: 20px;
   --ft-rail-dash: 82px;
   --ft-rail-gutter: 20px;
+  --ft-rail-clear: 16px;
 
   justify-content: flex-start;
   gap: var(--ft-rail-gap);
 
   /* the heading never under the site header's bar (--nav-offset), shown again on a move up */
-  padding-block: max(var(--ft-rail-top), var(--nav-offset, 90px) + 16px) var(--ft-rail-bottom);
+  padding-block: max(var(--ft-rail-top), var(--nav-offset, 90px) + var(--ft-rail-clear)) var(--ft-rail-bottom);
 
   @media (width >= 600px) {
     --ft-rail-top: 104px;
@@ -937,12 +971,14 @@ main > .section.light:has(.cards.features) {
     --ft-rail-gutter: 64px;
   }
 
-  /* short desktop screens, as the source */
+  /* short desktop screens, as Figma at 1280 x 720: heading at 88px (10px clear of the
+     header), cards down to 87px above the foot, dashes 44px under them */
   @media (width >= 900px) and (height <= 860px) {
     --ft-rail-top: 88px;
-    --ft-rail-bottom: 88px;
+    --ft-rail-bottom: 87px;
     --ft-rail-gap: 32px;
-    --ft-rail-dash: 43px;
+    --ft-rail-dash: 41px;
+    --ft-rail-clear: 10px;
   }
 
   > :is(.default-content-wrapper, .cards-wrapper) {
@@ -960,7 +996,7 @@ main > .section.light:has(.cards.features) {
   }
 
   .cards.features:not(.is-stats, .is-authoring) {
-    --ft-progress-gap: calc(var(--ft-rail-bottom) - var(--ft-rail-dash) - 1.5px);
+    --ft-progress-gap: calc(var(--ft-rail-bottom) - var(--ft-rail-dash) - var(--ft-progress-h));
 
     display: flex;
     flex: 1 1 auto;
@@ -972,9 +1008,11 @@ main > .section.light:has(.cards.features) {
       min-height: 0;
     }
 
+    /* as tall as the rail, never taller: a fixed minimum overflowed it on short screens and the
+       cards' tops (radius, "+") were cut off */
     .ft-card {
       height: auto;
-      min-height: 320px;
+      min-height: 0;
     }
   }
 }
@@ -1000,13 +1038,22 @@ main > .section.light:has(.cards.features) > .default-content-wrapper {
     letter-spacing: normal;
     text-transform: uppercase;
     text-wrap: balance;
+
+    /* two lines, the rest cut off (no ellipsis) */
+    max-height: 2lh;
+    overflow: hidden;
   }
 
+  /* three lines, then an ellipsis */
   > h2 + p {
+    display: -webkit-box;
+    overflow: hidden;
     color: rgb(0 0 0 / 55%);
     font-family: var(--font-family-base);
     font-size: 14px;
     line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
   }
 
   @media (width >= 600px) {
@@ -1058,8 +1105,7 @@ main > .section:has(.cards.features.is-stats) {
     max-width: none;
     margin: 0 0 auto;
 
-    /* phones: the Figma frame (375 wide): 84 from the top (not tied to the site header's
-       height), 20 at the sides */
+    /* as Figma: the figure 84px from the top (the section hides the site header) */
     padding: 84px 20px 0;
     color: var(--color-white, #fff);
 

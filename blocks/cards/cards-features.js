@@ -1,13 +1,4 @@
-// Cards "Features" style (product page: Performance, Technology, Safety). Each card opens its
-// detail in place, in a dialog built from the card's own fields, so nothing else is authored:
-//   Image  → the card's picture, shown larger in the detail (a stat tile shows it only there)
-//   Text   → 1. title: a heading, or a bold paragraph for a stat tile (e.g. "590 Nm")
-//            2. short line (the stat's label)
-//            3+. the detail; an optional heading first is the detail's own title
-//               (e.g. "590 Nm of torque"), else the card title is used
-// Opening and closing play the source prototype's motion (the picture grows out of the card)
-// unless reduced motion is asked for. A stat tile's detail has a "next" control that moves on
-// to the next tile, wrapping round.
+// Cards "Features" style (product page: Performance, Technology, Safety).
 
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
@@ -59,6 +50,9 @@ function readCard(li, authoring) {
   const els = body
     ? [...body.children].filter((el) => el.textContent.trim() || el.querySelector('img'))
     : [];
+  // an optional eyebrow: a plain paragraph just before the title heading (e.g. "Technology")
+  const eyebrow = els[0]?.tagName === 'P' && !isBoldLine(els[0]) && isHeading(els[1])
+    ? els.shift() : null;
   const first = els[0];
   const stat = isBoldLine(first);
   const title = isHeading(first) || stat ? els.shift() : null;
@@ -68,6 +62,9 @@ function readCard(li, authoring) {
 
   li.classList.add('ft-card');
   li.classList.toggle('is-stat', stat);
+  // shown in the detail only; Universal Editor keeps it visible so it stays editable
+  eyebrow?.classList.add('ft-card-eyebrow');
+  if (eyebrow && !authoring) eyebrow.hidden = true;
   title?.classList.add('ft-title');
   line?.classList.add('ft-line');
 
@@ -90,6 +87,7 @@ function readCard(li, authoring) {
     li,
     img,
     name,
+    eyebrow: eyebrow?.textContent.trim() || '',
     body: detail.filter((el) => el !== detailTitle),
   };
 }
@@ -282,10 +280,9 @@ export default function decorateFeatures(block, ul) {
     parts.pic.replaceChildren(...(card.img ? [pictureFor(card)] : []));
     parts.media.hidden = !card.img;
     dialog.classList.toggle('is-text-only', !card.img);
-    // the section's name above the title, from its side navigation label (as the source's tag)
-    const label = card.li.closest('.section')?.dataset.navlabel?.trim() || '';
-    parts.eyebrow.textContent = label;
-    parts.eyebrow.hidden = stats || !label;
+    // the card's own eyebrow above the title (authored before the title), none if not authored
+    parts.eyebrow.textContent = card.eyebrow;
+    parts.eyebrow.hidden = !card.eyebrow;
     parts.title.textContent = card.name;
     parts.text.replaceChildren(...card.body.map((el) => el.cloneNode(true)));
     if (!stats) return;
