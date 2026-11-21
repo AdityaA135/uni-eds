@@ -1276,11 +1276,11 @@ main > .section:has(.cards.features.is-stats) {
     }
   }
 
-  /* desktop: the Figma frame (1280×721), scaled down evenly on smaller or shorter screens, and
+  /* desktop: the Figma frame (1280×720), scaled down evenly on smaller or shorter screens, and
      not tied to the site header's height: the figure 64 from the top, 146.09 (134.4 a line), its
-     unit 39.04 and 14 below its top; the tiles' lines 84 above the foot (titles at 568) */
+     unit 39.04 and 14 below its top; the tiles' lines 83 above the foot (titles at 568) */
   @media (width >= 900px) {
-    --ft-u: min(calc(100vw / 1280), calc(100svh / 721));
+    --ft-u: min(calc(100vw / 1280), calc(100svh / 720));
 
     > .default-content-wrapper {
       padding-top: calc(64 * var(--ft-u));
@@ -1296,7 +1296,7 @@ main > .section:has(.cards.features.is-stats) {
     }
 
     > .cards-wrapper {
-      margin-bottom: calc(84 * var(--ft-u));
+      margin-bottom: calc(83 * var(--ft-u));
     }
   }
 }
