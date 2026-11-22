@@ -1065,6 +1065,12 @@ body.combat-motion main > .section:has(.tabs.vertical):not(.is-current, .is-arri
   position: relative;
 }
 
+/* a tab whose accordion follows the block in the section (tabs.js): the accordion shows below
+   the block, the panel takes no room */
+.tabs.faq > .tabs-panel.is-linked {
+  padding: 0;
+}
+
 /* stylelint-disable-next-line no-descending-specificity -- FAQ tabs are never pills */
 .tabs.faq > .tabs-list > .tabs-tab {
   font-family: var(--font-family-base);

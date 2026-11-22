@@ -647,6 +647,41 @@ main > .section.light:is(:has(.block.accordion:not(.dark)), :has(.block.tabs.faq
   }
 }
 
+/* with FAQ tabs: the accordions stay after the Tabs block in the section and only the selected
+   tab's shows (tabs.js), 24px under the bar; the head above the tabs on phones, beside both from
+   900px. The tabs row shrinks (and scrolls) only when a tab's fragment overfills the screen */
+main > .section.light:has(> .tabs-wrapper .block.tabs.faq) {
+  grid-template-rows: auto minmax(0, auto) minmax(0, 1fr);
+
+  > .accordion-wrapper {
+    margin-top: calc(24px - 19.8px);
+  }
+
+  > .accordion-wrapper[hidden] {
+    display: none;
+  }
+
+  @media (width >= 600px) {
+    > .accordion-wrapper {
+      margin-top: calc(24px - 28px);
+    }
+  }
+
+  @media (width >= 900px) {
+    grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+    row-gap: 24px;
+
+    > .default-content-wrapper {
+      grid-row: 1 / span 2;
+    }
+
+    > :is(.tabs-wrapper, .accordion-wrapper) {
+      grid-column: 2;
+      margin-top: 0;
+    }
+  }
+}
+
 main > .section.light .block.accordion:not(.dark) {
   --accordion-line: rgb(0 0 0 / 12%);
   --accordion-number: rgb(0 0 0 / 40%);
