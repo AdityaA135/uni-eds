@@ -154,8 +154,13 @@
           {
             "name": "Grey",
             "value": "grey"
+          },
+          {
+            "name": "FAQ Columns",
+            "value": "faq-columns"
           }
-        ]
+        ],
+        "description": "FAQ Columns: the section's texts on the left and its Accordion (or FAQ Tabs) on the right, as on the FAQ design; leave it off for the normal layout"
       }
     ]
   },
