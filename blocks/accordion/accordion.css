@@ -452,12 +452,13 @@ body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving
   transition: none;
 }
 
-/* --- a section with the FAQ Columns style (Code T FAQ, values from the prototype's .faq) ---
+/* --- a section with the FAQ Columns or FAQ Center style (Code T FAQ, values from the prototype's .faq) ---
    The section's own off-white instead of the white above, its default content (eyebrow, title,
    sub-line, link) as the FAQ's head: above the list on phones and tablets, beside it from
    900px. These rules sit here because they only apply to a section holding the (light)
    accordion or FAQ tabs; without the style (and in the dark theme) the section is as above. */
-main > .section.faq-columns:is(:has(.block.accordion:not(.dark)), :has(.block.tabs.faq)) {
+/* stylelint-disable-next-line no-descending-specificity -- a FAQ section is never dark */
+main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark)), :has(.block.tabs.faq)) {
   /* the prototype's off-white, set here: the site's --section-bg can be the dark page colour */
   --accordion-section-background: #fcfdfc;
 
@@ -655,7 +656,8 @@ main > .section > .accordion-wrapper[hidden] {
 /* ... and in FAQ Columns: the accordion 24px under the bar; the head above the tabs on phones
    (39.6 above them), beside both from 900px. The tabs row shrinks (and scrolls) only when a
    tab's fragment overfills the screen */
-main > .section.faq-columns:has(> .tabs-wrapper .block.tabs.faq) {
+/* stylelint-disable-next-line no-descending-specificity -- a FAQ section is never dark */
+main > .section:is(.faq-columns, .faq-center):has(> .tabs-wrapper .block.tabs.faq) {
   grid-template-rows: auto minmax(0, auto) minmax(0, 1fr);
 
   > .tabs-wrapper {
@@ -687,6 +689,59 @@ main > .section.faq-columns:has(> .tabs-wrapper .block.tabs.faq) {
     > :is(.tabs-wrapper, .accordion-wrapper) {
       grid-column: 2;
       margin-top: 0;
+    }
+  }
+}
+
+/* FAQ Center, from 900px (below, the same as FAQ Columns): one full-width column, centred:
+   eyebrow, title, description, then the tabs (centred while they fit), the accordion and the
+   button last. The head's own lines become the column's items so the button can go below the
+   accordion; the accordion shrinks (and scrolls) when the section is screen-tall */
+@media (width >= 900px) {
+  main > .section.faq-center:is(:has(.block.accordion:not(.dark)), :has(> .tabs-wrapper .block.tabs.faq)) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    row-gap: 0;
+
+    > .default-content-wrapper {
+      display: contents;
+    }
+
+    > .default-content-wrapper > * {
+      flex: none;
+      text-align: center;
+    }
+
+    > .default-content-wrapper > :is(h2, h2 + p) {
+      margin-inline: auto;
+    }
+
+    > .default-content-wrapper > p:has(> a:only-child) {
+      order: 1;
+      justify-content: center;
+    }
+
+    > :is(.tabs-wrapper, .accordion-wrapper) {
+      flex: none;
+      margin-top: 28px;
+      max-height: none;
+    }
+
+    > .accordion-wrapper {
+      flex: 0 1 auto;
+    }
+
+    > .tabs-wrapper ~ .accordion-wrapper {
+      margin-top: 24px;
+    }
+
+    .tabs.faq > .tabs-list > .tabs-tab:first-child {
+      margin-inline-start: auto;
+    }
+
+    .tabs.faq > .tabs-list > .tabs-tab:last-child {
+      margin-inline-end: auto;
     }
   }
 }
