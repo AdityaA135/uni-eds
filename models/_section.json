@@ -48,9 +48,13 @@
             {
               "name": "FAQ Columns",
               "value": "faq-columns"
+            },
+            {
+              "name": "FAQ Center",
+              "value": "faq-center"
             }
           ],
-          "description": "FAQ Columns: the section's texts on the left and its Accordion (or FAQ Tabs) on the right, as on the FAQ design; leave it off for the normal layout"
+          "description": "FAQ Columns: the section's texts on the left and its Accordion (or FAQ Tabs) on the right, as on the FAQ design. FAQ Center: the same design in one centred column (title, description, tabs, accordion, then the button). Pick one of them, or neither for the normal layout"
         }
       ]
     }

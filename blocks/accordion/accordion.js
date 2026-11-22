@@ -96,13 +96,14 @@ function buildItem(row, i) {
 }
 
 /**
- * The button of the FAQ section (FAQ Columns style): on hover its letters flicker off and back,
- * each at a random moment, a third of them twice, as on the design prototype. The link keeps
- * its text (and gets it as its label, the letters being split into spans)
+ * The button of the FAQ section (FAQ Columns or FAQ Center style): on hover its letters
+ * flicker off and back, each at a random moment, a third of them twice, as on the design
+ * prototype. The link keeps its text (and gets it as its label, the letters being split into
+ * spans)
  * @param {Element} block
  */
 function wireCtaGlitch(block) {
-  const link = block.closest('.section.faq-columns')
+  const link = block.closest('.section:is(.faq-columns, .faq-center)')
     ?.querySelector(':scope > .default-content-wrapper > p > a:only-child');
   if (!link || link.classList.contains('accordion-cta-glitch')) return;
   link.classList.add('accordion-cta-glitch');
