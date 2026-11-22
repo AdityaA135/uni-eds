@@ -697,11 +697,10 @@ main > .section:is(.faq-columns, .faq-center):has(> .tabs-wrapper .block.tabs.fa
 }
 
 /* FAQ Center, from 900px (below, the same as FAQ Columns): one column: eyebrow, title and
-   description centred (the title and description as wide as the section), then from the left
-   the tabs and the accordion as wide as its answers (640, .accordion-item-body), so its
-   lines and + end where the answers do, and the button last, centred. The head's own lines
-   become the column's items so the button can go below the accordion; the accordion shrinks
-   (and scrolls) when the section is screen-tall */
+   description centred (the title and description as wide as the section), then the tabs (from
+   the left) and the accordion, both full width, and the button last, centred. The head's own
+   lines become the column's items so the button can go below the accordion; the accordion
+   shrinks (and scrolls) when the section is screen-tall */
 @media (width >= 900px) {
   main > .section.faq-center:is(:has(.block.accordion:not(.dark)), :has(> .tabs-wrapper .block.tabs.faq)) {
     display: flex;
@@ -729,9 +728,6 @@ main > .section:is(.faq-columns, .faq-center):has(> .tabs-wrapper .block.tabs.fa
 
     > :is(.tabs-wrapper, .accordion-wrapper) {
       flex: none;
-      box-sizing: border-box;
-      width: 100%;
-      max-width: 640px;
       margin-top: 28px;
       max-height: none;
     }
