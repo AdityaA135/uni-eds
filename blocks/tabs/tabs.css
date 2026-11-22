@@ -1046,14 +1046,14 @@ body.combat-motion main > .section:has(.tabs.vertical):not(.is-current, .is-arri
 
 /* stylelint-enable no-descending-specificity */
 
-/* ---------- FAQ: text tabs above the accordions of a Light FAQ section ----------
-   Each tab's Fragment holds an Accordion block (accordion.css styles it and lays out the
-   section). The tabs as the FAQ's eyebrow: New Science SemiBold 12 / 15.6, uppercase, the open
-   one black with a 1px underline, the others at 55% (black on hover); a 12% line under the
-   bar, the accordion 24px below it. */
+/* ---------- FAQ: text tabs above the accordions of a FAQ section ----------
+   Each tab shows an Accordion block of the section (or of its Fragment); accordion.css styles
+   it and lays out the section. The tabs: New Science SemiBold 15 / 19.5, 0.045em tracking,
+   uppercase, the open one black with a 1px underline, the others at 55% (black on hover); a
+   12% line under the bar. */
 .tabs.faq {
   --tabs-gap: 24px;
-  --tabs-font-size: 12px;
+  --tabs-font-size: 15px;
   --tabs-tab-padding: 0 0 12px;
   --tabs-tab-color: rgb(0 0 0 / 55%);
   --tabs-tab-active-color: #000;
@@ -1075,8 +1075,8 @@ body.combat-motion main > .section:has(.tabs.vertical):not(.is-current, .is-arri
 .tabs.faq > .tabs-list > .tabs-tab {
   font-family: var(--font-family-base);
   font-weight: var(--font-weight-semibold, 600);
-  line-height: 15.6px;
-  letter-spacing: 0.54px;
+  line-height: 19.5px;
+  letter-spacing: 0.675px;
 }
 
 /* stylelint-disable-next-line no-descending-specificity -- FAQ tabs are never pills */
@@ -1100,9 +1100,9 @@ body.combat-motion main > .section:has(.tabs.vertical):not(.is-current, .is-arri
   align-items: flex-start;
   box-sizing: border-box;
   width: 40px;
-  height: calc(15.6px + 12px);
+  height: calc(19.5px + 12px);
   margin: 0;
-  padding: 1.8px 0 0;
+  padding: calc((19.5px - 12px) / 2) 0 0;
   border: 0;
   border-radius: 0;
   color: rgb(0 0 0 / 55%);
