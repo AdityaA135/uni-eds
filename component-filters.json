@@ -115,5 +115,11 @@
   {
     "id": "social-deck-full",
     "components": []
+  },
+  {
+    "id": "tabs",
+    "components": [
+      "tab"
+    ]
   }
 ]
