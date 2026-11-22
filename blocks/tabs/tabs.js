@@ -444,19 +444,28 @@ export default async function decorate(block) {
   if (buttons.length === 1 && !editing) list.classList.add('tabs-list-single');
   block.prepend(list);
 
-  // FAQ style: the Accordion blocks authored after the Tabs block in its section become the
-  // tabs' content, the first in the first tab and so on (a tab with a Fragment shows that
-  // instead), so a whole FAQ is authored on its page. They keep their editor instrumentation
+  // FAQ style: the Accordion blocks authored after the Tabs block in its section are the tabs'
+  // content, the first for the first tab and so on (a tab with a Fragment shows that instead).
+  // They stay where they are in the section, only the selected tab's is shown: the editor
+  // replaces the Tabs block when a tab is edited, which would take moved accordions with it
+  const linked = [];
   if (block.classList.contains('faq')) {
     const accordions = [];
     const own = block.closest('.tabs-wrapper') || block;
     for (let el = own.nextElementSibling; el; el = el.nextElementSibling) {
       if (el.matches('.accordion-wrapper')) accordions.push(el);
     }
-    panels.forEach((panel) => {
+    panels.forEach((panel, i) => {
       if (panel.querySelector(':scope > .tabs-panel-fragment')) return;
-      const next = accordions.shift();
-      if (next) panel.append(next);
+      const wrapper = accordions.shift();
+      if (!wrapper) return;
+      linked[i] = wrapper;
+      wrapper.id = `${panel.id}-accordion`;
+      wrapper.setAttribute('role', 'tabpanel');
+      wrapper.setAttribute('aria-labelledby', buttons[i].id);
+      buttons[i].setAttribute('aria-controls', wrapper.id);
+      panel.classList.add('is-linked');
+      ['role', 'aria-labelledby', 'tabindex'].forEach((name) => panel.removeAttribute(name));
     });
   }
 
@@ -474,6 +483,7 @@ export default async function decorate(block) {
       button.tabIndex = i === index ? 0 : -1;
     });
     panels.forEach((panel, i) => { panel.hidden = i !== index; });
+    linked.forEach((wrapper, i) => { wrapper.hidden = i !== index; });
     if (focus) buttons[index].focus();
     loadPanelFragment(panels[index]);
     if (previous >= 0) {
@@ -561,7 +571,8 @@ export default async function decorate(block) {
       }
       if (!detail?.selected || !detail.resource) return;
       const el = document.querySelector(`[data-aue-resource="${CSS.escape(detail.resource)}"]`);
-      const index = panels.findIndex((panel) => panel.contains(el));
+      const owns = (panel, i) => panel.contains(el) || !!linked[i]?.contains(el);
+      const index = el ? panels.findIndex(owns) : -1;
       if (index >= 0) select(index);
     };
     document.addEventListener('aue:ui-select', onEditorSelect, true);
