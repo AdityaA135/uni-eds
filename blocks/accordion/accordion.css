@@ -215,8 +215,10 @@
 }
 
 /* the section the accordion is in: white, so the accordion looks the same on a light or a dark
-   page; black in the dark theme */
-main .section:has(.block.accordion) {
+   page; black in the dark theme. Only the page's own sections: an accordion in a Fragment (e.g.
+   in a tab) comes in its own section, which takes no band. A Light section with FAQ tabs is one
+   from the start (their accordions arrive with each tab) */
+main > .section:is(:has(.block.accordion), :has(.block.tabs.faq)) {
   --accordion-section-background: #fff;
 
   padding-block: 72px;
@@ -456,7 +458,7 @@ body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving
    sub-line, link) as the FAQ's head: above the list on phones and tablets, beside it from
    900px. These rules sit here because they only apply to a section holding the (light)
    accordion; the dark theme and accordions outside Light sections are left as above. */
-main > .section.light:has(.block.accordion:not(.dark)) {
+main > .section.light:is(:has(.block.accordion:not(.dark)), :has(.block.tabs.faq)) {
   /* the prototype's off-white, set here: the site's --section-bg can be the dark page colour */
   --accordion-section-background: #fcfdfc;
 
@@ -473,14 +475,14 @@ main > .section.light:has(.block.accordion:not(.dark)) {
   }
 
   /* the list scrolls inside the screen-tall section when it does not fit */
-  > .accordion-wrapper {
+  > :is(.accordion-wrapper, .tabs-wrapper) {
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: none;
   }
 
-  > .accordion-wrapper::-webkit-scrollbar {
+  > :is(.accordion-wrapper, .tabs-wrapper)::-webkit-scrollbar {
     display: none;
   }
 
@@ -618,7 +620,7 @@ main > .section.light:has(.block.accordion:not(.dark)) {
     column-gap: 64px;
     padding: 120px 64px 64px;
 
-    > .accordion-wrapper {
+    > :is(.accordion-wrapper, .tabs-wrapper) {
       max-height: 100%;
     }
 

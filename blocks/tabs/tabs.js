@@ -387,6 +387,22 @@ export default async function decorate(block) {
   if (buttons.length === 1 && !editing) list.classList.add('tabs-list-single');
   block.prepend(list);
 
+  // FAQ style: the Accordion blocks authored after the Tabs block in its section become the
+  // tabs' content, the first in the first tab and so on (a tab with a Fragment shows that
+  // instead), so a whole FAQ is authored on its page. They keep their editor instrumentation
+  if (block.classList.contains('faq')) {
+    const accordions = [];
+    const own = block.closest('.tabs-wrapper') || block;
+    for (let el = own.nextElementSibling; el; el = el.nextElementSibling) {
+      if (el.matches('.accordion-wrapper')) accordions.push(el);
+    }
+    panels.forEach((panel) => {
+      if (panel.querySelector(':scope > .tabs-panel-fragment')) return;
+      const next = accordions.shift();
+      if (next) panel.append(next);
+    });
+  }
+
   // 3. selection
   let active = -1;
   const select = (index, focus = false) => {

@@ -41,14 +41,15 @@
           "component": "multiselect",
           "name": "classes",
           "label": "Style",
-          "description": "Combine freely, e.g. Vertical + Pills. Accordion on mobile stacks the tabs below 600px. Specs lays out a spec comparison: give each tab a Fragment holding a Columns block (one column per model; row 1 the model names, every other cell a label and a value as two paragraphs). Locations shows each tab as an image tile: give each tab a city Title and one image as its Content; the open tab's image fills the section.",
+          "description": "Combine freely, e.g. Vertical + Pills. Accordion on mobile stacks the tabs below 600px. Specs lays out a spec comparison: give each tab a Fragment holding a Columns block (one column per model; row 1 the model names, every other cell a label and a value as two paragraphs). Locations shows each tab as an image tile: give each tab a city Title and one image as its Content; the open tab's image fills the section. FAQ puts text tabs above the accordions of a Light FAQ section: give each tab a Title, then add one Accordion block per tab after the Tabs block in the same section (the first accordion goes in the first tab, and so on), or give a tab a Fragment holding an Accordion.",
           "options": [
             { "name": "Vertical", "value": "vertical" },
             { "name": "Pills", "value": "pills" },
             { "name": "Brackets", "value": "brackets" },
             { "name": "Accordion on mobile", "value": "accordion-mobile" },
             { "name": "Specs (comparison)", "value": "specs" },
-            { "name": "Locations (image tiles)", "value": "locations" }
+            { "name": "Locations (image tiles)", "value": "locations" },
+            { "name": "FAQ (accordions)", "value": "faq" }
           ]
         },
         {
