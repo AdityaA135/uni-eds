@@ -51,6 +51,63 @@ async function loadPanelFragment(panel) {
 }
 
 /**
+ * FAQ style: when the tabs don't fit their column (any screen), an arrow at each end of the
+ * bar moves it sideways by most of its width; each shows only while there is more that way.
+ * The bar still scrolls by swipe and trackpad, and the selected tab is kept in full view.
+ * The arrows are for pointers only: the keyboard moves through the tabs with the arrow keys.
+ * @param {HTMLElement} block
+ * @param {HTMLElement} list the tab bar
+ */
+function wireTabScroll(block, list) {
+  const smooth = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+  const arrow = (dir) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `tabs-scroll tabs-scroll-${dir}`;
+    button.tabIndex = -1;
+    button.setAttribute('aria-hidden', 'true');
+    button.hidden = true;
+    button.addEventListener('click', () => {
+      list.scrollBy({ left: (dir === 'next' ? 1 : -1) * list.clientWidth * 0.8, behavior: smooth() });
+    });
+    return button;
+  };
+  const prev = arrow('prev');
+  const next = arrow('next');
+  block.append(prev, next);
+
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const room = list.scrollWidth - list.clientWidth;
+    prev.hidden = list.scrollLeft <= 1;
+    next.hidden = list.scrollLeft >= room - 1;
+  };
+  const queue = () => { if (!frame) frame = requestAnimationFrame(update); };
+  list.addEventListener('scroll', queue, { passive: true });
+  new ResizeObserver(queue).observe(list);
+
+  // the selected (or focused) tab in full view, clear of the arrows
+  const reveal = (tab) => {
+    if (!tab) return;
+    const bar = list.getBoundingClientRect();
+    const box = tab.getBoundingClientRect();
+    const clear = prev.offsetWidth || next.offsetWidth || 40;
+    let by = 0;
+    if (box.left < bar.left + clear) by = box.left - bar.left - clear;
+    else if (box.right > bar.right - clear) by = box.right - bar.right + clear;
+    if (by) list.scrollBy({ left: by, behavior: smooth() });
+  };
+  list.addEventListener('focusin', (e) => reveal(e.target.closest('.tabs-tab')));
+  block.addEventListener('tabs:change', () => reveal(list.querySelector('[aria-selected="true"]')));
+  requestAnimationFrame(() => {
+    list.scrollLeft = 0;
+    reveal(list.querySelector('[aria-selected="true"]'));
+    update();
+  });
+}
+
+/**
  * Combat theme, Specs tabs (the Specifications side panel): the motion of the design
  * prototype. A sliding underline follows the selected tab; on a change the open rows
  * slide out towards the side the visitor is moving away from (0.16s), then the new
@@ -427,6 +484,7 @@ export default async function decorate(block) {
     }
   };
   select(Math.min(Math.max(openIndex, 0), buttons.length - 1));
+  if (block.classList.contains('faq')) wireTabScroll(block, list);
   // Specs: a row with a value per model gets its label on each value (tabs.css shows it over
   // the value on the spec sheet); the first row is the model names
   if (block.classList.contains('specs')) {
