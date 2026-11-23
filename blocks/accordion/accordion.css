@@ -463,27 +463,18 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
   --accordion-section-background: #fcfdfc;
 
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
   align-content: start;
   row-gap: 19.8px;
   padding: max(84px, var(--nav-offset, 0px) + 10px) 20px 32px;
 
+  /* min-width 0: a tab bar wider than the screen scrolls in its own row (its arrows), it does
+     not widen the column */
   > div {
+    min-width: 0;
     max-width: none;
     margin: 0;
     padding: 0;
-  }
-
-  /* the list scrolls inside the screen-tall section when it does not fit */
-  > :is(.accordion-wrapper, .tabs-wrapper) {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
-  }
-
-  > :is(.accordion-wrapper, .tabs-wrapper)::-webkit-scrollbar {
-    display: none;
   }
 
   > .default-content-wrapper {
@@ -615,14 +606,10 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
   /* the head at the left (5 parts), the list at the right (7 parts) */
   @media (width >= 900px) {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: 1fr;
     align-items: start;
     column-gap: 64px;
     padding: 120px 64px 64px;
-
-    > :is(.accordion-wrapper, .tabs-wrapper) {
-      max-height: 100%;
-    }
 
     /* 17.58 from the eyebrow to the title; 31.19 from the description to the button (its
        paragraph as tall as the button) */
@@ -653,15 +640,14 @@ main > .section > .accordion-wrapper[hidden] {
   display: none;
 }
 
-/* ... and in FAQ Columns / Center: the accordion right under the bar, whose line works as its
-   first row's (line to question as between the rows: 15, 14 on phones); the head above the tabs
-   on phones (39.6 above them), beside both from 900px in FAQ Columns. The tabs row shrinks (and
-   scrolls) only when a tab's fragment overfills the screen */
+/* ... and in FAQ Columns / Center: the accordion 24px under the bar; the head above the tabs on
+   phones (39.6 above them), beside both from 900px in FAQ Columns. Nothing scrolls inside the
+   section: it grows with its questions */
 /* stylelint-disable-next-line no-descending-specificity -- a FAQ section is never dark */
 main > .section:is(.faq-columns, .faq-center):has(> .tabs-wrapper .block.tabs.faq) {
-  --faq-tabs-to-accordion: 0px;
+  --faq-tabs-to-accordion: 24px;
 
-  grid-template-rows: auto minmax(0, auto) minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
 
   > .tabs-wrapper {
     margin-top: 19.8px;
@@ -682,7 +668,7 @@ main > .section:is(.faq-columns, .faq-center):has(> .tabs-wrapper .block.tabs.fa
   }
 
   @media (width >= 900px) {
-    grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
     row-gap: var(--faq-tabs-to-accordion);
 
     > .default-content-wrapper {
@@ -699,8 +685,7 @@ main > .section:is(.faq-columns, .faq-center):has(> .tabs-wrapper .block.tabs.fa
 /* FAQ Center, from 900px (below, the same as FAQ Columns): one column: eyebrow, title and
    description centred (the title and description as wide as the section), then the tabs (from
    the left) and the accordion, both full width, and the button last, centred. The head's own
-   lines become the column's items so the button can go below the accordion; the accordion
-   shrinks (and scrolls) when the section is screen-tall */
+   lines become the column's items so the button can go below the accordion */
 @media (width >= 900px) {
   main > .section.faq-center:is(:has(.block.accordion:not(.dark)), :has(> .tabs-wrapper .block.tabs.faq)) {
     display: flex;
@@ -729,11 +714,6 @@ main > .section:is(.faq-columns, .faq-center):has(> .tabs-wrapper .block.tabs.fa
     > :is(.tabs-wrapper, .accordion-wrapper) {
       flex: none;
       margin-top: 28px;
-      max-height: none;
-    }
-
-    > .accordion-wrapper {
-      flex: 0 1 auto;
     }
 
     > .tabs-wrapper ~ .accordion-wrapper {
