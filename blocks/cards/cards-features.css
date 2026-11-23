@@ -821,15 +821,6 @@
     }
   }
 
-  /* desktop: the image cards four across the section's text width (100cqi), 16 apart; more go
-     on to the right, under the rail's fade, and come in as it scrolls (narrower screens keep
-     the wider cards: four there would cut their titles short) */
-  @media (width >= 1200px) {
-    .ft-card:not(.is-stat) {
-      width: calc((100cqi - 3 * var(--ft-gap)) / 4);
-    }
-  }
-
   @media (width >= 900px) {
     /* stat tiles: one row of figures across the section, 30.45 apart (the Figma frame's unit,
        --ft-u, set on the section) */
