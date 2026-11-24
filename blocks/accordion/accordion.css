@@ -470,7 +470,10 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
   row-gap: 19.8px;
   padding: max(84px, var(--nav-offset, 0px) + 10px) 20px 32px;
 
+  /* min-width 0: a long word (or a tab bar wider than the screen) cuts or wraps in its column,
+     it does not widen it past the screen */
   > div {
+    min-width: 0;
     max-width: none;
     margin: 0;
     padding: 0;
@@ -510,7 +513,7 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
       white-space: nowrap;
     }
 
-    /* two lines, then "…" */
+    /* two lines, then "…" (a word longer than the line breaks, so it ends in "…" too) */
     > h2 {
       display: -webkit-box;
       margin-top: 9.58px;
@@ -522,6 +525,7 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
       line-height: 1;
       letter-spacing: normal;
       text-transform: uppercase;
+      overflow-wrap: anywhere;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
     }
@@ -535,6 +539,7 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
       color: rgb(0 0 0 / 55%);
       font-size: 14px;
       line-height: 1.6;
+      overflow-wrap: anywhere;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
     }
