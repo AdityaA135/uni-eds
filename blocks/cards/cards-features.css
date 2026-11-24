@@ -422,8 +422,9 @@
   }
 
   /* more than four tiles: a row that scrolls sideways (desktop: four across, from 900px below;
-     phones and tablets: pages of four); it bleeds to the screen's edges and fades out under
-     them, as the image cards' rail (both sides once it has moved). The block padding keeps the
+     phones and tablets: pages of four); it bleeds to the screen's edges, where its tiles blur
+     (or, without scroll-driven animations, fade as the image cards' rail; both sides once it
+     has moved). The block padding keeps the
      "+" and the focus ring clear of the rail's edge */
   &.is-stats:not(.is-authoring) .card-list:has(> .ft-card:nth-child(5)) {
     /* the fade twice the gutter (128 on desktop, 40 on phones), so the rail plainly scrolls */
@@ -444,6 +445,21 @@
         ft-fade-end linear both;
       animation-timeline: scroll(self inline), scroll(self inline);
       animation-range: 0 64px, calc(100% - 64px) 100%;
+    }
+
+    /* where an animation can follow a tile's place in the rail (Chrome, Edge, Safari 26), no
+       fade: a tile out in the gutters (the next ones, those scrolled past) is blurred past
+       reading, at full opacity, and sharpens as it comes in (ft-edge-blur). Elsewhere the fade
+       above stays */
+    @supports (animation-timeline: view()) {
+      mask-image: none;
+      animation: none;
+
+      > .ft-card.is-stat {
+        animation: ft-edge-blur linear both;
+        animation-timeline: view(inline var(--ft-gutter));
+        animation-range: entry 0% exit 100%;
+      }
     }
 
     /* dragged with the mouse (cards-features.js): no snapping while it moves and eases to its
@@ -1030,6 +1046,25 @@
 
   to {
     --ft-fade-end: 0;
+  }
+}
+
+/* a stat tile in the rail's gutters: blurred until it is in, and again as it leaves */
+@keyframes ft-edge-blur {
+  entry 0% {
+    filter: blur(10px);
+  }
+
+  entry 100% {
+    filter: blur(0);
+  }
+
+  exit 0% {
+    filter: blur(0);
+  }
+
+  exit 100% {
+    filter: blur(10px);
   }
 }
 
