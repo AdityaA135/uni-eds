@@ -48,7 +48,8 @@
 
     --ft-fade-end: var(--ft-gutter);
 
-    mask-image: linear-gradient(
+    /* the fade, also used by the stat tiles' rail (desktop, more than four tiles) */
+    --ft-rail-mask: linear-gradient(
       90deg,
       transparent 0,
       rgb(0 0 0 / 3%) calc(var(--ft-fade-start) * 0.14),
@@ -67,6 +68,8 @@
       rgb(0 0 0 / 3%) calc(100% - var(--ft-fade-end) * 0.14),
       transparent 100%
     );
+
+    mask-image: var(--ft-rail-mask);
   }
 
   .card-list::-webkit-scrollbar {
@@ -821,15 +824,6 @@
     }
   }
 
-  /* desktop: the image cards four across the section's text width (100cqi), 16 apart; more go
-     on to the right, under the rail's fade, and come in as it scrolls (narrower screens keep
-     the wider cards: four there would cut their titles short) */
-  @media (width >= 1200px) {
-    .ft-card:not(.is-stat) {
-      width: calc((100cqi - 3 * var(--ft-gap)) / 4);
-    }
-  }
-
   @media (width >= 900px) {
     /* stat tiles: one row of figures across the section, 30.45 apart (the Figma frame's unit,
        --ft-u, set on the section) */
@@ -837,6 +831,34 @@
       display: flex;
       justify-content: flex-start;
       gap: calc(30.45 * var(--ft-u, 1px));
+    }
+
+    /* more than four tiles: four across the row, each a quarter of it (as four tiles share it),
+       the rest on to the right; the row bleeds to the screen's edges and fades out under them,
+       as the image cards' rail (both sides once it has moved). The block padding keeps the "+"
+       and the focus ring clear of the rail's edge */
+    &.is-stats:not(.is-authoring) .card-list:has(> .ft-card:nth-child(5)) {
+      margin: -12px calc(50cqi - 50vw);
+      padding: 12px calc(50vw - 50cqi);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-padding-inline: calc(50vw - 50cqi);
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      mask-image: var(--ft-rail-mask);
+
+      > .ft-card.is-stat {
+        flex: none;
+        width: calc((100cqi - 3 * 30.45 * var(--ft-u, 1px)) / 4);
+      }
+
+      @supports (animation-timeline: scroll()) {
+        animation:
+          ft-fade-start linear both,
+          ft-fade-end linear both;
+        animation-timeline: scroll(self inline), scroll(self inline);
+        animation-range: 0 64px, calc(100% - 64px) 100%;
+      }
     }
 
     .ft-card.is-stat .ft-title {
