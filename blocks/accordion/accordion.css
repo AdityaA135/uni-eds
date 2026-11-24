@@ -59,12 +59,14 @@
     }
   }
 
+  /* no grey or black flash on a tap (phones); the keyboard focus ring stays */
   .accordion-item-label {
     display: flex;
     align-items: baseline;
     padding: 24px 0;
     list-style: none;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 
     &::-webkit-details-marker {
       display: none;
@@ -612,13 +614,23 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
     }
   }
 
-  /* the head at the left (5 parts), the list at the right (7 parts) */
+  /* the head at the left (5 parts), the list at the right (7 parts). The top: 32px under the
+     site header's bar (--nav-offset; the Figma's gap under its bar, 96 at least), plus half
+     of the screen's height past 720, so on taller screens the room left over is shared
+     between top and foot instead of all falling under the list (none in Universal Editor,
+     whose frame grows with the page) */
   @media (width >= 900px) {
+    --faq-top-extra: max(0px, (100svh - 720px) / 2);
+
+    body:has([data-aue-resource]) & {
+      --faq-top-extra: 0px;
+    }
+
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-template-rows: minmax(0, 1fr);
     align-items: start;
     column-gap: 64px;
-    padding: 120px 64px 64px;
+    padding: calc(max(96px, var(--nav-offset, 0px) + 32px) + var(--faq-top-extra)) 64px 64px;
 
     > :is(.accordion-wrapper, .tabs-wrapper) {
       max-height: 100%;
@@ -640,10 +652,6 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
         padding: 0 26px;
       }
     }
-  }
-
-  @media (width >= 900px) and (height <= 860px) {
-    padding-top: max(96px, var(--nav-offset, 0px) + 12px);
   }
 }
 
@@ -855,10 +863,12 @@ main > .section.light .block.accordion:not(.dark) {
     }
   }
 
+  /* phones: the answer 278 wide (34 in, 23 clear of the right side, where the site's page
+     scroller sits), 14 / 21.7 */
   .accordion-item-body {
     box-sizing: border-box;
     max-width: 640px;
-    padding: 0 0 16px 34px;
+    padding: 0 23px 16px 34px;
     color: var(--accordion-answer);
     font-size: 14px;
     line-height: 1.55;
