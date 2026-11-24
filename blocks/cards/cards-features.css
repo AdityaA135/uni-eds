@@ -456,9 +456,9 @@
       animation: none;
 
       > .ft-card.is-stat {
-        animation: ft-edge-blur linear both;
+        animation: ft-edge-blur cubic-bezier(0.67, 0.83, 1, 1) both;
         animation-timeline: view(inline var(--ft-gutter));
-        animation-range: entry 0% exit 100%;
+        animation-range: entry 30% exit 100%;
       }
     }
 
