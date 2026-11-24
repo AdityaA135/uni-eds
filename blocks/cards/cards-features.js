@@ -222,27 +222,6 @@ function decorateProgress(block, ul) {
 }
 
 /**
- * Stat tiles, more than four (phones and tablets, cards-features.css): pages of four, as the
- * four tiles' 2 x 2 (1 2 / 3 4); a last page of one or two tiles has them in the bottom row,
- * as two tiles on their own. Each tile gets its column and row, the list its column count
- * (whole pages, so the last one can come fully into view)
- * @param {HTMLUListElement} ul
- */
-function placeStatPages(ul) {
-  const items = [...ul.children];
-  if (items.length <= 4) return;
-  const pages = Math.ceil(items.length / 4);
-  ul.style.setProperty('--ft-page-cols', pages * 2);
-  items.forEach((li, i) => {
-    const page = Math.floor(i / 4);
-    const spot = i % 4;
-    const onPage = Math.min(4, items.length - page * 4);
-    li.style.setProperty('--ft-page-col', page * 2 + (spot % 2) + 1);
-    li.style.setProperty('--ft-page-row', onPage <= 2 ? 2 : Math.floor(spot / 2) + 1);
-  });
-}
-
-/**
  * A row that scrolls sideways follows a mouse drag (touch and trackpads scroll it natively).
  * While dragged it does not snap; let go, it eases to the nearest stop, or the next one in the
  * drag's direction after a short flick. A drag does not open the tile it ends on
@@ -338,7 +317,6 @@ export default function decorateFeatures(block, ul) {
   block.classList.toggle('is-stats', items.length > 0 && items.every((li) => li.classList.contains('is-stat')));
   if (!authoring && block.classList.contains('is-stats')) {
     splitSectionFigure(block);
-    placeStatPages(ul);
     wireDragScroll(ul);
   }
   if (!authoring && !block.classList.contains('is-stats')) decorateProgress(block, ul);
