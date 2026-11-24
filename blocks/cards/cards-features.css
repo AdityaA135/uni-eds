@@ -46,7 +46,7 @@
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
 
-    --ft-fade-end: var(--ft-gutter);
+    --ft-fade-end: var(--ft-fade, var(--ft-gutter));
 
     /* the fade, also used by the stat tiles' rail (desktop, more than four tiles) */
     --ft-rail-mask: linear-gradient(
@@ -426,6 +426,9 @@
      them, as the image cards' rail (both sides once it has moved). The block padding keeps the
      "+" and the focus ring clear of the rail's edge */
   &.is-stats:not(.is-authoring) .card-list:has(> .ft-card:nth-child(5)) {
+    /* the fade twice the gutter (128 on desktop, 40 on phones), so the rail plainly scrolls */
+    --ft-fade: calc(var(--ft-gutter) * 2);
+
     margin: -12px calc(50cqi - 50vw);
     padding: 12px calc(50vw - 50cqi);
     overflow-x: auto;
@@ -456,22 +459,28 @@
     }
 
     /* phones and tablets, as an app drawer: pages of four tiles in the four tiles' 2 x 2 (1 2 /
-       3 4, their size and gaps), at the foot; a swipe brings the next page, one at a time. Each
-       tile's row comes from its place on its page; the columns fill in page by page (dense: a
-       tile takes the first free column of its row). A last page of one or two tiles has them in
-       the bottom row, as two tiles on their own; a last page of one tile gets its missing
-       column as end padding, so it comes fully into view */
+       3 4, their size and 16px gap), at the foot; a swipe brings the next page, one at a time.
+       The pages follow each other with no gap (a page's first column holds the 16px), so the
+       next page's start shows in the gutter, under the fade. Each tile's row comes from its
+       place on its page; the columns fill in page by page (dense: a tile takes the first free
+       column of its row). A last page of one or two tiles has them in the bottom row, as two
+       tiles on their own; a last page of one tile gets its missing column as end padding, so
+       it comes fully into view */
     @media (width < 900px) {
+      --ft-page-tile: calc((100cqi - 16px) / 2);
+
       grid-template-columns: none;
       grid-template-rows: auto auto;
-      grid-auto-columns: calc((100cqi - 16px) / 2);
+      grid-auto-columns: calc(var(--ft-page-tile) + 16px) var(--ft-page-tile);
       grid-auto-flow: column dense;
+      column-gap: 0;
 
       &:has(> .ft-card:nth-child(4n + 1):last-child) {
-        padding-inline-end: calc(50vw - 50cqi + (100cqi - 16px) / 2 + 16px);
+        padding-inline-end: calc(50vw - 50cqi + var(--ft-page-tile));
       }
 
       > .ft-card.is-stat {
+        width: var(--ft-page-tile);
         scroll-snap-align: none;
       }
 
@@ -1010,13 +1019,13 @@
   }
 
   to {
-    --ft-fade-start: var(--ft-gutter);
+    --ft-fade-start: var(--ft-fade, var(--ft-gutter));
   }
 }
 
 @keyframes ft-fade-end {
   from {
-    --ft-fade-end: var(--ft-gutter);
+    --ft-fade-end: var(--ft-fade, var(--ft-gutter));
   }
 
   to {
