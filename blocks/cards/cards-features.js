@@ -222,6 +222,110 @@ function decorateProgress(block, ul) {
 }
 
 /**
+ * Stat tiles, more than four (phones and tablets, cards-features.css): pages of four, as the
+ * four tiles' 2 x 2 (1 2 / 3 4); a last page of one or two tiles has them in the bottom row,
+ * as two tiles on their own. Each tile gets its column and row, the list its column count
+ * (whole pages, so the last one can come fully into view)
+ * @param {HTMLUListElement} ul
+ */
+function placeStatPages(ul) {
+  const items = [...ul.children];
+  if (items.length <= 4) return;
+  const pages = Math.ceil(items.length / 4);
+  ul.style.setProperty('--ft-page-cols', pages * 2);
+  items.forEach((li, i) => {
+    const page = Math.floor(i / 4);
+    const spot = i % 4;
+    const onPage = Math.min(4, items.length - page * 4);
+    li.style.setProperty('--ft-page-col', page * 2 + (spot % 2) + 1);
+    li.style.setProperty('--ft-page-row', onPage <= 2 ? 2 : Math.floor(spot / 2) + 1);
+  });
+}
+
+/**
+ * A row that scrolls sideways follows a mouse drag (touch and trackpads scroll it natively).
+ * While dragged it does not snap; let go, it eases to the nearest stop, or the next one in the
+ * drag's direction after a short flick. A drag does not open the tile it ends on
+ * @param {HTMLUListElement} ul
+ */
+function wireDragScroll(ul) {
+  let drag = null;
+  let timer = 0;
+  // snapping comes back once the row has reached its stop (it is one: no jump)
+  const settle = () => {
+    clearTimeout(timer);
+    ul.removeEventListener('scrollend', settle);
+    ul.classList.remove('is-dragging');
+  };
+  ul.addEventListener('dragstart', (e) => { if (drag) e.preventDefault(); });
+  ul.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    if (ul.scrollWidth <= ul.clientWidth + 1) return;
+    drag = {
+      id: e.pointerId, x: e.clientX, left: ul.scrollLeft, moved: false,
+    };
+  });
+  ul.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.moved) {
+      if (Math.abs(dx) < 6) return;
+      drag.moved = true;
+      // a drag that starts while the row still eases to a stop takes over from there
+      clearTimeout(timer);
+      ul.removeEventListener('scrollend', settle);
+      drag.left = ul.scrollLeft;
+      ul.setPointerCapture(e.pointerId);
+      ul.classList.add('is-dragging', 'is-grabbing');
+      window.getSelection()?.removeAllRanges();
+    }
+    ul.scrollLeft = drag.left - dx;
+  });
+  const end = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const { moved, left } = drag;
+    const dx = e.clientX - drag.x;
+    drag = null;
+    if (!moved) return;
+    ul.classList.remove('is-grabbing');
+    // the click that ends the drag opens nothing
+    const swallow = (ev) => { ev.preventDefault(); ev.stopPropagation(); };
+    ul.addEventListener('click', swallow, { capture: true, once: true });
+    setTimeout(() => ul.removeEventListener('click', swallow, { capture: true }), 0);
+    // the stops: the tiles that snap, where the row puts them (its scroll padding)
+    const pad = parseFloat(getComputedStyle(ul).scrollPaddingInlineStart) || 0;
+    const rowLeft = ul.getBoundingClientRect().left;
+    const room = ul.scrollWidth - ul.clientWidth;
+    const stops = [...ul.children]
+      .filter((li) => getComputedStyle(li).scrollSnapAlign !== 'none')
+      .map((li) => {
+        const at = ul.scrollLeft + li.getBoundingClientRect().left - rowLeft - pad;
+        return Math.min(room, Math.max(0, at));
+      });
+    if (!stops.length) {
+      settle();
+      return;
+    }
+    const nearest = (at) => stops
+      .reduce((best, s) => (Math.abs(s - at) < Math.abs(best - at) ? s : best));
+    let target = nearest(ul.scrollLeft);
+    // a short flick still moves on one stop, in its direction
+    if (target === nearest(left) && Math.abs(dx) > 40) {
+      const ahead = dx < 0
+        ? stops.find((s) => s > left + 1)
+        : [...stops].reverse().find((s) => s < left - 1);
+      if (ahead !== undefined) target = ahead;
+    }
+    const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    ul.addEventListener('scrollend', settle);
+    timer = setTimeout(settle, 700);
+    ul.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+  };
+  ul.addEventListener('pointerup', end);
+  ul.addEventListener('pointercancel', end);
+}
+
+/**
  * @param {Element} block the cards block
  * @param {HTMLUListElement} ul the decorated card list (cards.js)
  */
@@ -232,7 +336,11 @@ export default function decorateFeatures(block, ul) {
   const cards = items.map((li) => readCard(li, authoring)).filter(Boolean);
   // all stat tiles (Performance): a row of figures rather than image cards
   block.classList.toggle('is-stats', items.length > 0 && items.every((li) => li.classList.contains('is-stat')));
-  if (!authoring && block.classList.contains('is-stats')) splitSectionFigure(block);
+  if (!authoring && block.classList.contains('is-stats')) {
+    splitSectionFigure(block);
+    placeStatPages(ul);
+    wireDragScroll(ul);
+  }
   if (!authoring && !block.classList.contains('is-stats')) decorateProgress(block, ul);
   // in Universal Editor every card stays selectable: no dialog to cover the canvas
   if (authoring || !cards.length) return;
