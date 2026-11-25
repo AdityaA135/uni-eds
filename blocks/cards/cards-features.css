@@ -1249,21 +1249,29 @@ main > .section:has(.cards.features.is-stats) {
   overflow: clip;
 
   /* a Video block authored in the picture's place: behind everything, as the picture (2% above,
-     8% beyond each side, 14% below), whatever the block's own markup; its video covers it */
+     8% beyond each side, 14% below), whatever the block's own markup; its video covers it.
+     The minimum sizes keep that size whatever width or height cap a site's own styles set on
+     a block, a wrapper or a video (a minimum wins over a maximum): a 1280px cap left the
+     video short of the screen's right edge */
   > :not(.default-content-wrapper, .cards-wrapper):has(video) {
     position: absolute;
     inset: -2% -8% -14%;
     z-index: -1;
+    min-width: 116%;
     max-width: none;
+    min-height: 116%;
     margin: 0;
     padding: 0;
+    aspect-ratio: auto;
   }
 
   > :not(.default-content-wrapper, .cards-wrapper):has(video) :has(video),
   > .default-content-wrapper > :has(video):not(:has(strong, a)) :has(video) {
     width: 100%;
+    min-width: 100%;
     max-width: none;
     height: 100%;
+    min-height: 100%;
     margin: 0;
     padding: 0;
     aspect-ratio: auto;
@@ -1272,8 +1280,10 @@ main > .section:has(.cards.features.is-stats) {
   > :not(.cards-wrapper) video {
     display: block;
     width: 100%;
+    min-width: 100%;
     max-width: none;
     height: 100%;
+    min-height: 100%;
     aspect-ratio: auto;
     object-fit: cover;
     object-position: 50% 100%;
@@ -1318,6 +1328,10 @@ main > .section:has(.cards.features.is-stats) {
       position: absolute;
       inset: -2% -8% -14%;
       z-index: -1;
+      min-width: 116%;
+      max-width: none;
+      min-height: 116%;
+      aspect-ratio: auto;
     }
 
     /* the figure (a bold paragraph, or a bare <strong> as Universal Editor publishes it): number
