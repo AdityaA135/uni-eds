@@ -422,14 +422,10 @@
   }
 
   /* more than four tiles: a row that scrolls sideways (desktop: four across, from 900px below;
-     phones and tablets: pages of four); it bleeds to the screen's edges, where its tiles blur
-     (or, without scroll-driven animations, fade as the image cards' rail; both sides once it
-     has moved). The block padding keeps the
-     "+" and the focus ring clear of the rail's edge */
+     phones and tablets: pages of four); it bleeds to the screen's edges, and a light arrow at
+     each end shows while there is more that way (cards-features.js). The block padding keeps
+     the "+" and the focus ring clear of the rail's edge */
   &.is-stats:not(.is-authoring) .card-list:has(> .ft-card:nth-child(5)) {
-    /* the fade twice the gutter (128 on desktop, 40 on phones), so the rail plainly scrolls */
-    --ft-fade: calc(var(--ft-gutter) * 2);
-
     margin: -12px calc(50cqi - 50vw);
     padding: 12px calc(50vw - 50cqi);
     overflow-x: auto;
@@ -437,30 +433,6 @@
     scroll-padding-inline: calc(50vw - 50cqi);
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    mask-image: var(--ft-rail-mask);
-
-    @supports (animation-timeline: scroll()) {
-      animation:
-        ft-fade-start linear both,
-        ft-fade-end linear both;
-      animation-timeline: scroll(self inline), scroll(self inline);
-      animation-range: 0 64px, calc(100% - 64px) 100%;
-    }
-
-    /* where an animation can follow a tile's place in the rail (Chrome, Edge, Safari 26), no
-       fade: a tile out in the gutters (the next ones, those scrolled past) is blurred past
-       reading, at full opacity, and sharpens as it comes in (ft-edge-blur). Elsewhere the fade
-       above stays */
-    @supports (animation-timeline: view()) {
-      mask-image: none;
-      animation: none;
-
-      > .ft-card.is-stat {
-        animation: ft-edge-blur cubic-bezier(0.67, 0.83, 1, 1) both;
-        animation-timeline: view(inline var(--ft-gutter));
-        animation-range: entry 30% exit 100%;
-      }
-    }
 
     /* dragged with the mouse (cards-features.js): no snapping while it moves and eases to its
        stop, no text selection, the grabbing hand */
@@ -514,6 +486,80 @@
       > .ft-card.is-stat:nth-child(4n + 2):last-child {
         grid-row: 2;
       }
+    }
+  }
+
+  /* the rail's arrows (cards-features.js): light, in the gutters level with the tiles, each
+     shown only while there is more that way; a click moves on a view (four tiles, or a page) */
+  .ft-rail-arrow {
+    position: absolute;
+    inset-block-start: 50%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 22%);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 8%);
+    color: rgb(255 255 255 / 70%);
+    cursor: pointer;
+    translate: 0 -50%;
+    backdrop-filter: blur(6px);
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .ft-rail-arrow[hidden] {
+    display: none;
+  }
+
+  .ft-rail-arrow:hover {
+    background: rgb(255 255 255 / 16%);
+    color: var(--color-white, #fff);
+  }
+
+  .ft-rail-arrow:focus-visible {
+    outline: 2px solid rgb(255 255 255 / 70%);
+    outline-offset: 2px;
+  }
+
+  .ft-rail-arrow::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: currentcolor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M4.25 2 8.25 6l-4 4' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  /* in the middle of the gutter (64 on desktop); on phones, 4px in from the screen's edge */
+  .ft-rail-prev {
+    inset-inline-start: max(calc(var(--ft-gutter) / -2 - 16px), calc(4px - var(--ft-gutter)));
+  }
+
+  .ft-rail-next {
+    inset-inline-end: max(calc(var(--ft-gutter) / -2 - 16px), calc(4px - var(--ft-gutter)));
+  }
+
+  .ft-rail-prev::before {
+    scale: -1 1;
+  }
+
+  /* phones and tablets: the margin is too narrow beside the tiles, so the pair sits just above
+     them at the right (‹ ›), clear of their texts */
+  @media (width < 900px) {
+    .ft-rail-arrow {
+      inset-block: auto calc(100% + 4px);
+      translate: none;
+    }
+
+    .ft-rail-prev {
+      inset-inline: auto 40px;
+    }
+
+    .ft-rail-next {
+      inset-inline-end: 0;
     }
   }
 
@@ -1070,25 +1116,6 @@
 
   to {
     --ft-fade-end: 0;
-  }
-}
-
-/* a stat tile in the rail's gutters: blurred until it is in, and again as it leaves */
-@keyframes ft-edge-blur {
-  entry 0% {
-    filter: blur(10px);
-  }
-
-  entry 100% {
-    filter: blur(0);
-  }
-
-  exit 0% {
-    filter: blur(0);
-  }
-
-  exit 100% {
-    filter: blur(10px);
   }
 }
 
