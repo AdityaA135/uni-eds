@@ -40,7 +40,7 @@
           "component": "select",
           "name": "classes",
           "label": "Style",
-          "description": "Carousel auto-rotates; recommended: 6 to 12 cards. Timeline: 6 to 10 cards. Pillars: up to 6 cards, JPG or PNG images only. Roller: 3 to 6 cards, one per scroll step. Rail: a horizontally scrolling row of fixed-width cards, any number. Features: cards that open their detail in place, with a next button (tech, safety or performance features).",
+          "description": "Default - a grid of cards.\nCarousel - auto-rotates; recommended: 6 to 12 cards.\nTimeline - 6 to 10 cards.\nPillars - up to 6 cards, JPG or PNG images only.\nRoller - 3 to 6 cards, one per scroll step.\nRail - a horizontally scrolling row of fixed-width cards, any number.\nFeatures - cards that open their details in a pop-up, with a Next button to the next card. Image cards (Technology, Safety): the picture fills the card, with its title and short line; the rest of its text shows in the pop-up. Stat tiles (Performance): the title in bold (e.g. 590 Nm) and a short label, the picture shown in the pop-up; up to 4 across on desktop and 2 x 2 on phones, more scroll sideways. Card text: see the card's Text field.",
           "options": [
             { "name": "Default", "value": "" },
             { "name": "Carousel", "value": "carousel" },
