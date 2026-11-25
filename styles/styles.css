@@ -755,15 +755,23 @@ body:has([data-aue-resource]) main :is(
     .register-form,
     .countdown,
     .columns.thank-you,
+    .columns.split,
+    .light .cards.carousel,
     .featured-intro,
     .events,
     .blog-listing,
-    .featured-blogs,
+    .featured-blogs
   ),
 body:has([data-aue-resource]) footer .footer {
   height: 900px;
   min-height: 0;
   overflow: hidden;
+}
+
+/* Universal Editor: a section sized from the screen by its block's own rule, which outranks the
+   reset above (Social Deck strip: min-height 100svh on phones) */
+body:has([data-aue-resource]) main > .section:has(.social-deck.strip) {
+  min-height: auto;
 }
 
 /* stops the footer's aspect-ratio widening the editor canvas */
