@@ -537,7 +537,6 @@
     scale: -1 1;
   }
 
-  /* desktop: a little larger (40, a 14px chevron), in the middle of each 64px gutter */
   @media (width >= 900px) {
     .ft-rail-arrow {
       width: 40px;
@@ -558,8 +557,6 @@
     }
   }
 
-  /* phones and tablets: the margin is too narrow beside the tiles, so the pair sits just above
-     them at the left (‹ ›), clear of their texts; each keeps its place when the other hides */
   @media (width < 900px) {
     .ft-rail-arrow {
       inset-block: auto calc(100% + 4px);
