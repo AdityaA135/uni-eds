@@ -909,9 +909,6 @@ main > .section.light .block.accordion:not(.dark) {
     }
   }
 
-  /* tablets: the "+" 16px in from the row's end, 36px from the screen's edge, clear of the
-     site's section navigation fixed at the right (9 to 35px from it); phones have it 54px in,
-     desktop's margin is 64px */
   @media (600px <= width < 900px) {
     .accordion-item-label {
       padding-inline-end: 16px;
