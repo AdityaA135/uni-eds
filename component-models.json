@@ -383,6 +383,35 @@
         "name": "rows",
         "value": "",
         "label": "Rows"
+      },
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "description": "Default is a standard columns layout. Thank You is a full-bleed split (image + centered content) on a dark surface. Reach Us is the Contact Us layout (use 3 columns × 2 rows): it also styles the Title above and the Text below it in the same section and adds a live IST clock. Split is two full-screen video panes side by side (2 columns): each column a link to an MP4, a heading, bold-first stat lines (e.g. **1100+ KM** range), a heading and text for its card; an optional 2nd row is a film card (image | eyebrow, line, MP4 link, then a heading and text for the film). Reach Us (Photo) is the Reach Us layout over a dark photo instead of the gradient: put an Image (and optionally a Text with a link to an MP4, for a muted looping film) alone in one cell, e.g. the empty first cell of the second row.",
+        "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Thank You",
+            "value": "thank-you"
+          },
+          {
+            "name": "Reach Us",
+            "value": "reach-us"
+          },
+          {
+            "name": "Split",
+            "value": "split"
+          },
+          {
+            "name": "Reach Us (Photo)",
+            "value": "reach-us photo"
+          }
+        ]
       }
     ]
   },
@@ -473,6 +502,110 @@
     ]
   },
   {
+    "id": "events",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Heading",
+        "value": "Upcoming events"
+      }
+    ]
+  },
+  {
+    "id": "event",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false,
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "alt",
+        "label": "ALT Text"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "city",
+        "label": "City",
+        "required": true,
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^[A-Za-z]+( [A-Za-z]+)*$",
+          "customErrorMsg": "City can only contain letters and spaces."
+        }
+      },
+      {
+        "component": "date-time",
+        "valueType": "date",
+        "name": "date",
+        "label": "Event Date",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "description",
+        "label": "Event Description",
+        "description": "Recommended character limit: 35 characters."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "venue",
+        "label": "Event Venue"
+      }
+    ]
+  },
+  {
+    "id": "floater",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Name"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "text",
+        "label": "Text"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "links",
+        "label": "Links",
+        "description": "As anywhere on the site: bold = primary button, italic = secondary, plain = text link; with no button, the last link is the primary one. Brochure: its two links on one line, then a line with the label."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "classes",
+        "label": "Style",
+        "value": "",
+        "options": [
+          {
+            "name": "Glass",
+            "value": ""
+          },
+          {
+            "name": "Dark",
+            "value": "dark"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {
@@ -489,22 +622,447 @@
         "component": "reference",
         "valueType": "string",
         "name": "image",
-        "label": "Image",
+        "label": "Background Image or Video (Desktop)",
+        "required": true,
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileImage",
+        "label": "Background Image or Video (Mobile)",
+        "description": "Optional. Uses the desktop one if empty.",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
         "multi": false
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "imageAlt",
-        "label": "Alt",
+        "label": "Image Alt Text",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "thumbnail",
+        "label": "Video Thumbnail (Desktop)",
+        "description": "Optional. Only used for a video: the image shown until it plays. Product: the image of the Watch the film card. Dealer: the image of the product card, bottom right.",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileThumbnail",
+        "label": "Video Thumbnail (Mobile)",
+        "description": "Optional. Only used for a video on mobile. Uses the desktop thumbnail if empty.",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Text",
+        "description": "Heading, text and buttons. Carousel: shown on every slide without its own Text (with Opening Animation, its first two paragraphs are the animation's lines). Tech Slides: shown below every slide; key and value paragraph pairs (e.g. Battery / 26.7 kWh) become stat tiles, then the button. Product, in this order: title (Heading 1), a link to the film's MP4 (its text is the card's eyebrow, e.g. Watch the film) and the card's text in the next paragraph, the price line (amount in bold), then the button. Dealer, in this order: the status line (e.g. Closed today · Opens Monday, 10am), the dealer's name (Heading 1), the address, the two buttons in one paragraph, then the product card's paragraphs: its title (e.g. [ New ] Combat), the price line and a line of text.",
         "value": ""
       },
       {
         "component": "richtext",
-        "name": "text",
+        "valueType": "string",
+        "name": "manifesto",
+        "label": "Scroll Manifesto (Editorial and Intro)",
+        "description": "Editorial and Intro styles only. Appears on scroll.",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "backgroundImage",
+        "label": "Background Image",
+        "description": "Showcase only. Optional. A decorative layer behind the main image, e.g. a sky behind a cut-out car photo.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "showcase"
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "logo",
+        "label": "Logo (Product)",
+        "description": "Product only. The model's logo or lockup, shown above the title.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "product"
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "logoAlt",
+        "label": "Logo Alt Text",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "product"
+          ]
+        },
+        "value": ""
+      },
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "description": "Hero layout. Carousel and Tech Slides take up to 3 slides. Product: a car launch hero with the logo and a big centred title, a Watch the film card and the price beside the button. Its Background Image is the whole scene (e.g. the car in its landscape); the Logo has its own field. Dealer: a dealer storefront hero with the status line, name, address and two buttons bottom left, and a product card (the Video Thumbnail and the paragraphs after the buttons) bottom right.",
         "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Editorial",
+            "value": "editorial"
+          },
+          {
+            "name": "Teaser",
+            "value": "teaser"
+          },
+          {
+            "name": "Showcase",
+            "value": "showcase"
+          },
+          {
+            "name": "Carousel",
+            "value": "carousel"
+          },
+          {
+            "name": "Intro",
+            "value": "intro"
+          },
+          {
+            "name": "Statement",
+            "value": "statement"
+          },
+          {
+            "name": "Tech Slides",
+            "value": "tech-slides"
+          },
+          {
+            "name": "Product",
+            "value": "product"
+          },
+          {
+            "name": "Dealer",
+            "value": "dealer"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_opening",
+        "label": "Opening Animation",
+        "description": "Carousel only. On load the first slide plays in a small card in the middle of the screen, then grows to fill it. The first two Text paragraphs appear either side of the card, and only there (screen readers still get them).",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "carousel"
+          ]
+        }
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_showroom",
+        "label": "Showroom Layout",
+        "description": "Carousel only. The Text stays beside every slide: its first paragraphs are the eyebrow above the slide's heading, and each paragraph that starts with a bold label (e.g. **Address** Plot 14, Sector 54) becomes a row of the info card under the slide's text. Each slide's own Text gives its heading and description.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "carousel"
+          ]
+        }
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_thumbs-bottom",
+        "label": "Thumbnails at the Bottom",
+        "description": "Carousel only. Moves the thumbnails to a row at the bottom right and keeps the heading and text clear of them and of the Test Drive strip.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "carousel"
+          ]
+        }
+      },
+      {
+        "component": "select",
+        "name": "classes_align",
+        "label": "Heading Position",
+        "description": "Where the heading sits: left, centre or right. Only the heading moves; the text and buttons stay where the style puts them. Default keeps the style's own layout.",
+        "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Left",
+            "value": "align-left"
+          },
+          {
+            "name": "Center",
+            "value": "align-center"
+          },
+          {
+            "name": "Right",
+            "value": "align-right"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hero-slide",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Background Image or Video (Desktop)",
+        "required": true,
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Image Alt Text",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileImage",
+        "label": "Background Image or Video (Mobile)",
+        "description": "Optional. Uses the desktop one if empty.",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "thumbnail",
+        "label": "Thumbnail (Desktop)",
+        "description": "Optional. Tech Slides: the close-up tile. Carousel: the video's poster and slide strip image.",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileThumbnail",
+        "label": "Thumbnail (Mobile)",
+        "description": "Carousel: only used for a video on mobile. Uses the desktop thumbnail if empty. Optional.",
+        "multi": false
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "videoControls",
+        "label": "Enable Video Control",
+        "description": "Shows mute and pause buttons when this slide is a video."
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
         "label": "Text",
-        "valueType": "string"
+        "description": "Optional. Heading, text and buttons for this slide. Uses the Hero's Text if empty. Tech Slides: label, heading, description, stats (e.g. Battery / 26.7 kWh) and a button.",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tilePosition",
+        "label": "Tile Position",
+        "description": "Tech Slides only. Written as: x, y (e.g. 33, 61). You can drag the tile to any position in preview mode.",
+        "value": "",
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^(\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*,\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*)?$",
+          "customErrorMsg": "Write it as x, y: two numbers from 0 to 100, e.g. 33, 61."
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tilePositionMobile",
+        "label": "Tile Position (Mobile)",
+        "description": "Tech Slides only. Optional, written as: x, y. Uses Tile Position if empty. Drag the tile at mobile size in preview mode.",
+        "value": "",
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^(\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*,\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*)?$",
+          "customErrorMsg": "Write it as x, y: two numbers from 0 to 100, e.g. 50, 70."
+        }
       }
     ]
   },
@@ -792,6 +1350,195 @@
         "label": "Photos",
         "description": "The photos the card opens, in order",
         "multi": true
+      }
+    ]
+  },
+  {
+    "id": "register-form",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Decorative Image",
+        "required": true,
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Image Alt Text",
+        "description": "Describe the image for screen readers and SEO.",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading & Intro",
+        "required": true,
+        "value": "<h2>Be the first to know</h2><p>Leave your details and we'll tell you when reservations open, before anyone else hears about it.</p>"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "consent",
+        "label": "Consent Text",
+        "required": true,
+        "value": "I agree to JSW Motors storing my details and contacting me about the launch, reservations and related updates over email, SMS, WhatsApp and phone, as in the <a href=\"#privacy\">Privacy Notice.</a>"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "notice",
+        "label": "Privacy Notice",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "redirect",
+        "label": "Thank-you Page Link",
+        "description": "Page to redirect to after a successful registration. Internal path (e.g. /thank-you) or a full URL."
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "requestSent",
+        "label": "Request Sent Pop-up",
+        "description": "Booking only (used when the Thank-you Page Link is empty). The heading is the pop-up's title (e.g. Request sent to Meridian Motors); each paragraph starting with a bold label is a row (e.g. **Dealer** Meridian Motors, Plot 14, Sector 54, Golf Course Road, Gurgaon); a plain paragraph is the status line (e.g. Waiting for Meridian Motors to call you); a link is the outlined button beside Done (e.g. Explore the Combat to #combat). The visitor's email and contact are added automatically.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "booking"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "mapName",
+        "label": "Map Pop-up Name",
+        "description": "Booking only. The bold line of the pop-up over the map's pin, e.g. Meridian Motors.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "booking"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "mapAddress",
+        "label": "Map Address",
+        "description": "Booking only. The address the Google map shows and marks, e.g. Plot 14, Sector 54, Gurgaon; also the pop-up's second line. With it the map replaces the Decorative Image (which stays as the fallback); clicking the map opens the address in Google Maps.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "booking"
+          ]
+        }
+      },
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "description": "Default: the registration form. Booking: the dealer microsite's quote request: the details (email optional, pincode as in Default), then the OTP and the Request Sent pop-ups; the lead is sent with source Dealer Microsite and channel Digital. The Decorative Image is the map beside it.",
+        "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Booking",
+            "value": "booking"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "related-blogs",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "value": "More Articles"
+      },
+      {
+        "component": "aem-content",
+        "name": "root",
+        "label": "Root Path (Optional)",
+        "description": "Folder to pick articles from, e.g. /blogs/technology."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "index",
+        "label": "Query Index Path",
+        "description": "Index to read articles from, e.g. /news-index.json. Another site's index can be given as a full URL (e.g. https://www.jswmotors.com/news-index.json for a dealer site): its articles then link to that site. That site must allow this one to read it (CORS)."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "show",
+        "label": "Show",
+        "description": "Current Page Tags: articles sharing this page's tags (the block is hidden when the page has no tags). Latest articles: the newest articles from the Root Path, whatever their tags.",
+        "value": "",
+        "options": [
+          {
+            "name": "Current Page Tags",
+            "value": ""
+          },
+          {
+            "name": "Latest articles",
+            "value": "latest"
+          }
+        ]
+      },
+      {
+        "component": "aem-content",
+        "name": "viewAll",
+        "label": "View All Link (Optional)",
+        "description": "Page the View all button opens, e.g. /newsroom. The button shows on the right of the heading only when this and the View All Label are both filled in."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "viewAllLabel",
+        "label": "View All Label (Optional)",
+        "description": "Text of the View all button, e.g. View all news. No button when empty."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "classes",
+        "label": "Style",
+        "description": "Center (default): the heading centred over the cards. Left: the eyebrow and heading on the left, then title and summary under each image. In both, the View all button sits on the right of the heading.",
+        "value": "",
+        "options": [
+          {
+            "name": "Center (default)",
+            "value": ""
+          },
+          {
+            "name": "Left",
+            "value": "left"
+          }
+        ]
       }
     ]
   },

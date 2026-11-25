@@ -2,8 +2,12 @@
 
 import { attachToSnap, createGestureStepper } from '../../scripts/utils/gesture-stepper.js';
 
-// step lock: --pl-move in the CSS plus a little
+// step lock: --pl-move in the CSS plus a little (the layout sets its own, e.g. Pillar Horizontal)
 const STEP_MS = 1300;
+const stepMs = (block) => {
+  const move = parseFloat(getComputedStyle(block).getPropertyValue('--pl-move'));
+  return Number.isFinite(move) ? move * 1000 + 100 : STEP_MS;
+};
 // pillars authors may add
 const CARDS_MAX = 6;
 const IMAGE_TYPES = ['jpg', 'jpeg', 'png'];
@@ -50,6 +54,13 @@ function classCard(li) {
     if (el.tagName !== 'P') {
       if (!seenHeading) el.classList.add('pl-title');
       seenHeading = true;
+      return;
+    }
+    // after the heading, a paragraph that is just a link (e.g. Download brochure): the
+    // card's link, black and underlined with an arrow
+    const link = el.querySelector('a[href]');
+    if (seenHeading && link && el.textContent.trim() === link.textContent.trim()) {
+      el.classList.add('pl-link');
       return;
     }
     // before the heading: label; after it: description
@@ -111,8 +122,10 @@ export default function decoratePillars(block, ul) {
     return mark;
   });
 
-  // stack the images, first on top
-  cards.forEach((li, i) => li.style.setProperty('--pl-z', cards.length - i));
+  // stack the images: first on top (vertical, each wipes up to the next), or last on top
+  // (horizontal, each next one slides in over the current)
+  const horizontal = block.classList.contains('pillar-horizontal');
+  cards.forEach((li, i) => li.style.setProperty('--pl-z', horizontal ? i + 1 : cards.length - i));
 
   let active = 0;
   const show = (to) => {
@@ -143,12 +156,42 @@ export default function decoratePillars(block, ul) {
     count: cards.length,
     current: () => active,
     play: (to) => {
-      busyUntil = performance.now() + STEP_MS;
+      busyUntil = performance.now() + stepMs(block);
       show(to);
     },
     busy: () => performance.now() < busyUntil,
   });
-  attachToSnap(block.closest('.section'), stepper, () => {
+  // the snap engine asks before it pages (canScrollDown/Up): only a gesture over the image
+  // steps the pillars; anywhere else, and upward once the section was reached from the
+  // section below, it moves the page on to the next / previous section
+  const section = block.closest('.section');
+  let overImage = false;
+  const onImage = (x, y) => {
+    const r = block.querySelector('.card.is-active .card-image')?.getBoundingClientRect();
+    return !!r && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  };
+  window.addEventListener('wheel', (e) => {
+    overImage = onImage(e.clientX, e.clientY);
+  }, { capture: true, passive: true });
+  window.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    overImage = !!t && onImage(t.clientX, t.clientY);
+  }, { capture: true, passive: true });
+  let fromBelow = false;
+  document.addEventListener('snap:start', ({ detail }) => {
+    if (detail?.to !== section) return;
+    fromBelow = !!detail.from && detail.from.offsetTop > section.offsetTop;
+  });
+  const controller = {
+    ...stepper,
+    canScrollDown: () => overImage && stepper.canScrollDown(),
+    canScrollUp: () => overImage && !fromBelow && stepper.canScrollUp(),
+    scrollDown: () => {
+      fromBelow = false;
+      stepper.scrollDown();
+    },
+  };
+  attachToSnap(section, controller, () => {
     block.classList.remove('is-stepped');
     block.classList.add('is-static');
     frame.remove();

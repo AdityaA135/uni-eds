@@ -236,6 +236,53 @@
           }
         },
         {
+          "title": "Events",
+          "id": "events",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Events",
+                  "model": "events",
+                  "filter": "events",
+                  "title": "Upcoming events"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Event",
+          "id": "event",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Event",
+                  "model": "event"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Floater",
+          "id": "floater",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Floater",
+                  "model": "floater"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Fragment",
           "id": "fragment",
           "plugins": {
@@ -259,7 +306,23 @@
                 "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
                   "name": "Hero",
-                  "model": "hero"
+                  "model": "hero",
+                  "filter": "hero"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Hero Slide",
+          "id": "hero-slide",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Hero Slide",
+                  "model": "hero-slide"
                 }
               }
             }
@@ -459,6 +522,37 @@
                 "template": {
                   "name": "Photo Gallery Topic",
                   "model": "photo-gallery-topic"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Register Form",
+          "id": "register-form",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Register Form",
+                  "model": "register-form",
+                  "filter": "richtext"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Related Blogs",
+          "id": "related-blogs",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Related Blogs",
+                  "model": "related-blogs"
                 }
               }
             }

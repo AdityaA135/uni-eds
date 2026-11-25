@@ -245,7 +245,7 @@ export default async function decorate(block) {
   let scaleX = 1;
 
   const usable = Math.min(count, MAX_AUTHORED);
-  const arcCount = ARC.desktop.halfSlots * 2 + 1 + 2; // 5 visible + 2 buffer
+  const arcCount = ARC.desktop.halfSlots * 2 + 1 + 4; // 5 visible + 2 buffer each side
   const arcCards = [];
   let scrollAngle = 0; // degrees; 0 = card 0 centred
   let velocity = 0;
@@ -307,10 +307,14 @@ export default async function decorate(block) {
       const media = document.createElement('div');
       media.className = 'social-deck-card-media';
       a.append(media);
-      li.append(a);
+      // darkens the outer cards: a fading layer, not a filter Safari repaints every frame
+      const dim = document.createElement('span');
+      dim.className = 'social-deck-card-dim';
+      dim.setAttribute('aria-hidden', 'true');
+      li.append(a, dim);
       // dataIdx null (not -1, a real wrapped index) so paint() never skips first fill
       const arc = {
-        li, a, media, dataIdx: null,
+        li, a, media, dim, dataIdx: null,
       };
       arcCards.push(arc);
       frag.append(li);
@@ -323,20 +327,22 @@ export default async function decorate(block) {
   const paint = () => {
     const centreFloat = scrollAngle / tilt;
     const baseIdx = Math.round(centreFloat);
-    arcCards.forEach((arc, i) => {
+    arcCards.forEach((_, i) => {
       const dataIdx = baseIdx + (i - Math.floor(arcCount / 2));
+      // a post keeps its slot while in view: only the slot wrapping round, out of sight, refills
+      const arc = arcCards[((dataIdx % arcCount) + arcCount) % arcCount];
       const pos = dataIdx - centreFloat;
       const over = Math.abs(pos) - halfSlots; // >0 past the outermost slot
+      if (arc.dataIdx !== dataIdx) setContent(arc, dataIdx);
       if (over > FADE_BAND) {
         arc.li.style.visibility = 'hidden';
         return;
       }
       arc.li.style.visibility = 'visible';
-      if (arc.dataIdx !== dataIdx) setContent(arc, dataIdx);
       const p = slotProps(pos);
       const opacity = over <= 0 ? 1 : Math.max(0, 1 - over / FADE_BAND);
       arc.li.style.transform = `translate(-50%, 0) translateX(${p.x}px) translateY(${p.y}px) rotate(${p.rot}deg)`;
-      arc.li.style.filter = `brightness(${p.brightness})`;
+      arc.dim.style.opacity = `${(1 - p.brightness).toFixed(3)}`;
       arc.li.style.opacity = `${opacity}`;
       arc.li.style.zIndex = `${p.z}`;
     });

@@ -27,11 +27,20 @@
     margin: 0;
     padding: 0 var(--sd-side, 20px);
     overflow: auto hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--sd-side, 20px);
     scrollbar-width: none;
     overscroll-behavior-x: contain;
     touch-action: pan-x pan-y;
+
+    --sd-fade-w: calc(333 * var(--sd-u, 1px) * var(--sd-fade-in));
+
+    mask-image: linear-gradient(
+      to right,
+      rgb(0 0 0 / 12%) 0,
+      #000 max(40px, var(--sd-side, 20px)),
+      #000 calc(100% - var(--sd-fade-w)),
+      rgb(0 0 0 / 78%) calc(100% - var(--sd-fade-w) / 2),
+      rgb(0 0 0 / 12%) 100%
+    );
 
     &::-webkit-scrollbar {
       display: none;
@@ -44,7 +53,6 @@
 
     &.is-drag {
       cursor: grabbing;
-      scroll-snap-type: none;
     }
 
     &.is-drag a {
@@ -58,8 +66,6 @@
     width: calc(333 * var(--sd-u, 1px));
     height: calc(451 * var(--sd-u, 1px));
     list-style: none;
-    scroll-snap-align: start;
-    will-change: opacity;
   }
 
   & .social-deck-strip-card .social-deck-card-link {
@@ -77,13 +83,12 @@
     background: #111;
   }
 
-  /* photo is a little wider than the card so JS can drift it against the row */
   & .social-deck-strip-card img {
     position: absolute;
     top: 0;
-    left: -4%;
+    left: 0;
     display: block;
-    width: 108%;
+    width: 100%;
     max-width: none;
     height: 100%;
     object-fit: cover;
@@ -420,5 +425,100 @@ main .section.social-deck-container:has(.social-deck.strip) {
       width: calc(100% - 23.33 * var(--sd-u));
       height: calc(100% - 23.33 * var(--sd-u));
     }
+  }
+}
+
+/* ---------- Light section (section style "light", styles/section-light.css) ----------
+   Colours only, measured from the source's light Socials panel: eyebrow #666,
+   heading #121212, social tiles and arrows rgb(0 0 0 / 7%) with a #121212 /
+   #000 glyph, 12% on hover / focus, card fill #222. The photo cards keep their
+   dark caption shade, caption and arrow tile, as the source does. The section
+   background is the light section's own --section-bg. */
+.section.light .social-deck.block.strip {
+  & .social-deck-cards.social-deck-strip-track:focus-visible {
+    outline-color: rgb(18 18 18);
+  }
+
+  & .social-deck-strip-card .social-deck-card-media {
+    background: rgb(34 34 34);
+  }
+
+  & .social-deck-strip-btn {
+    background: rgb(0 0 0 / 7%);
+    color: rgb(18 18 18);
+
+    &:hover,
+    &:focus-visible {
+      background: rgb(0 0 0 / 12%);
+    }
+
+    &:disabled {
+      background: rgb(0 0 0 / 7%);
+    }
+  }
+}
+
+main .section.light.social-deck-container:has(.social-deck.strip) {
+  color: rgb(18 18 18);
+
+  /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+  & .default-content-wrapper > p {
+    opacity: 1;
+    color: rgb(102 102 102);
+  }
+
+  & .default-content-wrapper > h2 {
+    color: rgb(18 18 18);
+  }
+
+  /* social text links in one paragraph: a row of small tiles like the icons */
+  /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+  & .default-content-wrapper > p:has(> a) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  & .default-content-wrapper > p > a:any-link {
+    display: grid;
+    place-items: center;
+    height: 40px;
+    padding: 0 calc(23.33px / 2);
+    border-radius: 9.09px;
+    transition: background-color 0.2s;
+  }
+
+  @media (width >= 1200px), (width >= 900px) and (not ((hover: none) and (pointer: coarse))) {
+    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+    & .default-content-wrapper > p:has(> a) {
+      gap: calc(4 * var(--sd-u));
+    }
+
+    & .default-content-wrapper > p > a:any-link {
+      height: calc(40 * var(--sd-u));
+      padding: 0 calc(23.33 * var(--sd-u) / 2);
+      border-radius: calc(8 * var(--sd-u));
+    }
+  }
+
+  /* social tiles: icon list or text links (white icon glyphs are inverted to
+     black, as on the source) */
+  & .default-content-wrapper > ul a:any-link,
+  & .default-content-wrapper > p > a:any-link {
+    background: rgb(0 0 0 / 7%);
+    color: rgb(0 0 0);
+  }
+
+  & .default-content-wrapper > ul a:any-link:hover,
+  & .default-content-wrapper > ul a:any-link:focus-visible,
+  & .default-content-wrapper > p > a:any-link:hover,
+  & .default-content-wrapper > p > a:any-link:focus-visible {
+    background: rgb(0 0 0 / 12%);
+    color: rgb(0 0 0);
+    text-decoration-color: transparent;
+  }
+
+  & .default-content-wrapper > ul .icon img {
+    filter: invert(1);
   }
 }

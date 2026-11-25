@@ -39,6 +39,10 @@ const CARDS_MAX = 6;
 
 // title lines, and the smallest px titles shrink to before they are cut
 const TITLE_LINES = 2;
+// tablets (stacked cards, 600–899px): the description takes up to 3 lines, and the image keeps
+// its size
+const TABLET = window.matchMedia('(width >= 600px) and (width < 900px)');
+const TABLET_TEXT_LINES = 3;
 const TITLE_MIN = 18;
 // times (and most share of the card) a stacked card takes a line's room from its image
 const GROW_TRIES = 3;
@@ -161,7 +165,9 @@ function fitCard(body, more = 0, tries = 0) {
       return;
     }
     const lh = lineHeight(el);
-    const max = el.classList.contains('title') ? TITLE_LINES : Infinity;
+    let max = Infinity;
+    if (el.classList.contains('title')) max = TITLE_LINES;
+    else if (el.classList.contains('text') && TABLET.matches) max = TABLET_TEXT_LINES;
     const free = Math.floor((room + 1 - el.offsetTop) / lh);
     const allowed = Math.min(max, free);
     if (Math.round(el.offsetHeight / lh) <= allowed) {
@@ -180,12 +186,12 @@ function fitCard(body, more = 0, tries = 0) {
       el.classList.add('is-off');
       endBefore(el);
     }
-    // a title cut to its TITLE_LINES still leaves room below it; anything else fills the card
-    if (free < max) full = true;
+    // a title cut to its lines still leaves room below it; a cut description ends the text
+    if (free < max || el.classList.contains('text')) full = true;
   });
   const card = body.closest('.card');
   const grow = card ? Math.min(more + short, card.clientHeight * GROW_MAX) : 0;
-  if (short > 0 && grow > more && tries < GROW_TRIES
+  if (short > 0 && grow > more && tries < GROW_TRIES && !TABLET.matches
     && getComputedStyle(card).gridTemplateColumns.trim().split(/\s+/).length === 1) {
     unfit(body);
     card.style.setProperty('--copy-more', `${Math.ceil(grow)}px`);
@@ -319,13 +325,13 @@ function decorateStrip(block, ul, onChange) {
 
   const stage = document.createElement('div');
   stage.className = 'carousel-stage';
-  // it takes focus (arrow keys move it), so it needs a role and a name: the section's heading
+  // named by the section's heading; not a Tab stop (the arrow keys work while it is on screen,
+  // and its links and arrow buttons take focus)
   const section = block.closest('.section');
   const heading = section?.querySelector('h1, h2, h3');
   stage.setAttribute('role', 'group');
   stage.setAttribute('aria-roledescription', 'carousel');
   stage.setAttribute('aria-label', heading?.textContent.trim() || 'Highlights');
-  stage.tabIndex = 0;
   stage.append(ul);
   const nav = document.createElement('div');
   nav.className = 'carousel-nav';
@@ -566,4 +572,6 @@ export default function decorateCarouselLight(block, ul, decorateCarousel) {
   };
   new ResizeObserver(refit).observe(block);
   document.fonts?.ready.then(refit);
+  // ready can resolve before the display face is in; a face swapped in later rewraps the text
+  document.fonts?.addEventListener?.('loadingdone', refit);
 }

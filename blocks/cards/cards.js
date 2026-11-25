@@ -1,5 +1,6 @@
 import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
+import snapRow from '../../scripts/utils/snap-row.js';
 
 const AUTOPLAY_MS = 3000;
 // cards the ring holds at least: five on show plus spares on both sides
@@ -317,16 +318,17 @@ function decorateCarousel(block, ul, options = {}) {
     });
   });
 
-  stage.tabIndex = 0;
-  stage.addEventListener('keydown', (e) => {
+  // the arrow keys move it while focus is on its links or arrow buttons (the stage itself is
+  // not a Tab stop, so no focus ring around the whole strip)
+  block.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
   });
-  stage.addEventListener('focusin', () => {
-    focused = stage.matches(':focus-visible');
+  block.addEventListener('focusin', () => {
+    focused = !!block.querySelector(':focus-visible');
     schedule();
   });
-  stage.addEventListener('focusout', () => {
+  block.addEventListener('focusout', () => {
     focused = false;
     schedule();
   });
@@ -461,6 +463,7 @@ function decorateRail(block, ul) {
   ul.addEventListener('scroll', queue, { passive: true });
   new ResizeObserver(queue).observe(ul);
   update();
+  snapRow(ul);
 
   // mouse drag (touch and trackpads already scroll natively)
   let drag = null;

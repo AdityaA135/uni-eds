@@ -2,8 +2,6 @@
 // with prev/next buttons, instead of the arc
 
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-// fast start, gentle finish
-const easeOut = (t) => 1 - (1 - t) ** 2;
 
 /**
  * Builds a prev/next button.
@@ -56,19 +54,48 @@ export default function decorateStrip(block, {
   nav.append(prev, next);
   block.append(nav);
 
-  // one card's width plus the gap
-  const stepWidth = () => {
-    if (cards.length < 2) return ring.clientWidth;
-    return cards[1].offsetLeft - cards[0].offsetLeft;
+  // No scroll snapping: swipes scroll freely (Safari's snap got a swipe back from the last
+  // card stuck). The arrows and mouse drag still land on these stops: the start of every
+  // card the row can scroll to, then its end.
+  let stops = [0];
+  const syncSnap = () => {
+    const end = Math.max(0, ring.scrollWidth - ring.clientWidth);
+    const first = cards[0]?.offsetLeft ?? 0;
+    const minGap = Math.max(2, ((cards[1]?.offsetLeft ?? first) - first) / 2);
+    const spots = [0];
+    cards.forEach((li, i) => {
+      const at = li.offsetLeft - first;
+      if (i && at < end - minGap) spots.push(at);
+    });
+    if (end > 2) spots.push(end);
+    stops = spots;
   };
+  // the stop nearest a scroll position
+  const nearest = (left) => stops.reduce(
+    (best, at, i) => (Math.abs(at - left) < Math.abs(stops[best] - left) ? i : best),
+    0,
+  );
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const goTo = (left) => ring.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' });
-  // moves a whole card at a time and lands on a card edge
-  const step = (dir) => {
-    const pitch = stepWidth();
-    const index = clamp(Math.round(ring.scrollLeft / pitch) + dir, 0, cards.length - 1);
-    goTo(index * pitch);
+  // is-gliding marks an arrow/drag glide; is-drag (link clicks off) ends once it's still
+  let settle = 0;
+  const settled = () => {
+    clearTimeout(settle);
+    ring.classList.remove('is-gliding', 'is-drag');
   };
+  const goTo = (left) => {
+    ring.classList.add('is-gliding');
+    ring.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' });
+    clearTimeout(settle);
+    settle = setTimeout(settled, 400);
+  };
+  ring.addEventListener('scroll', () => {
+    if (!ring.classList.contains('is-gliding')) return;
+    clearTimeout(settle);
+    settle = setTimeout(settled, 150);
+  }, { passive: true });
+  ring.addEventListener('wheel', settled, { passive: true });
+  // moves one stop at a time
+  const step = (dir) => goTo(stops[clamp(nearest(ring.scrollLeft) + dir, 0, stops.length - 1)]);
   prev.addEventListener('click', () => step(-1));
   next.addEventListener('click', () => step(1));
 
@@ -81,10 +108,11 @@ export default function decorateStrip(block, {
     step(e.key === 'ArrowRight' ? 1 : -1);
   });
 
-  // mouse drag with a little throw, then it settles on the nearest card
+  // mouse drag with a little throw, then it glides to the nearest card
   let drag = null;
   ring.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse' || e.button) return;
+    settled();
     drag = {
       x: e.clientX, left: ring.scrollLeft, t: performance.now(), v: 0, moved: false,
     };
@@ -108,36 +136,18 @@ export default function decorateStrip(block, {
     const { moved, v } = drag;
     drag = null;
     if (!moved) return;
-    ring.classList.remove('is-drag');
-    const pitch = stepWidth();
-    goTo(clamp(Math.round((ring.scrollLeft + v * 220) / pitch), 0, cards.length - 1) * pitch);
+    goTo(stops[nearest(ring.scrollLeft + v * 220)]);
   });
 
-  // per frame: arrow states, a soft fade on cards leaving either edge, and
-  // each photo drifting slightly against the row
-  const imgs = cards.map((li) => li.querySelector('img'));
+  // per frame: the arrow states only (the edge fade is a fixed mask in CSS)
   const update = () => {
-    const end = ring.scrollWidth - ring.clientWidth - 4;
-    prev.disabled = ring.scrollLeft < 4;
-    next.disabled = ring.scrollLeft > end;
-    nav.hidden = ring.scrollWidth <= ring.clientWidth;
-
-    const vw = window.innerWidth;
-    const ringStyle = getComputedStyle(ring);
-    const side = parseFloat(ringStyle.paddingLeft) || 0;
-    // fade-in distance in card widths, per breakpoint
-    const fadeInSpan = parseFloat(ringStyle.getPropertyValue('--sd-fade-in')) || 0.85;
-    cards.forEach((li, i) => {
-      const r = li.getBoundingClientRect();
-      const w = r.width || 1;
-      const fadeIn = easeOut(clamp((vw - r.left) / (w * fadeInSpan), 0, 1));
-      const fadeOut = easeOut(clamp((r.left + w - side * 0.5) / (w * 0.8), 0, 1));
-      li.style.opacity = (0.12 + 0.88 * Math.min(fadeIn, fadeOut)).toFixed(3);
-      if (!reduce && imgs[i]) {
-        const drift = clamp((r.left + w / 2 - vw / 2) / vw, -1, 1) * -3;
-        imgs[i].style.translate = `${drift.toFixed(2)}% 0`;
-      }
-    });
+    const left = ring.scrollLeft;
+    const end = ring.scrollWidth - ring.clientWidth;
+    const atStart = left < 4;
+    const atEnd = left > end - 4;
+    if (prev.disabled !== atStart) prev.disabled = atStart;
+    if (next.disabled !== atEnd) next.disabled = atEnd;
+    if (nav.hidden !== end <= 0) nav.hidden = end <= 0;
   };
   let raf = 0;
   const queue = () => {
@@ -148,6 +158,14 @@ export default function decorateStrip(block, {
     });
   };
   ring.addEventListener('scroll', queue, { passive: true });
-  new ResizeObserver(queue).observe(ring);
+  // the row or its cards change size (the cards scale with the screen's height too)
+  const relayout = () => {
+    syncSnap();
+    queue();
+  };
+  const resized = new ResizeObserver(relayout);
+  resized.observe(ring);
+  if (cards[0]) resized.observe(cards[0]);
+  syncSnap();
   update();
 }

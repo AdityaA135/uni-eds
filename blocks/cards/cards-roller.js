@@ -561,14 +561,14 @@ export default function decorateRoller(block, ul) {
   jumpTo(-1);
 
   // the stepper is registered with the snap engine at once and kept only if the engine starts
-  // (`snap-active`, after `snap-ready`); without it the section becomes the scroll runway
+  // (`snap-active`, before `snap-settled`); without it the section becomes the scroll runway
   const snap = import('../../scripts/section-snap.js').then((mod) => {
     mod.registerBlockScroll(section, stepper);
     return mod;
   });
   const root = document.documentElement;
   const decide = () => {
-    if (!root.classList.contains('snap-ready')) return false;
+    if (!root.classList.contains('snap-settled')) return false;
     if (!root.classList.contains('snap-active')) {
       stepping = false;
       stepper.destroy();

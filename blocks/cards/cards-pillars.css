@@ -50,6 +50,17 @@ main > .section.cards-container:has(.cards.pillars) {
     object-fit: cover;
   }
 
+  /* imported and published content wraps the picture in a <p>: it still fills the frame */
+  .card-image p:has(> picture) {
+    height: 100%;
+    margin: 0;
+  }
+
+  .card-image p > picture {
+    display: block;
+    height: 100%;
+  }
+
   :where(.card-body p, .pl-title) {
     margin: 0;
   }
@@ -112,6 +123,58 @@ main > .section.cards-container:has(.cards.pillars) {
     }
   }
 
+  /* a card's link (e.g. "Download brochure"): black, underlined, an arrow after it; also when
+     the page made it a button (a link alone in its paragraph) */
+  .pl-link {
+    margin-top: calc(12 * var(--p-u));
+
+    @media (width >= 900px) {
+      margin-top: calc(16 * var(--p-u));
+    }
+
+    a:any-link,
+    a.button:any-link {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(8 * var(--p-u));
+      margin: 0;
+      padding: 0 0 calc(2 * var(--p-u));
+      border: 0;
+      border-bottom: 1px solid currentcolor;
+      border-radius: 0;
+      background: none;
+      color: var(--color-black);
+      font-family: var(--font-family-base);
+      font-size: calc(16 * var(--p-u));
+      font-weight: var(--font-weight-medium);
+      line-height: 1.2;
+      letter-spacing: 0;
+      text-decoration: none;
+      text-transform: none;
+      white-space: nowrap;
+
+      &::after {
+        content: '';
+        flex: 0 0 auto;
+        width: calc(14 * var(--p-u));
+        height: calc(14 * var(--p-u));
+        background-color: currentcolor;
+        mask: url('../../icons/arrow-right.svg') center / contain no-repeat;
+      }
+
+      &:hover {
+        background: none;
+        color: var(--color-black);
+        opacity: 0.7;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-black);
+        outline-offset: 3px;
+      }
+    }
+  }
+
   /* static: a plain list (reduced motion, Universal Editor) */
   &.is-static {
     padding: calc(80 * var(--p-u)) calc(20 * var(--p-u));
@@ -125,6 +188,10 @@ main > .section.cards-container:has(.cards.pillars) {
     .card {
       display: grid;
       gap: calc(32 * var(--p-u));
+
+      /* not the default cards' bordered tile */
+      border: 0;
+      background: none;
 
       @media (width >= 900px) {
         grid-template-columns: calc(564 * var(--p-u)) calc(390 * var(--p-u));
@@ -371,6 +438,112 @@ main > .section.cards-container:has(.cards.pillars) {
     }
   }
 
+  /* Pillar Horizontal (as the reference video): the next image is uncovered in place over the
+     current one, its rounded left edge sweeping in from the frame's right edge while it zooms
+     out from 1.5x to rest; the current image stays still; the text crossfades with a slide the
+     same way, on the same timing; the progress dots run along the bottom left inside the image */
+  &.pillar-horizontal.is-stepped {
+    --pl-move: 1.48s;
+    --pl-ease: cubic-bezier(0.6, 0, 0.5, 1);
+    --pl-zoom-next: calc(var(--pl-zoom-on) * 1.5);
+    --pl-shift: calc(55 * var(--p-u));
+    --pl-r: calc(24 * var(--p-u));
+
+    /* the text still to come waits a little to the right: it must not widen the page */
+    overflow: hidden;
+    overflow: clip;
+
+    @media (width >= 900px) {
+      --pl-r: calc(28 * var(--p-u));
+    }
+
+    .card {
+      & .card-image {
+        clip-path: inset(0 round var(--pl-r));
+        transition: clip-path var(--pl-move) var(--pl-ease);
+      }
+
+      & .card-body {
+        transform: translateX(var(--pl-shift));
+        transition:
+          opacity var(--pl-move) var(--pl-ease),
+          transform var(--pl-move) var(--pl-ease);
+      }
+
+      /* still to come: in place but hidden and zoomed in; its rounded left edge sweeps in from
+         the frame's right edge, uncovering it over the current image (back: the same in reverse) */
+      &:not(.is-active, .is-before) {
+        & .card-image {
+          clip-path: inset(0 0 0 100% round var(--pl-r));
+        }
+
+        & .card-img {
+          transform: scale(var(--pl-zoom-next));
+        }
+      }
+
+      /* passed: stays still, as it was, under the image that came over it */
+      &.is-before {
+        & .card-image {
+          clip-path: inset(0 round var(--pl-r));
+        }
+
+        & .card-img {
+          transform: scale(var(--pl-zoom-on));
+        }
+      }
+
+      &.is-before .card-body {
+        transform: translateX(calc(-1 * var(--pl-shift)));
+      }
+
+      &.is-active .card-body {
+        transform: none;
+      }
+    }
+
+    .pl-rail {
+      top: calc((106 + 335 - 20 - 6) * var(--p-u));
+      flex-direction: row;
+
+      @media (width >= 900px) {
+        top: calc((128.5 + 564 - 24 - 6) * var(--p-u));
+        left: calc((102 + 24) * var(--p-u));
+        padding: 0;
+      }
+    }
+
+    .pl-mark {
+      --track: rgb(255 255 255 / 60%);
+      --fill: var(--color-white);
+
+      transition: width var(--pl-move) var(--pl-ease);
+
+      &::before {
+        inset: 0 auto 0 0;
+        width: 0;
+        height: auto;
+      }
+
+      &[aria-current='step'] {
+        --track: rgb(255 255 255 / 40%);
+
+        width: var(--mark-on);
+        height: var(--mark);
+
+        &::before {
+          width: 78%;
+          height: auto;
+          animation-name: pl-fill-x;
+        }
+      }
+
+      &:focus-visible {
+        outline-color: var(--color-white);
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .card-image,
     .card-body,
@@ -392,4 +565,10 @@ main > .section.cards-container:has(.cards.pillars) {
 @keyframes pl-fill {
   from { height: 16%; }
   to { height: 78%; }
+}
+
+/* the horizontal rail's fill, as pl-fill across */
+@keyframes pl-fill-x {
+  from { width: 16%; }
+  to { width: 78%; }
 }

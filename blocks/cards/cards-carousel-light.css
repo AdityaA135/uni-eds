@@ -203,7 +203,11 @@ main > .section.light .cards.carousel {
     border-radius: var(--card-radius);
     background-color: #f1f1ef;
 
+    /* tablets (stacked): every card's text the same height, room for a label, a two-line title
+       and three lines of description, so the images match and never shrink; longer text ends in
+       an ellipsis */
     @media (width >= 600px) {
+      grid-template-rows: minmax(0, 1fr) min(286px, 50%);
       gap: 8px;
     }
 
