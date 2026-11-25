@@ -77,7 +77,8 @@ export function createGestureStepper({
 
 /**
  * Registers the stepper with the snap engine for `section`, and keeps it only
- * if the engine actually starts: `snap-ready` is set on every path,
+ * if the engine actually starts: `snap-settled` is set on every path once the engine has started
+ * or bowed out (scripts.js; not the fallback timer's `snap-ready`),
  * `snap-active` only once the engine is live (it bows out under reduced motion
  * and in Universal Editor).
  * @param {Element} section the block's section
@@ -94,7 +95,7 @@ export function attachToSnap(section, controller, onInactive) {
   });
   const root = document.documentElement;
   const settle = () => {
-    if (!root.classList.contains('snap-ready')) return false;
+    if (!root.classList.contains('snap-settled')) return false;
     if (!root.classList.contains('snap-active')) {
       snap.then((mod) => mod.unregisterBlockScroll(section)).catch(() => {});
       onInactive();

@@ -74,7 +74,7 @@ function socialProfiles() {
       }
     })
     .filter((url) => url && SOCIAL_HOSTS.some((host) => url.hostname === host
-      || url.hostname.endsWith(`.${host}`)) && url.pathname.replace(/\//g, ''))
+            || url.hostname.endsWith(`.${host}`)) && url.pathname.replace(/\//g, ''))
     .map((url) => url.href);
   return [...new Set(urls)];
 }
@@ -91,7 +91,7 @@ async function organization({ withContact = false } = {}) {
     name: BRAND_NAME,
     url: `${origin}/`,
   };
-  // the logoUrl placeholder wins; otherwise the header logo
+    // the logoUrl placeholder wins; otherwise the header logo
   if (placeholders.logoUrl) node.logo = absolute(placeholders.logoUrl);
   else if (logo?.getAttribute('src')) node.logo = absolute(logo.currentSrc || logo.src);
   if (sameAs.length) node.sameAs = sameAs;
@@ -166,7 +166,7 @@ function articleInfoDates() {
   const block = document.querySelector('main .article-info');
   if (!block) return {};
   const read = (key, selector) => parseDate(block.dataset[key] || '')
-    || parseDate(block.querySelector(`${selector} time`)?.dateTime || '');
+        || parseDate(block.querySelector(`${selector} time`)?.dateTime || '');
   return {
     published: read('published', '.article-info-published'),
     modified: read('updated', '.article-info-updated'),
@@ -176,11 +176,11 @@ function articleInfoDates() {
 function article(type, logo) {
   const info = articleInfoDates();
   const published = info.published
-    || ['published-time', 'article-date', 'publication-date', 'publishdate', 'date']
-      .map((name) => parseDate(getMetadata(name))).find(Boolean);
+        || ['published-time', 'article-date', 'publication-date', 'publishdate', 'date']
+          .map((name) => parseDate(getMetadata(name))).find(Boolean);
   const modified = info.modified || parseDate(getMetadata('modified-time')) || published;
   const author = text(document.querySelector('.article-info-author')).replace(/^By\s+/i, '')
-    || getMetadata('author');
+        || getMetadata('author');
   const image = getMetadata('og:image');
   const description = getMetadata('description');
   return {
@@ -243,7 +243,7 @@ function videoObjects() {
     const source = videoSource(url);
     const thumbnailUrl = block.dataset.embedThumb || source?.thumbnail;
     const uploadDate = iso(parseDate(getMetadata('modified-time'))
-      || parseDate(getMetadata('published-time')) || parseDate(document.lastModified));
+            || parseDate(getMetadata('published-time')) || parseDate(document.lastModified));
     // name, thumbnail and upload date are required for a video rich result: no guessing
     if (!source || !thumbnailUrl || !uploadDate) return null;
     const name = block.dataset.embedTitle || text(block.querySelector('iframe')) || headline();

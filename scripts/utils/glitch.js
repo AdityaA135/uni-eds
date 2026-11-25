@@ -10,21 +10,17 @@
  * readers announce the words, not single letters.
  */
 
-// every primary CTA: authored primary and primary v2 buttons (incl. thank-you
-// .ty-cta), the hero, header and footer Register CTAs, and the register form's
-// solid buttons
+// every primary CTA: authored primary buttons (incl. thank-you .ty-cta), the
+// hero, header and footer Register CTAs, and the register form's solid buttons
 const SELECTOR = [
   'a.button.primary',
   'button.button.primary',
-  'a.button.primary-v2',
-  'button.button.primary-v2',
   '.cta.cta-primary',
   '.footer-register',
   'header .tools .cta',
   '.register-form .submit',
   '.register-form .back-home',
-  // any other link a block styles as a CTA opts in with data-glitch
-  // (e.g. the cards roller's "Know more", the locations' "See all locations")
+  // any other link a block opts in (e.g. the Cards Roller's "Know more")
   '[data-glitch]',
 ].join(', ');
 

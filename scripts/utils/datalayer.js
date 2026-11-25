@@ -7,8 +7,9 @@
  * is silence, not an error. Keep values lowercase, hyphen-separated, colon-keyed.
  */
 
-// Host on which the dev-mode validator is silenced (production only).
-const PROD_HOST = 'www.jswmotors.com';
+// Hosts on which the dev-mode validator is silenced (production only: the brand site and the
+// dealer sites)
+const PROD_HOSTS = ['www.jswmotors.com', 'dealers.jswmotors.com'];
 
 // Per-page-load interaction state. Reset by the pageView push.
 const state = { count: 0, start: Date.now() };
@@ -202,7 +203,7 @@ function validate(payload) {
  */
 export function dataLayerPush(payload) {
   try {
-    if (window.location.hostname !== PROD_HOST) validate(payload);
+    if (!PROD_HOSTS.includes(window.location.hostname)) validate(payload);
     window.adobeDataLayer = window.adobeDataLayer || [];
     window.adobeDataLayer.push(payload);
   } catch {

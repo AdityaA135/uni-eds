@@ -1,6 +1,23 @@
 // Date and tag helpers shared by the article listing blocks and Article Info.
 // Kept free of imports so Article Info (in the first section) loads only this.
 
+// URL path shape for each article type — the one place to change if either
+// section ever moves.
+const NEWS_PATH_PREFIX = '/newsroom/news/';
+const BLOG_PATH_PREFIX = '/blogs/';
+
+/**
+ * content.type/contentType from an article URL's path shape, or null when the
+ * path isn't a blog/news article link.
+ * @param {string} pathname
+ * @returns {'blog'|'news'|null}
+ */
+export function contentTypeFromPath(pathname) {
+  if (pathname.startsWith(NEWS_PATH_PREFIX)) return 'news';
+  if (pathname.startsWith(BLOG_PATH_PREFIX)) return 'blog';
+  return null;
+}
+
 /**
  * Converts a bare numeric timestamp into epoch milliseconds. Handles Excel
  * serial dates (~1900-2065 → the 30000-60000 range), epoch seconds, and epoch

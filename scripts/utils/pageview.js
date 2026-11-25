@@ -4,16 +4,17 @@ import { getMetadata } from '../aem.js';
 import {
   dataLayerPush, pageName, token, resetInteractions,
 } from './datalayer.js';
-import { categoryTokenOf, parseDate } from './article-data.js';
-import { contentTypeFromPath } from '../articles.js';
+import { categoryTokenOf, parseDate, contentTypeFromPath } from './article-data.js';
 
 // data-screen value → furthest journey milestone reached.
 const SCREEN_TO_MILESTONE = { fields: 'form', otp: 'verification', success: 'registered' };
 
-// The prod domain always wins; elsewhere use page metadata, defaulting to dev.
+// The prod domains (the brand site and the dealer sites) always win; elsewhere use page
+// metadata, defaulting to dev.
+const PROD_HOSTS = ['www.jswmotors.com', 'jswmotors.com', 'dealers.jswmotors.com'];
 function environment() {
   const host = window.location.hostname;
-  if (host === 'www.jswmotors.com' || host === 'jswmotors.com') return 'prod';
+  if (PROD_HOSTS.includes(host)) return 'prod';
   return getMetadata('environment') || 'dev';
 }
 

@@ -1,7 +1,6 @@
 import {
   decorateBlock,
   decorateBlocks,
-  decorateButtons,
   decorateIcons,
   decorateSections,
   loadBlock,
@@ -9,9 +8,21 @@ import {
   loadSections,
 } from './aem.js';
 import { decorateRichtext } from './editor-support-rte.js';
-import { decorateMain } from './scripts.js';
+import { decorateButtons, decorateMain } from './scripts.js';
+import { decorateSectionStyles, normalizeSectionStyles } from './utils/section-styles.js';
+
+/**
+ * Re-runs the section-style scripts (e.g. the blog article's contents and
+ * callouts) after an edit replaced part of the page, which comes back
+ * undecorated. Each script is idempotent.
+ */
+const redecorateSectionStyles = () => decorateSectionStyles(document.querySelector('main'));
+
+let promiseChanges$ = Promise.resolve();
 
 async function applyChanges(event) {
+  await promiseChanges$;
+
   // redecorate default content and blocks on patches (in the properties rail)
   const { detail } = event;
 
@@ -34,6 +45,7 @@ async function applyChanges(event) {
   if (element) {
     if (element.matches('main')) {
       const newMain = parsedUpdate.querySelector(`[data-aue-resource="${resource}"]`);
+      if (!newMain) return false;
       newMain.style.display = 'none';
       element.insertAdjacentElement('afterend', newMain);
       decorateMain(newMain);
@@ -41,8 +53,9 @@ async function applyChanges(event) {
       await loadSections(newMain);
       element.remove();
       newMain.style.display = null;
+      await redecorateSectionStyles();
       // eslint-disable-next-line no-use-before-define
-      attachEventListners(newMain);
+      attachEventListeners(newMain);
       return true;
     }
 
@@ -60,6 +73,7 @@ async function applyChanges(event) {
         await loadBlock(newBlock);
         block.remove();
         newBlock.style.display = null;
+        await redecorateSectionStyles();
         return true;
       }
     } else {
@@ -75,15 +89,18 @@ async function applyChanges(event) {
           decorateIcons(newSection);
           decorateRichtext(newSection);
           decorateSections(parentElement);
+          normalizeSectionStyles(parentElement);
           decorateBlocks(parentElement);
           await loadSections(parentElement);
           element.remove();
           newSection.style.display = null;
+          await redecorateSectionStyles();
         } else {
           element.replaceWith(...newElements);
           decorateButtons(parentElement);
           decorateIcons(parentElement);
           decorateRichtext(parentElement);
+          await redecorateSectionStyles();
         }
         return true;
       }
@@ -93,7 +110,7 @@ async function applyChanges(event) {
   return false;
 }
 
-function attachEventListners(main) {
+function attachEventListeners(main) {
   [
     'aue:content-patch',
     'aue:content-update',
@@ -103,12 +120,13 @@ function attachEventListners(main) {
     'aue:content-copy',
   ].forEach((eventType) => main?.addEventListener(eventType, async (event) => {
     event.stopPropagation();
-    const applied = await applyChanges(event);
+    promiseChanges$ = applyChanges(event);
+    const applied = await promiseChanges$;
     if (!applied) window.location.reload();
   }));
 }
 
-attachEventListners(document.querySelector('main'));
+attachEventListeners(document.querySelector('main'));
 
 // decorate rich text
 // this has to happen after decorateMain(), and everythime decorateBlocks() is called

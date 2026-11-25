@@ -10,15 +10,30 @@ import { inEditor } from './common.js';
  *   js: module in /scripts/ decorating one section (lazy phase; must be safe to
  *       re-run, as the editor does after each edit)
  *   freeScroll: the page scrolls natively (no section snap, no "No Snap" needed)
+ *   colorOnly: no layout of its own — it only recolours the section, or adds page
+ *       behaviour (Hide Header) — so the section still behaves like any other, e.g.
+ *       long text scrolls inside it
  */
 const SECTION_STYLES = {
   'article-hero': { css: 'article-detail', freeScroll: true },
   'article-body': { css: 'article-detail', js: 'article-detail/article-body', freeScroll: true },
   collage: { css: 'collage', js: 'collage' },
   'media-gradient': { css: 'media-gradient', js: 'media-gradient' },
+  light: { css: 'section-light', colorOnly: true },
+  statement: { css: 'section-statement', js: 'section-statement' },
+  'hide-header': { css: 'header-hide', js: 'header-hide', colorOnly: true },
 };
 
 export const FREE_SCROLL_CLASS = 'free-scroll';
+
+/**
+ * @param {Element} section
+ * @returns {boolean} whether the section uses a style above (its own CSS/JS layout)
+ */
+export function hasSectionStyle(section) {
+  return Object.entries(SECTION_STYLES)
+    .some(([name, { colorOnly }]) => !colorOnly && section.classList.contains(name));
+}
 
 /**
  * `parent`'s children, with Universal Editor's <div data-aue-type="richtext">
