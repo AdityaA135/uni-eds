@@ -496,3 +496,10 @@ main > .section:has(.columns.reach-us.photo):has(> .reach-us-photo-footer) ~ .se
   min-height: 0;
   padding: 0;
 }
+
+@media (width >= 900px) {
+  body:has([data-aue-resource]) main > .section:has(.columns.reach-us.photo) {
+    --reach-us-pad-top: max(96px, 102 * var(--ru));
+    --reach-us-pad-bottom: 0px;
+  }
+}
