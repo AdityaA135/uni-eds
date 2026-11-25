@@ -371,6 +371,8 @@ export default function decorateFeatures(block, ul) {
     parts.eyebrow.hidden = !card.eyebrow;
     parts.title.textContent = card.name;
     parts.text.replaceChildren(...card.body.map((el) => el.cloneNode(true)));
+    // each card's copy from its start (it scrolls in the stat panel)
+    parts.body.scrollTop = 0;
     if (!stats) return;
 
     const after = cards[(i + 1) % cards.length];
@@ -458,6 +460,9 @@ export default function decorateFeatures(block, ul) {
     document.documentElement.classList.add(OPEN_CLASS);
     // native modal: focus moves in (to the close button), the page behind is inert
     dialog.showModal();
+    // Safari may scroll the dialog to the close button while the sheet is still below the
+    // screen (the CSS clips it, so it cannot; older Safari: put it back)
+    dialog.scrollTop = 0;
     if (!motion.matches) return;
     if (stats) openSheet();
     else openFromCard(cards[i]);
