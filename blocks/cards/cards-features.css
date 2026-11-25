@@ -489,11 +489,12 @@
     }
   }
 
-  /* the rail's arrows (cards-features.js): light, in the gutters level with the tiles, each
-     shown only while there is more that way; a click moves on a view (four tiles, or a page) */
+  /* the rail's arrows (cards-features.js): light, each shown only while there is more that way;
+     a click moves on a view (four tiles, or a page). Desktop: in the gutters, 12px below the
+     tiles (under their descriptions, clear of every text; the tiles stay at the foot) */
   .ft-rail-arrow {
     position: absolute;
-    inset-block-start: 50%;
+    inset-block-start: calc(100% + 12px);
     z-index: 2;
     display: grid;
     place-items: center;
@@ -506,7 +507,6 @@
     background: rgb(255 255 255 / 8%);
     color: rgb(255 255 255 / 70%);
     cursor: pointer;
-    translate: 0 -50%;
     backdrop-filter: blur(6px);
     transition: background-color 0.2s, color 0.2s;
   }
@@ -551,7 +551,6 @@
   @media (width < 900px) {
     .ft-rail-arrow {
       inset-block: auto calc(100% + 4px);
-      translate: none;
     }
 
     .ft-rail-prev {
