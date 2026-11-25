@@ -6,11 +6,50 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 const OPEN_CLASS = 'is-modal-open';
 let uid = 0;
 
-// the most characters the one-word texts may have (published page; Universal Editor keeps the
-// whole text): the section's figure and unit (e.g. "359" "PS"), a stat tile's value (e.g.
-// "1.5L Turbo GDI"). Longer ones end in "…"; the other texts are cut by line (cards-features.css)
-const MAX_CHARS = { figure: 4, unit: 4, value: 16 };
+// the most characters the texts may have (published page; Universal Editor keeps the whole
+// text): the section's figure and unit (e.g. "359" "PS"), a stat tile's value (e.g. "1.5L Turbo
+// GDI"), and a stat tile's description in its pop-up (250: at most six lines on phones, as the
+// Figma's compact panel, never a scroll). Longer ones end in "…"; the other texts are cut by
+// line (cards-features.css)
+const MAX_CHARS = {
+  figure: 4, unit: 4, value: 16, detail: 250,
+};
 const clipText = (text, max) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
+
+/**
+ * Cuts a run of elements (rich text: paragraphs, lists) to `max` characters in all, at a word
+ * where it can, ending in "…"; elements past the limit, and those left empty, are dropped
+ * @param {Element[]} els
+ * @param {number} max
+ * @returns {Element[]} the elements that remain
+ */
+function clipElements(els, max) {
+  const total = els.reduce((n, el) => n + el.textContent.replace(/\s+/g, ' ').trim().length, 0);
+  if (total <= max) return els;
+  let left = max;
+  els.forEach((el) => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const texts = [];
+    while (walker.nextNode()) texts.push(walker.currentNode);
+    texts.forEach((text) => {
+      const value = text.textContent.replace(/\s+/g, ' ');
+      if (left <= 0) {
+        text.remove();
+      } else if (value.trim().length <= left) {
+        left -= value.trim().length;
+      } else {
+        const cut = value.slice(0, Math.max(0, left - 1));
+        const atWord = cut.replace(/\s+\S*$/, '');
+        text.textContent = `${(atWord.length >= left / 2 ? atWord : cut).replace(/[\s.,;:–-]+$/, '')}…`;
+        left = 0;
+      }
+    });
+    [...el.querySelectorAll('*')].reverse().forEach((child) => {
+      if (!child.textContent.trim() && !child.querySelector('img, picture, br')) child.remove();
+    });
+  });
+  return els.filter((el) => el.textContent.trim());
+}
 
 const isHeading = (el) => /^H[1-6]$/.test(el?.tagName || '');
 const isAuthoring = (block) => !!block.closest('[data-aue-resource]')
@@ -83,12 +122,16 @@ function readCard(li, authoring) {
   if (value && !value.children.length) {
     value.textContent = clipText(value.textContent.trim(), MAX_CHARS.value);
   }
+  const copy = detail.filter((el) => el !== detailTitle);
   return {
     li,
     img,
     name,
     eyebrow: eyebrow?.textContent.trim() || '',
-    body: detail.filter((el) => el !== detailTitle),
+    // a stat tile's description, as its pop-up shows it: a copy cut to MAX_CHARS.detail
+    body: stat && !authoring
+      ? clipElements(copy.map((el) => el.cloneNode(true)), MAX_CHARS.detail)
+      : copy,
   };
 }
 
@@ -259,6 +302,46 @@ function decorateProgress(block, ul) {
 }
 
 /**
+ * Stat tiles, more than four: a light arrow at each end of the row, shown only while there is
+ * more that way (and only while the row scrolls at all). A click moves on a view: the four
+ * tiles across on desktop, a page of four on phones (the row's width and one gap)
+ * @param {Element} block
+ * @param {HTMLUListElement} ul
+ */
+function wireRailArrows(block, ul) {
+  const arrow = (dir, label) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `ft-rail-arrow ft-rail-${dir}`;
+    button.setAttribute('aria-label', label);
+    button.hidden = true;
+    block.append(button);
+    return button;
+  };
+  const prev = arrow('prev', 'Previous');
+  const next = arrow('next', 'Next');
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const room = ul.scrollWidth - ul.clientWidth;
+    const at = Math.abs(ul.scrollLeft);
+    prev.hidden = room <= 1 || at <= 1;
+    next.hidden = room <= 1 || at >= room - 1;
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  const move = (dir) => {
+    const gap = parseFloat(getComputedStyle(ul).columnGap) || 0;
+    const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    ul.scrollBy({ left: dir * (block.clientWidth + gap), behavior: smooth ? 'smooth' : 'auto' });
+  };
+  prev.addEventListener('click', () => move(-1));
+  next.addEventListener('click', () => move(1));
+  ul.addEventListener('scroll', schedule, { passive: true });
+  new ResizeObserver(schedule).observe(ul);
+  update();
+}
+
+/**
  * A row that scrolls sideways follows a mouse drag (touch and trackpads scroll it natively).
  * While dragged it does not snap; let go, it eases to the nearest stop, or the next one in the
  * drag's direction after a short flick. A drag does not open the tile it ends on
@@ -356,6 +439,7 @@ export default function decorateFeatures(block, ul) {
     splitSectionFigure(block);
     playSectionVideos(block);
     wireDragScroll(ul);
+    if (items.length > 4) wireRailArrows(block, ul);
   }
   if (!authoring && !block.classList.contains('is-stats')) decorateProgress(block, ul);
   // in Universal Editor every card stays selectable: no dialog to cover the canvas
