@@ -192,6 +192,43 @@ function splitSectionFigure(block) {
 }
 
 /**
+ * Performance: a video authored in the section's picture place (a Video block, or a video in
+ * its text) plays as its background, as the picture: muted, looping, inline, without
+ * controls (cards-features.css sets it over the section). A video the Video block adds later
+ * is caught as it comes. With reduced motion it stays on its first frame
+ * @param {Element} block
+ */
+function playSectionVideos(block) {
+  const section = block.closest('.section');
+  if (!section) return;
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const asBackground = (video) => {
+    if (video.closest('.cards') || video.dataset.ftBackground) return;
+    video.dataset.ftBackground = 'true';
+    video.controls = false;
+    video.removeAttribute('controls');
+    video.muted = true;
+    video.defaultMuted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('aria-hidden', 'true');
+    video.tabIndex = -1;
+    video.disablePictureInPicture = true;
+    if (still) {
+      video.autoplay = false;
+      video.pause();
+      return;
+    }
+    video.autoplay = true;
+    video.play()?.catch(() => {});
+  };
+  section.querySelectorAll('video').forEach(asBackground);
+  new MutationObserver(() => section.querySelectorAll('video').forEach(asBackground))
+    .observe(section, { childList: true, subtree: true });
+}
+
+/**
  * Image cards: a row of dashes under the rail, one per card, the one for the rail's
  * position marked (as the source's .tech-progress). Decorative: the cards stay reachable
  * by scroll, swipe and Tab.
@@ -317,6 +354,7 @@ export default function decorateFeatures(block, ul) {
   block.classList.toggle('is-stats', items.length > 0 && items.every((li) => li.classList.contains('is-stat')));
   if (!authoring && block.classList.contains('is-stats')) {
     splitSectionFigure(block);
+    playSectionVideos(block);
     wireDragScroll(ul);
   }
   if (!authoring && !block.classList.contains('is-stats')) decorateProgress(block, ul);

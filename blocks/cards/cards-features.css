@@ -1248,6 +1248,37 @@ main > .section:has(.cards.features.is-stats) {
      content overflow (reduced motion, Universal Editor), or it widens the page */
   overflow: clip;
 
+  /* a Video block authored in the picture's place: behind everything, as the picture (2% above,
+     8% beyond each side, 14% below), whatever the block's own markup; its video covers it */
+  > :not(.default-content-wrapper, .cards-wrapper):has(video) {
+    position: absolute;
+    inset: -2% -8% -14%;
+    z-index: -1;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  > :not(.default-content-wrapper, .cards-wrapper):has(video) :has(video),
+  > .default-content-wrapper > :has(video):not(:has(strong, a)) :has(video) {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    aspect-ratio: auto;
+  }
+
+  > :not(.cards-wrapper) video {
+    display: block;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+    object-position: 50% 100%;
+  }
+
   > .default-content-wrapper {
     display: grid;
     grid-template-columns: auto auto 1fr auto;
@@ -1279,6 +1310,14 @@ main > .section:has(.cards.features.is-stats) {
       height: 100%;
       object-fit: cover;
       object-position: 50% 100%;
+    }
+
+    /* a video in the text, in the picture's place: the same (cards-features.js makes it a
+       muted, looping background without controls) */
+    > :has(video):not(:has(strong, a)) {
+      position: absolute;
+      inset: -2% -8% -14%;
+      z-index: -1;
     }
 
     /* the figure (a bold paragraph, or a bare <strong> as Universal Editor publishes it): number
