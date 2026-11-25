@@ -768,8 +768,6 @@ body:has([data-aue-resource]) footer .footer {
   overflow: hidden;
 }
 
-/* Universal Editor: a section sized from the screen by its block's own rule, which outranks the
-   reset above (Social Deck strip: min-height 100svh on phones) */
 body:has([data-aue-resource]) main > .section:has(.social-deck.strip) {
   min-height: auto;
 }
