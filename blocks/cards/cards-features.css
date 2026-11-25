@@ -536,7 +536,11 @@
     margin: 0;
     padding: 0;
     border: 0;
+
+    /* clip, not hidden: nothing can scroll it (Safari scrolled it to the close button as the
+       phone sheet rose, which shifted the sheet up, then back down) */
     overflow: hidden;
+    overflow: clip;
     overscroll-behavior: contain;
     background: none;
     color: var(--ft-ink);
@@ -741,9 +745,14 @@
     object-fit: cover;
   }
 
+  /* one line, then "…": a long name never pushes the arrow out of the panel */
   .ft-next-label {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
     font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-weight: var(--font-weight-medium, 500);
     text-transform: capitalize;
   }
@@ -772,7 +781,8 @@
     max-height: calc(100% - 24px);
     padding-bottom: env(safe-area-inset-bottom, 0);
     border-radius: 24px 24px 0 0;
-    overflow-y: auto;
+    overflow: hidden;
+    overflow: clip;
     background: rgb(255 255 255 / 35%);
     clip-path: none;
     backdrop-filter: blur(50px);
@@ -817,11 +827,14 @@
     background: none;
   }
 
+  /* the copy scrolls in the panel when it is long (its picture, close and "next" stay put) */
   &.is-stats .ft-body {
     display: block;
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
     padding: 18px 20px 16px;
-    overflow: visible;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   &.is-stats .ft-media[hidden] + .ft-body {
@@ -838,9 +851,13 @@
     -webkit-line-clamp: 3;
   }
 
+  /* all of it (it scrolls), not cut after six or eight lines */
   &.is-stats .ft-detail-text {
+    display: block;
     max-width: none;
     margin-top: 10px;
+    overflow: visible;
+    -webkit-line-clamp: unset;
     font-size: 14px;
     font-weight: var(--font-weight-medium, 500);
     line-height: 20px;
@@ -927,6 +944,13 @@
       display: flex;
       justify-content: flex-start;
       gap: calc(30.45 * var(--ft-u, 1px));
+    }
+
+    /* a tile at most a third of the row: a very long label wraps (two lines, then "…") rather
+       than stretch its tile across the row, as with two or three tiles (the usual tiles are
+       narrower, 216 to 298 at 1280) */
+    &.is-stats .card-list > .ft-card.is-stat {
+      max-width: calc((100cqi - 2 * 30.45 * var(--ft-u, 1px)) / 3);
     }
 
     /* more than four tiles (the rail, above): four across the row, each a quarter of it (as
