@@ -1132,6 +1132,15 @@ body.combat-motion main > .section:has(.tabs.vertical):not(.is-current, .is-arri
   background: linear-gradient(to right, rgb(252 253 252 / 0%), #fcfdfc 45%);
 }
 
+/* phones and tablets: its chevron 16px in (36px from the screen's edge, as the FAQ's "+"),
+   clear of the site's section navigation fixed at the right; the fade still reaches the end */
+@media (width < 900px) {
+  .tabs.faq > .tabs-scroll-next {
+    width: 56px;
+    padding-inline-end: 16px;
+  }
+}
+
 .tabs.faq > .tabs-scroll-prev {
   inset-inline-start: 0;
   justify-content: flex-start;
