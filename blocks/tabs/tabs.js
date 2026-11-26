@@ -418,6 +418,10 @@ export default async function decorate(block) {
     if (imageCell?.querySelector('picture, img')) imageCell.classList.add('tabs-panel-image');
     else if (imageCell && !editing) imageCell.remove();
 
+    if (editing && block.classList.contains('faq') && row.dataset.aueModel === 'tab') {
+      row.dataset.aueModel = 'tab-faq';
+    }
+
     row.className = 'tabs-panel';
     row.id = `tabpanel-${id}`;
     row.setAttribute('role', 'tabpanel');
