@@ -288,6 +288,10 @@ export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const items = [...block.children].map(buildItem);
 
+  if (!editing && !block.classList.contains('dark')) {
+    block.closest('main > .section:is(.faq-columns, .faq-center)')?.classList.add('no-snap');
+  }
+
   // texts over their limit (MAX_CHARS): shortened, and listed for the author in the editor
   const tooLong = [];
   items.forEach((details, i) => {
