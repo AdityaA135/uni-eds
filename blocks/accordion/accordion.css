@@ -442,13 +442,13 @@ body.combat-motion main > .section:has(.accordion):not([data-arrive='up']) .acco
 
 /* the hidden state last, so it wins over the transitions above (no transition: it is
    taken off screen) */
-body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving) > .default-content-wrapper > * {
+body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving, .no-snap) > .default-content-wrapper > * {
   opacity: 0;
   translate: 0 70px;
   transition: none;
 }
 
-body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving) .accordion > .accordion-item {
+body.combat-motion main > .section:has(.accordion):not(.is-current, .is-arriving, .no-snap) .accordion > .accordion-item {
   opacity: 0;
   translate: 0 60px;
   transition: none;
@@ -477,18 +477,6 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
     max-width: none;
     margin: 0;
     padding: 0;
-  }
-
-  /* the list scrolls inside the screen-tall section when it does not fit */
-  > :is(.accordion-wrapper, .tabs-wrapper) {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
-  }
-
-  > :is(.accordion-wrapper, .tabs-wrapper)::-webkit-scrollbar {
-    display: none;
   }
 
   > .default-content-wrapper {
@@ -636,10 +624,6 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
     align-items: start;
     column-gap: 64px;
     padding: calc(max(96px, var(--nav-offset, 0px) + 32px) + var(--faq-top-extra)) 64px 64px;
-
-    > :is(.accordion-wrapper, .tabs-wrapper) {
-      max-height: 100%;
-    }
 
     /* 17.58 from the eyebrow to the title; 31.19 from the description to the button (its
        paragraph as tall as the button) */
@@ -950,4 +934,9 @@ main > .section.light .block.accordion:not(.dark) {
       transition: none;
     }
   }
+}
+
+main > .section.no-snap .block.accordion:not(.dark) {
+  max-height: none;
+  overflow-y: visible;
 }
