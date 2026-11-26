@@ -23,7 +23,8 @@
       "session",
       "photo-gallery",
       "infosys-footer",
-      "accordion"
+      "accordion",
+      "tabs-faq"
     ]
   },
   {
@@ -276,6 +277,12 @@
     "id": "tabs",
     "components": [
       "tab",
+      "tab-faq"
+    ]
+  },
+  {
+    "id": "tabs-faq",
+    "components": [
       "tab-faq"
     ]
   }
