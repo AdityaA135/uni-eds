@@ -10,6 +10,7 @@ import {
 import { decorateRichtext } from './editor-support-rte.js';
 import { decorateButtons, decorateMain } from './scripts.js';
 import { decorateSectionStyles, normalizeSectionStyles } from './utils/section-styles.js';
+import fixEditorViewport from './utils/editor-viewport.js';
 
 /**
  * Re-runs the section-style scripts (e.g. the blog article's contents and
@@ -126,6 +127,7 @@ function attachEventListeners(main) {
   }));
 }
 
+fixEditorViewport();
 attachEventListeners(document.querySelector('main'));
 
 // decorate rich text
