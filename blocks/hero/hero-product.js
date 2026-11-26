@@ -322,11 +322,17 @@ export default function decorateProduct(block, {
   buy.className = 'product-buy';
   const priceLines = [...textCell.querySelectorAll(':scope > p.subtext')];
   priceLines.forEach((p) => {
-    p.classList.add('product-price');
     if (!inEditor()) p.querySelectorAll('strong, b').forEach(raiseFootnoteMark);
   });
+  let price = null;
+  if (priceLines.length) {
+    price = document.createElement('div');
+    price.className = 'product-price';
+    priceLines[0].before(price);
+    price.append(...priceLines);
+  }
   const cta = textCell.querySelector(':scope > .cta-wrapper');
-  const buyParts = [...priceLines, cta].filter(Boolean);
+  const buyParts = [price, cta].filter(Boolean);
   if (buyParts.length) {
     buyParts[0].before(buy);
     buy.append(...buyParts);
