@@ -55,31 +55,36 @@ main > .section.light.cards-container:has(.cards.carousel) {
     }
   }
 
-  .brochure-toggle {
+  .brochure-toggle,
+  > .default-content-wrapper p > a[href*="brochure"]:only-child:any-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
+    box-sizing: border-box;
     max-width: 100%;
-    min-height: 44px;
-    padding: 0;
+    height: 48px;
+    min-height: 0;
+    padding: 0 20px;
     border: 0;
-    background: none;
+    border-radius: 12px;
+    background-color: #111;
     font-family: var(--font-family-base);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: var(--font-weight-medium);
     letter-spacing: 0.02em;
+    text-decoration: none;
     text-transform: uppercase;
     white-space: nowrap;
-    color: inherit;
-    opacity: 0.7;
+    color: #fff;
+    opacity: 1;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: background-color 0.25s;
 
     &::before {
       content: '';
       flex: 0 0 auto;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       background-color: currentcolor;
       mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v12m0 0 5-5m-5 5-5-5M4 21h16'/%3E%3C/svg%3E") center / contain no-repeat;
     }
@@ -87,11 +92,19 @@ main > .section.light.cards-container:has(.cards.carousel) {
     &:hover,
     &:focus-visible,
     &[aria-expanded="true"] {
+      background-color: #2e2e2e;
+      color: #fff;
       opacity: 1;
     }
 
-    @media (width >= 600px) {
-      min-height: 0;
+    &:focus-visible {
+      outline: 2px solid #111;
+      outline-offset: 2px;
+    }
+
+    @media (width < 600px) {
+      gap: 8px;
+      padding: 0 16px;
     }
   }
 
@@ -122,11 +135,7 @@ main > .section.light.cards-container:has(.cards.carousel) {
       opacity 0.2s,
       visibility 0s 0.35s;
 
-    @media (width >= 600px) {
-      bottom: calc(100% - 4px);
-    }
-
-    a:any-link {
+    :where(a:any-link) {
       display: flex;
       align-items: center;
       gap: 12px;
