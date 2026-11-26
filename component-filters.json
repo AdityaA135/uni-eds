@@ -275,7 +275,8 @@
   {
     "id": "tabs",
     "components": [
-      "tab"
+      "tab",
+      "tab-faq"
     ]
   }
 ]
