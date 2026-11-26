@@ -938,6 +938,12 @@ main > .section.light .block.accordion:not(.dark) {
     }
   }
 
+  @media (width >= 900px) {
+    .accordion-item-label {
+      padding-inline-end: 24px;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .accordion-item-label,
     .accordion-item-icon {
