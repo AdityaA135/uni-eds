@@ -149,6 +149,7 @@ function buildDialog(stats) {
   const dialog = document.createElement('dialog');
   dialog.className = 'ft-detail';
   dialog.setAttribute('aria-labelledby', titleId);
+  dialog.tabIndex = -1;
   const close = '<button type="button" class="ft-close" aria-label="Close" autofocus><span class="ft-close-icon" aria-hidden="true"></span></button>';
   const media = '<div class="ft-media"><div class="ft-media-pic"></div></div>';
   const body = `<div class="ft-body"${stats ? ' aria-live="polite"' : ''}>
@@ -211,12 +212,57 @@ function clipTo(panel, card, radius) {
  * (cards-features.css). Anything else is left as authored.
  * @param {Element} block the cards block (stat tiles)
  */
+function fitToLines(el) {
+  if (!el || el.children.length || el.dataset.ftFit) return;
+  const full = el.textContent.replace(/\s+/g, ' ').trim();
+  if (!full) return;
+  el.dataset.ftFit = 'true';
+  const words = full.split(' ');
+  let width = -1;
+  const fit = () => {
+    el.classList.remove('ft-fit');
+    el.textContent = full;
+    const lines = parseInt(getComputedStyle(el).webkitLineClamp, 10);
+    if (!lines) return;
+    el.classList.add('ft-fit');
+    const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+    const fits = () => el.getBoundingClientRect().height <= lineHeight * lines + 0.5;
+    if (fits()) return;
+    let lo = 1;
+    let hi = words.length - 1;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      el.textContent = `${words.slice(0, mid).join(' ')}…`;
+      if (fits()) lo = mid;
+      else hi = mid - 1;
+    }
+    el.textContent = `${words.slice(0, lo).join(' ').replace(/[\s.,;:–-]+$/, '')}…`;
+  };
+  const refit = () => {
+    const now = el.parentElement?.clientWidth ?? 0;
+    if (now === width) return;
+    width = now;
+    fit();
+  };
+  if (el.parentElement) {
+    new ResizeObserver(() => requestAnimationFrame(refit)).observe(el.parentElement);
+  }
+  const again = () => {
+    width = -1;
+    refit();
+  };
+  document.fonts?.ready.then(again);
+  document.fonts?.addEventListener?.('loadingdone', again);
+  refit();
+}
+
 function splitSectionFigure(block) {
   const content = block.closest('.section')?.querySelector(':scope > .default-content-wrapper');
   const holder = content && [...content.children]
     .find((el) => isBoldLine(el) || /^(STRONG|B)$/.test(el.tagName));
   const figure = holder?.matches('strong, b') ? holder : holder?.querySelector('strong, b');
   if (!figure || figure.children.length) return;
+  fitToLines(holder.nextElementSibling);
   const match = figure.textContent.trim().match(/^([\d.,]+)\s+(\S.*)$/);
   if (!match) {
     figure.textContent = clipText(figure.textContent.trim(), MAX_CHARS.figure + MAX_CHARS.unit + 1);
@@ -437,6 +483,7 @@ export default function decorateFeatures(block, ul) {
   block.classList.toggle('is-stats', items.length > 0 && items.every((li) => li.classList.contains('is-stat')));
   if (!authoring && block.classList.contains('is-stats')) {
     splitSectionFigure(block);
+    ul.querySelectorAll('.ft-card.is-stat .ft-line').forEach(fitToLines);
     playSectionVideos(block);
     wireDragScroll(ul);
     if (items.length > 4) wireRailArrows(block, ul);
@@ -455,6 +502,7 @@ export default function decorateFeatures(block, ul) {
   const buttons = [];
   let current = 0;
   let opener = 0;
+  let byPointer = false;
   let closing = false;
   let swapping = false;
   let running = [];
@@ -585,6 +633,7 @@ export default function decorateFeatures(block, ul) {
     // Safari may scroll the dialog to the close button while the sheet is still below the
     // screen (the CSS clips it, so it cannot; older Safari: put it back)
     dialog.scrollTop = 0;
+    if (byPointer) dialog.focus({ preventScroll: true });
     if (!motion.matches) return;
     if (stats) openSheet();
     else openFromCard(cards[i]);
@@ -634,7 +683,12 @@ export default function decorateFeatures(block, ul) {
     swapping = false;
     document.documentElement.classList.remove(OPEN_CLASS);
     // back to the card that was opened
-    buttons[opener].focus({ preventScroll: true });
+    const back = buttons[opener];
+    if (byPointer) {
+      back.classList.add('is-quiet-focus');
+      back.addEventListener('blur', () => back.classList.remove('is-quiet-focus'), { once: true });
+    }
+    back.focus({ preventScroll: true, focusVisible: !byPointer });
   });
   parts.close.addEventListener('click', requestClose);
   parts.back.addEventListener('click', requestClose);
@@ -648,12 +702,14 @@ export default function decorateFeatures(block, ul) {
     button.setAttribute('aria-label', `More about ${card.name}`);
     button.innerHTML = '<span class="ft-open-icon" aria-hidden="true"></span>';
     buttons[i] = button;
+    button.addEventListener('keydown', () => button.classList.remove('is-quiet-focus'));
     // a stat tile's "+" follows its value; an image card's sits in its corner
     const statTitle = card.li.classList.contains('is-stat') && card.li.querySelector('.ft-title');
     (statTitle || card.li).append(button);
     // the whole card opens it; a key press on the button reaches here as a click too
     card.li.addEventListener('click', (e) => {
       if (e.target.closest('a')) return;
+      byPointer = e.detail > 0;
       open(i);
     });
     // the larger picture starts loading as the pointer or focus reaches the card

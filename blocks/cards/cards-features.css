@@ -208,6 +208,10 @@
     outline-offset: 2px;
   }
 
+  .ft-open.is-quiet-focus:focus-visible {
+    outline: none;
+  }
+
   .ft-open:hover,
   .ft-card:hover .ft-open {
     background: rgb(20 20 20 / 62%);
@@ -377,23 +381,29 @@
     height: 1.5px;
   }
 
+  .ft-card.is-stat .ft-open:focus {
+    outline: none;
+  }
+
   .ft-card.is-stat:hover .ft-open,
-  .ft-card.is-stat .ft-open:focus-visible {
+  .ft-card.is-stat .ft-open:focus-visible:not(.is-quiet-focus) {
     background: rgb(255 255 255 / 30%);
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 60%);
   }
 
+  .ft-card.is-stat .ft-line.ft-fit {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+  }
+
   .ft-card.is-stat:hover .ft-line,
-  .ft-card.is-stat:has(.ft-open:focus-visible) .ft-line {
+  .ft-card.is-stat:has(.ft-open:focus-visible:not(.is-quiet-focus)) .ft-line {
     opacity: 0.85;
   }
 
   /* the focus ring goes round the whole tile, as on the source */
-  .ft-card.is-stat .ft-open:focus-visible {
-    outline: none;
-  }
-
-  .ft-card.is-stat:has(.ft-open:focus-visible) {
+  .ft-card.is-stat:has(.ft-open:focus-visible:not(.is-quiet-focus)) {
     outline: 2px solid rgb(255 255 255 / 60%);
     outline-offset: 8px;
   }
@@ -602,6 +612,10 @@
 
   .ft-detail::backdrop {
     background: none;
+  }
+
+  .ft-detail:focus {
+    outline: none;
   }
 
   .ft-back {
@@ -1429,6 +1443,12 @@ main > .section:has(.cards.features.is-stats) {
         overflow: clip;
         overflow-clip-margin: 0.07em;
       }
+    }
+
+    > :is(p:has(> strong:only-child), strong) + p.ft-fit {
+      display: block;
+      overflow: visible;
+      -webkit-line-clamp: unset;
     }
 
     /* the tag line: desktop only, as the source */
