@@ -59,6 +59,7 @@ main > .section.hero-container .hero-wrapper .hero.product {
       'logo' auto
       'title' auto
       '.' 1fr
+      'price' auto
       'film' auto
       'buy' auto
       / minmax(0, 1fr);
@@ -114,26 +115,32 @@ main > .section.hero-container .hero-wrapper .hero.product {
     display: none;
   }
 
+  /* phones and tablets: the price above the film card, the button below it (the price and
+     the button share a row from 900px) */
   .product-buy {
+    display: contents;
+  }
+
+  .product-buy .cta-wrapper {
     grid-area: buy;
     position: relative;
     z-index: 4;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 24px;
+    width: auto;
+    margin: 0;
   }
 
-  /* the price line: hidden on small screens, as on the launch page */
+  /* the price line: left, above the film card, as the launch page on phones */
   .product-price {
-    display: none;
-    margin: 0;
+    grid-area: price;
+    position: relative;
+    z-index: 4;
+    margin: 0 0 14px;
     font-family: var(--font-family-base);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: var(--font-weight-semibold);
     line-height: 1.3;
     letter-spacing: 0.045em;
-    text-align: end;
+    text-align: start;
     text-transform: uppercase;
     color: rgb(255 255 255 / 72%);
     text-shadow: 0 1px 16px rgb(0 0 0 / 30%);
@@ -141,9 +148,9 @@ main > .section.hero-container .hero-wrapper .hero.product {
 
     strong {
       display: block;
-      margin-top: 4px;
+      margin-top: 3px;
       font-family: var(--font-family-display);
-      font-size: 18px;
+      font-size: 20px;
       font-weight: var(--font-weight-regular);
       line-height: 1;
       letter-spacing: -0.01em;
@@ -157,11 +164,6 @@ main > .section.hero-container .hero-wrapper .hero.product {
       font-size: 0.55em;
       vertical-align: top;
     }
-  }
-
-  .product-buy .cta-wrapper {
-    width: auto;
-    margin: 0;
   }
 
   .product-buy .cta.button {
@@ -266,13 +268,18 @@ main > .section.hero-container .hero-wrapper .hero.product {
     letter-spacing: 0.045em;
     text-transform: uppercase;
     color: var(--product-ink-soft);
+
+    /* the heading stays on one line at every width */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .product-film-text {
     /* stylelint-disable-next-line value-no-vendor-prefix */
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
     overflow: hidden;
     font-size: 13px;
     line-height: 1.4;
@@ -375,19 +382,29 @@ main > .section.hero-container .hero-wrapper .hero.product {
     }
 
     .product-film-text {
-      display: block;
       font-size: 14px;
       line-height: 1.45;
     }
 
     .product-buy {
+      grid-area: buy;
+      position: relative;
+      z-index: 4;
+      display: flex;
       flex-direction: row;
       align-items: center;
       justify-self: end;
+      gap: 24px;
     }
 
     .product-price {
-      display: block;
+      margin: 0;
+      text-align: end;
+
+      strong {
+        margin-top: 4px;
+        font-size: 21px;
+      }
     }
 
     .product-buy .cta.button {
