@@ -940,7 +940,7 @@ main > .section.light .block.accordion:not(.dark) {
 
   @media (width >= 900px) {
     .accordion-item-label {
-      padding-inline-end: 24px;
+      padding-inline-end: 40px;
     }
   }
 
