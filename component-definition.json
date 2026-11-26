@@ -635,6 +635,21 @@
               }
             }
           }
+        },
+        {
+          "title": "FAQ Tab",
+          "id": "tab-faq",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "FAQ Tab",
+                  "model": "tab-faq"
+                }
+              }
+            }
+          }
         }
       ]
     }
