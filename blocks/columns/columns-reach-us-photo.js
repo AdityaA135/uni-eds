@@ -222,6 +222,79 @@ function wireArrival(block, cell, video) {
 /**
  * @param {Element} block the .columns.reach-us.photo block
  */
+const SOCIAL = [
+  [/(^|\.)facebook\.com$/i, 'facebook', 'Facebook'],
+  [/(^|\.)instagram\.com$/i, 'instagram', 'Instagram'],
+  [/(^|\.)(x|twitter)\.com$/i, 'x', 'X'],
+  [/(^|\.)linkedin\.com$/i, 'linkedin', 'LinkedIn'],
+  [/(^|\.)(youtube\.com|youtu\.be)$/i, 'youtube', 'YouTube'],
+];
+
+const socialOf = (a) => {
+  let host = '';
+  try {
+    host = new URL(a.href).hostname;
+  } catch (e) {
+    return null;
+  }
+  return SOCIAL.find(([re]) => re.test(host)) || null;
+};
+
+function decorateFoldLinks(cell) {
+  const label = cell.querySelector(':scope > :is(h1, h2, h3, h4, h5, h6)')
+    || [...cell.children].find((el) => el.matches('p') && !el.querySelector('a'));
+  label?.classList.add('reach-us-photo-label');
+  const links = [...cell.querySelectorAll('a[href]')];
+  if (links.length && links.every((a) => socialOf(a))) {
+    cell.classList.add('reach-us-photo-connect');
+    links.forEach((a) => {
+      const [, platform, name] = socialOf(a);
+      a.classList.add('reach-us-photo-social');
+      a.dataset.platform = platform;
+      a.setAttribute('aria-label', a.textContent.trim() || name);
+      a.classList.remove('button');
+    });
+    return;
+  }
+  links.forEach((a) => a.classList.remove('button'));
+}
+
+function gatherFoldFooter(block) {
+  const section = block.closest('.section');
+  const wrapper = block.closest('.columns-wrapper');
+  if (!section || !wrapper || inEditor()) return;
+  if (section.querySelector(':scope > .reach-us-photo-fold-footer')) return;
+  const parts = [];
+  for (let el = wrapper.nextElementSibling; el; el = el.nextElementSibling) parts.push(el);
+  if (!parts.length) return;
+
+  const footer = document.createElement('div');
+  footer.className = 'reach-us-photo-footer reach-us-photo-fold-footer';
+  parts.forEach((el) => {
+    el.classList.remove('reach-us-foot');
+    footer.append(el);
+  });
+
+  footer.querySelectorAll('.columns-wrapper').forEach((links) => {
+    links.classList.add('reach-us-photo-links');
+    links.querySelectorAll('.columns > div > div').forEach((cell) => {
+      decorateFoldLinks(cell);
+      cell.classList.add('reach-us-photo-item');
+    });
+  });
+  footer.querySelectorAll(':scope > .default-content-wrapper').forEach((text) => {
+    text.classList.add('reach-us-photo-legal', 'reach-us-photo-item');
+    const last = text.lastElementChild;
+    const link = last?.querySelector('a[href]');
+    if (link && last.textContent.trim() === link.textContent.trim()) {
+      last.classList.add('reach-us-photo-privacy');
+      link.classList.remove('button');
+    }
+  });
+  section.append(footer);
+  document.body.classList.add('has-reach-us-photo-fold');
+}
+
 export default function decorate(block) {
   const cell = findBackdropCell(block);
   if (!cell || cell.classList.contains('reach-us-backdrop')) return;
@@ -255,4 +328,5 @@ export default function decorate(block) {
   }
 
   wireArrival(block, cell, video);
+  gatherFoldFooter(block);
 }
