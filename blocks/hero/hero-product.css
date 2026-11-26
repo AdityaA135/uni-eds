@@ -139,8 +139,10 @@ main > .section.hero-container .hero-wrapper .hero.product {
     justify-content: center;
     align-items: flex-start;
     justify-self: start;
+    flex: none;
     gap: 3px;
     box-sizing: border-box;
+    max-width: 100%;
     margin: 0 0 14px;
     padding: 9px 14px;
     border-radius: 12px;
@@ -155,6 +157,21 @@ main > .section.hero-container .hero-wrapper .hero.product {
     text-transform: uppercase;
     color: rgb(255 255 255 / 75%);
     opacity: 1;
+
+    > p {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      max-width: 100%;
+      margin: 0;
+      font: inherit;
+      letter-spacing: inherit;
+      text-align: inherit;
+      text-transform: inherit;
+      text-shadow: none;
+      color: inherit;
+    }
 
     strong {
       display: block;
@@ -380,7 +397,7 @@ main > .section.hero-container .hero-wrapper .hero.product {
     .product-film {
       justify-self: start;
       box-sizing: border-box;
-      width: min(460px, 40vw);
+      width: min(460px, 40vw, 100%);
       gap: 18px;
       margin-bottom: 0;
       padding: 8px 22px 8px 8px;
@@ -401,19 +418,21 @@ main > .section.hero-container .hero-wrapper .hero.product {
       position: relative;
       z-index: 4;
       display: flex;
-      flex-direction: row;
+      flex-flow: row wrap;
+      justify-content: flex-end;
       align-items: center;
       justify-self: end;
       gap: 12px;
+      max-width: 100%;
     }
 
     .product-price {
-      height: 60px;
+      min-height: 60px;
       margin: 0;
-      padding: 0 20px;
+      padding: 8px 20px;
 
       @media (width < 1200px) {
-        padding: 0 16px;
+        padding: 8px 16px;
 
         strong {
           font-size: 22px;
