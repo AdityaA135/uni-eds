@@ -679,7 +679,7 @@ main:has(.hero.product) > .section:last-of-type:not(:has([data-block-name])) {
         opacity 0.2s,
         visibility 0s 0.35s;
 
-      a:any-link {
+      :where(a:any-link) {
         display: flex;
         align-items: center;
         gap: 12px;
@@ -756,9 +756,7 @@ main:has(.hero.product) > .section:last-of-type:not(:has([data-block-name])) {
         mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v12m0 0 5-5m-5 5-5-5M4 21h16'/%3E%3C/svg%3E") center / contain no-repeat;
       }
 
-      &:hover,
-      &:focus-visible,
-      &[aria-expanded='true'] {
+      &:where(:hover, :focus-visible, [aria-expanded='true']) {
         opacity: 1;
       }
     }
