@@ -772,6 +772,11 @@ body:has([data-aue-resource]) main > .section:has(.social-deck.strip) {
   min-height: auto;
 }
 
+body:has([data-aue-resource]) main .hero-wrapper > .hero {
+  max-height: 1800px !important;
+  overflow: clip !important;
+}
+
 @media (width >= 900px) {
   body:has([data-aue-resource]) main > .section:has(> .related-blogs-wrapper > .related-blogs:is(.left, .news)) {
     padding-top: calc(116 * var(--rbn-u));
