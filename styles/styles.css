@@ -772,6 +772,17 @@ body:has([data-aue-resource]) main > .section:has(.social-deck.strip) {
   min-height: auto;
 }
 
+@media (width >= 900px) {
+  body:has([data-aue-resource]) main > .section:has(> .related-blogs-wrapper > .related-blogs:is(.left, .news)) {
+    padding-top: calc(116 * var(--rbn-u));
+  }
+
+  body:has([data-aue-resource]) main > .section:has(.columns.reach-us.photo) {
+    --reach-us-pad-top: max(96px, 102 * var(--ru));
+    --reach-us-pad-bottom: 0px;
+  }
+}
+
 /* stops the footer's aspect-ratio widening the editor canvas */
 body:has([data-aue-resource]) footer .footer {
   aspect-ratio: auto;
