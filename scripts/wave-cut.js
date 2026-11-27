@@ -1,23 +1,3 @@
-/*
- * "Wave In" section style: when the section snap moves between two neighbouring
- * sections and the lower one has the style, the move plays as a cut: the upper
- * section holds still while the lower one is revealed from the bottom up behind
- * a soft, drifting wave edge. Moving up plays it in reverse.
- *
- * Optional tuning, read from CSS custom properties (unitless numbers; all unset by default, which
- * keeps the plain cut above). A page theme sets them, e.g. styles/theme-combat.css:
- *   on the upper section (the one being covered):
- *     --wave-sink       its full-bleed media (or, without any, its content) sinks this share of
- *                       the screen height as it is covered
- *     --wave-sink-zoom  ... and zooms in by this share (default 0.03 once --wave-sink is set)
- *     --wave-fade-out   its copy fades out early in the move, drifting this many px (negative:
- *                       up); 0 fades without moving
- *   on the lower section (the one revealed):
- *     --wave-settle     its photo settles from this share of the screen height, early in the move
- *                       (instead of with the edge)
- *     --wave-rise       px its content rises from (default 16)
- */
-
 const STYLE = 'wave-in';
 // the edge's reveal window (of the move's time) and its travel (of the screen height)
 const EDGE_START = 0;
@@ -29,6 +9,8 @@ const RISE_PX = 16;
 const HERO_ZOOM = 0.025;
 // longest a move can take before the cut gives up (the snap tween is 1.2s)
 const MAX_MS = 3000;
+// px each section paints past its edges while held, so a subpixel gap (Firefox) shows no line
+const SEAM_PX = 4;
 
 // full-bleed media: settled rather than risen
 const PHOTO = [
@@ -140,6 +122,9 @@ function applyMask(el) {
   el.style.webkitMaskRepeat = 'repeat-x';
   el.style.maskSize = size;
   el.style.webkitMaskSize = size;
+  // the mask reaches past the box too, so the seam fill (box-shadow) isn't cut off
+  el.style.maskClip = 'no-clip';
+  el.style.webkitMaskClip = 'no-clip';
 }
 
 // edge: px from the top of the screen; roll: the wave's sideways drift
@@ -150,8 +135,8 @@ function moveMask(el, edge, roll, width, height) {
 }
 
 function clearMask(el) {
-  ['maskImage', 'webkitMaskImage', 'maskRepeat', 'webkitMaskRepeat', 'maskSize',
-    'webkitMaskSize', 'maskPosition', 'webkitMaskPosition'].forEach((k) => { el.style[k] = ''; });
+  ['maskImage', 'webkitMaskImage', 'maskRepeat', 'webkitMaskRepeat', 'maskSize', 'webkitMaskSize',
+    'maskPosition', 'webkitMaskPosition', 'maskClip', 'webkitMaskClip'].forEach((k) => { el.style[k] = ''; });
 }
 
 /**
@@ -207,6 +192,13 @@ function releaseAnchoring(els) {
   }));
 }
 
+// a section's own fill, else the page's
+function fillOf(el) {
+  const colour = getComputedStyle(el).backgroundColor;
+  const clear = !colour || colour === 'transparent' || /rgba\(.*,\s*0\)$/.test(colour);
+  return clear ? getComputedStyle(document.documentElement).backgroundColor : colour;
+}
+
 /**
  * Prepares one cut between neighbouring sections.
  * @param {Element} upper
@@ -244,6 +236,9 @@ function createCut(upper, lower, upperRest) {
   holdAnchoring([upper, lower]);
   lower.style.zIndex = '2';
   upper.style.zIndex = '1';
+  // both edges sit on the screen's edges at subpixel offsets: each section's fill covers the seam
+  const seams = [upper, lower].map((el) => [el, el.style.boxShadow]);
+  [upper, lower].forEach((el) => { el.style.boxShadow = `0 0 0 ${SEAM_PX}px ${fillOf(el)}`; });
   const distance = lower.offsetTop - upperRest;
   // measured once: reading layout after the per-frame writes would force a reflow
   const width = lower.clientWidth;
@@ -323,6 +318,7 @@ function createCut(upper, lower, upperRest) {
       el.style.zIndex = '';
     });
     positioned.forEach((el) => { el.style.position = ''; });
+    seams.forEach(([el, shadow]) => { el.style.boxShadow = shadow; });
     clearMask(lower);
     if (photo) photo.style.translate = '';
     items.forEach(({ el }) => {
@@ -377,17 +373,16 @@ export default function initWaveCut(main) {
     const upperRest = upper.classList.contains('scroll-runway')
       ? upper.offsetTop + upper.offsetHeight - window.innerHeight
       : upper.offsetTop;
-    const cut = createCut(upper, lower, upperRest);
     const top = upperRest;
     const distance = lower.offsetTop - top;
-    if (distance <= 0) {
-      cut.clear();
-      return;
-    }
+    const down = b > a;
+    // a move that starts where it ends (already there) would replay the cut: a flash back
+    const at = (window.scrollY - top) / distance;
+    if (distance <= 0 || (down ? at >= 0.99 : at <= 0.01)) return;
+    const cut = createCut(upper, lower, upperRest);
     const started = performance.now();
     // the snap tween's time progress drives the cut (reversed when moving up); it is created
     // just after snap:start, so it's looked up per frame until found
-    const down = b > a;
     let tween = null;
     const draw = () => {
       tween = tween || gsap?.getTweensOf?.(window)?.[0] || null;
@@ -397,7 +392,9 @@ export default function initWaveCut(main) {
       cut.render(p, v);
       if (performance.now() - started > MAX_MS) stop();
     };
-    running = { cut, frame: 0, tick: null };
+    running = {
+      cut, frame: 0, tick: null, lower, width: window.innerWidth, height: lower.offsetHeight,
+    };
     draw();
     if (gsap?.ticker) {
       running.tick = draw;
@@ -411,5 +408,10 @@ export default function initWaveCut(main) {
     }
   });
   document.addEventListener('snap:end', stop);
-  window.addEventListener('resize', stop);
+  // only a real layout change ends a cut: iOS Safari resizes as its bars change, sections (100svh)
+  // keep their size
+  window.addEventListener('resize', () => {
+    if (running && (window.innerWidth !== running.width
+      || running.lower.offsetHeight !== running.height)) stop();
+  });
 }
